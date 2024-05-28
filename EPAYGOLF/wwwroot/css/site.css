@@ -16,3 +16,6 @@ html {
 body {
   margin-bottom: 60px;
 }
+[class*=sidebar-dark-] {
+    background-color: #4a4070;
+}
