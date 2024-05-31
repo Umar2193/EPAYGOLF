@@ -1,0 +1,126 @@
+﻿@{
+	ViewData["Title"] = "VAT Rates";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-edit" style="color:#2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">VAT Rates</span>
+								</h3>
+							<button onclick="AddVATRates()" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-plus"></i>  Add VAT Rates</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div id="tblVATRates">
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		GetVATRatesLists();
+	
+	 });
+	function GetVATRatesLists() {
+        $.ajax({
+			url: "/MetaData/VATRatesList",
+            type: "Get",
+            success: function (result) {
+				$('#tblVATRates').html(result);
+
+            },
+            error: function (result) {
+
+            },
+            beforeSend: function () {
+				$('.preloader').show();
+            },
+            complete: function (result) {
+				$('.preloader').hide();
+            }
+        });
+    }
+	function AddVATRates(ID) {
+
+		$.ajax({
+			url: "/MetaData/AddUpdateVATRates",
+			data: { ID: ID },
+			success: function (result) {
+				$('#LargeModalPopup').modal('show');
+				$('#LargeModalPopupTitle').html("VAT Rates Detail");
+				$('#LargeModalPopupBody').html(result);
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ConfirmDeleteVATRates(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteVATRates(ID);
+				}
+			}
+		});
+	}
+	function DeleteVATRates(ID) {
+		$.ajax({
+			url: "/MetaData/DeleteVATRates",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetVATRatesLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+
+</script>

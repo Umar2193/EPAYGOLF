@@ -1,0 +1,188 @@
+﻿@model Entity.StoresRedeemEntity
+@{
+	ViewData["Title"] = "Redemptions Stores Detail";
+	Layout = null;
+}
+<!-- Content Wrapper. Contains page content -->
+<!-- Main content -->
+<section class="content">
+	<div class="container-fluid">
+		<!-- SELECT2 EXAMPLE -->
+		<div class="card card-default">
+	  <form id="frmstoresredeem">
+			<!-- /.card-header -->
+			<div class="card-body">
+			
+					<input type="hidden" name="StoresRedeemID" id="StoresRedeemID" value="@Model.StoresRedeemID" />
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">StoreNo</label>
+							<div class="col-md-8">
+								
+								<input  value="@Model.StoreNo" required name="StoreNo" type="number" class="form-control" id="StoreNo" placeholder="StoreNo"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="19">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">StoreName</label>
+							<div class="col-md-8">
+								<input value="@Model.StoreName" required name="StoreName" type="text" class="form-control" autocomplete="off" id="StoreName" max="100" placeholder="StoreName">
+							</div>
+						</div>
+					</div>
+					<div class="row col-md-12 mb-3">
+						
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Address1</label>
+							<div class="col-md-8">
+								<textarea name="Address1" id="Address1" class="form-control" rows="3">@Model.Address1</textarea>
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Address2</label>
+							<div class="col-md-8">
+								<textarea name="Address2" id="Address2" class="form-control" rows="3">@Model.Address2</textarea>
+							</div>
+						</div>
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Email</label>
+							<div class="col-md-8">
+								<input value="@Model.Email" name="Email" type="email" class="form-control" autocomplete="off" id="Email" max="200" placeholder="Email">
+							</div>
+						</div>
+						
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">CityTown</label>
+							<div class="col-md-8">
+								<input value="@Model.CityTown" name="CityTown" type="text" class="form-control" autocomplete="off" id="CityTown" max="500" placeholder="CityTown">
+
+							</div>
+						</div>
+
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">PostCode</label>
+							<div class="col-md-8">
+								<input value="@Model.PostCode" name="PostCode" type="text" class="form-control" autocomplete="off" id="CityTown" max="100" placeholder="PostCode">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">UserID</label>
+							<div class="col-md-8">
+
+								<input oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" value="@Model.UserID" name="CityTown" type="number" class="form-control" autocomplete="off" id="UserID" maxlength="20" placeholder="UserID">
+
+							</div>
+						</div>
+
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Title</label>
+							<div class="col-md-8">
+								<input value="@Model.Title" name="Title" type="text" class="form-control" autocomplete="off" id="Title" max="50" placeholder="Title">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">FirstName</label>
+							<div class="col-md-8">
+								<input value="@Model.FirstName" name="FirstName" type="text" class="form-control" autocomplete="off" id="FirstName" max="200" placeholder="FirstName">
+
+							</div>
+						</div>
+
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">LastName</label>
+							<div class="col-md-8">
+								<input value="@Model.LastName" name="LastName" type="text" class="form-control" autocomplete="off" id="LastName" max="200" placeholder="LastName">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">StoreNameUser</label>
+							<div class="col-md-8">
+								<input value="@Model.StoreNameUser" name="StoreNameUser" type="text" class="form-control" autocomplete="off" id="StoreNameUser" max="200" placeholder="StoreNameUser">
+
+							</div>
+						</div>
+
+					</div>
+			
+
+			</div>
+			<!-- /.row -->
+			<div class="card-footer">
+
+				<button style="margin-left:5px;margin-right:5px;float:right;"  type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
+				<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
+			</div>
+			</form>
+		</div>
+		
+		<!-- /.card-body -->
+
+	</div>
+	<!-- /.card -->
+	<!-- /.row -->
+	<!-- /.row -->
+	
+	<!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+<!-- /.content-wrapper -->
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#frmstoresredeem").submit(function (e) {
+			debugger
+			e.preventDefault();
+			SaveRedemptionsStores();
+		});
+
+	});
+	
+	
+
+	function SaveRedemptionsStores() {
+		if ($('#StoreNo').val() == null || $('#StoreNo').val() == ""
+			|| $('#StoreNo').val() == "0") {
+			toastr.error("Please enter StoreNo")
+			return;
+		}
+		if ($('#StoreName').val() == null || $('#StoreName').val() == ""
+			|| $('#StoreName').val().trim() == "") {
+			toastr.error("Please enter StoreName")
+			return;
+		}
+		$.ajax({
+			url: "/MetaData/SaveStoresRedeem",
+			data: $('#frmstoresredeem').serialize(),
+			type: "post",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record saved successfully..!!!");
+					$('#ExtraLargeModalPopup').modal('hide');
+					GetRedemptionsStoresLists();
+				}
+				else {
+					toastr.error("Unable to save record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+</script>

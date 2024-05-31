@@ -1,0 +1,61 @@
+﻿@model List<Entity.VATRatesEntity>
+@{
+    ViewData["Title"] = "VAT Rates";
+    Layout = null;
+}
+<table id="tblVATRatesList_datatable" class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>VATRateDate</th>
+            <th>VATRate</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model !=null && Model.Count > 0)
+        {    
+            
+            @foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.VATRateDate.Value.ToString("dd/MM/yyyy")</td>
+                    <td>@item.VATRate</td>
+                    
+                    <td>
+                        <a onclick="AddVATRates(@item.VATRatesID)">  <i class="fa fa-edit" title="Detail"></i></a>&nbsp;
+                        <a onclick="ConfirmDeleteVATRates(@item.VATRatesID)"><i class="fa fa-trash" title="Delete"></i></a>
+                    </td>
+                </tr>
+            }
+           
+        }
+        else
+        {
+         <tr>
+             <td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+         </tr>
+        }
+
+     
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>VATRateDate</th>
+            <th>VATRate</th>
+            <th>Actions</th>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+    $('#tblVATRatesList_datatable').DataTable({
+        "order": [],
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+    });
+</script>

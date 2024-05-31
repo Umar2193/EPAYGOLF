@@ -1,0 +1,126 @@
+﻿@{
+	ViewData["Title"] = "Redemptions Stores";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-edit" style="color:##2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">Redemptions Stores</span>
+								</h3>
+							<button onclick="AddRedemptionsStores()" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-plus"></i>  Add Redemptions Stores</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div id="tblStoresRedeemList">
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		GetRedemptionsStoresLists();
+	
+	 });
+	function GetRedemptionsStoresLists() {
+        $.ajax({
+			url: "/MetaData/StoresRedeemList",
+            type: "Get",
+            success: function (result) {
+				$('#tblStoresRedeemList').html(result);
+
+            },
+            error: function (result) {
+
+            },
+            beforeSend: function () {
+				$('.preloader').show();
+            },
+            complete: function (result) {
+				$('.preloader').hide();
+            }
+        });
+    }
+	function AddRedemptionsStores(ID) {
+
+		$.ajax({
+			url: "/MetaData/AddUpdateStoresRedeem",
+			data: { ID: ID },
+			success: function (result) {
+				$('#ExtraLargeModalPopup').modal('show');
+				$('#ExtraLargeModalPopupTitle').html("Redemptions Stores Detail");
+				$('#ExtraLargeModalPopupBody').html(result);
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ConfirmDeleteRedemptionsStores(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteRedemptionsStores(ID);
+				}
+			}
+		});
+	}
+	function DeleteRedemptionsStores(ID) {
+		$.ajax({
+			url: "/MetaData/DeleteStoresRedeem",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetRedemptionsStoresLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+
+</script>

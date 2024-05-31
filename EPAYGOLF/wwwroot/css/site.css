@@ -17,5 +17,51 @@ body {
   margin-bottom: 60px;
 }
 [class*=sidebar-dark-] {
-    background-color: #4a4070;
+    background-color: #2b92ae;
+}
+.container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl {
+    width: 100%;
+    padding-right: 0.5px !important;
+    padding-left: 0.5px !important;
+    margin-right: auto;
+    margin-left: auto
+}
+.content-wrapper {
+    margin-top:5px;
+}
+.modal-dialog .modal-header {
+    background-color: #2b92ae !important;
+    color: white !important;
+}
+.card-primary.card-outline {
+    border-top: 3px solid #2b92ae !important;
+}
+section .fa-edit {
+    color: #2b92ae !important;
+}
+section .fa-trash {
+    color: #dc3545 !important;
+}
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #2b92ae;
+    border-color: #2b92ae;
+}
+.page-link {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #2b92ae;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+form .card-body {
+    padding:8px;
+}
+table.table thead tr {
+    background:#2b92ae !important;
+    color: white;
 }

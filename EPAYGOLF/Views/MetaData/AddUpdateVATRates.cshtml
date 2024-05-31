@@ -1,0 +1,127 @@
+﻿@model Entity.VATRatesEntity
+@{
+	ViewData["Title"] = "VAT Rates Detail";
+	Layout = null;
+}
+<!-- Content Wrapper. Contains page content -->
+<!-- Main content -->
+<section class="content">
+	<div class="container-fluid">
+		<!-- SELECT2 EXAMPLE -->
+		<div class="card card-default">
+			<form id="frmvatrates">
+				<!-- /.card-header -->
+				<div class="card-body">
+
+					<input type="hidden" name="VATRatesID" id="VATRatesID" value="@Model.VATRatesID" />
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">VATRateDate</label>
+							<div class="col-md-8">
+								<div class="input-group">
+									@{
+										var currentorderdate = "";
+										if (Model.VATRateDate != null)
+										{
+											currentorderdate = Model.VATRateDate.Value.ToString("dd/MM/yyyy");
+										}
+									}
+	@* 								@Html.TextBoxFor(model => model.VATRateDate, null, new { @required = "required", @id = "VATRateDate", @autocomplete = "off", @class = "form-control", @placeholder = "dd/mm/yyyy" }) *@
+									<input type="text" data-date data-date-format="dd/MM/yyyy" autocomplete="off" value="@currentorderdate" id="VATRateDate" placeholder="dd/mm/yyyy" name="VATRateDate" required class="form-control" />
+									<div class="input-group-append" >
+										<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">VATRate</label>
+							<div class="col-md-8">
+								<input value="@Model.VATRate" required name="VATRate" type="number" class="form-control" id="VATRate" placeholder="VATRate"
+									   data-inputmask="'mask': ['99.9']"
+									   data-mask
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+							</div>
+						</div>
+						
+					</div>
+				
+
+				</div>
+				<!-- /.row -->
+				<div class="card-footer">
+
+					<button style="margin-left:5px;margin-right:5px;float:right;" type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
+					<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- /.card-body -->
+
+	</div>
+	<!-- /.card -->
+	<!-- /.row -->
+	<!-- /.row -->
+	<!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+<!-- /.content-wrapper -->
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#frmvatrates").submit(function (e) {
+			debugger
+			e.preventDefault();
+			SaveVATRates();
+		});
+	
+
+		$("#VATRateDate").datepicker({
+			format: 'dd/mm/yyyy',
+			todayBtn:true,
+			autoclose: true,
+
+	    });
+		
+
+	});
+
+
+
+	function SaveVATRates() {
+		if ($('#VATRate').val() == null || $('#VATRate').val() == ""
+			|| $('#VATRate').val() == "0") {
+			toastr.error("Please enter VATRate")
+			return;
+		}
+		
+		$.ajax({
+			url: "/MetaData/SaveVATRates",
+			data: $('#frmvatrates').serialize(),
+			type: "post",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record saved successfully..!!!");
+					$('#LargeModalPopup').modal('hide');
+					GetVATRatesLists();
+				}
+				else {
+					toastr.error("Unable to save record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+</script>

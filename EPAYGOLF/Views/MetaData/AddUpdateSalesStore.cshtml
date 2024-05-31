@@ -1,0 +1,193 @@
+﻿@model Entity.SalesStoreEntity
+@{
+	ViewData["Title"] = "Sales Stores Detail";
+	Layout = null;
+}
+<!-- Content Wrapper. Contains page content -->
+<!-- Main content -->
+<section class="content">
+	<div class="container-fluid">
+		<div class="card card-default">
+	  <form id="frmsalesstores">
+			<!-- /.card-header -->
+			<div class="card-body">
+			
+					<input type="hidden" name="CommisionID" id="CommisionID" value="@Model.CommisionID" />
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">RetailerID</label>
+							<div class="col-md-8">
+								
+								<input value="@Model.RetailerID" required name="RetailerID" type="number" class="form-control" id="RetailerID" placeholder="RetailerID"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="19">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">RetailerName</label>
+							<div class="col-md-8">
+								<input value="@Model.RetailerName" required name="RetailerName" type="text" class="form-control" autocomplete="off" id="RetailerName" max="400" placeholder="RetailerName">
+							</div>
+						</div>
+					</div>
+					<div class="row col-md-12 mb-3">
+						
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">StoreName</label>
+							<div class="col-md-8">
+								<input value="@Model.StoreName" required name="StoreName" type="text" class="form-control" autocomplete="off" id="StoreName" max="400" placeholder="StoreName">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Commission</label>
+							<div class="col-md-8">
+								<div class="input-group">
+								<input value="@Model.Commission" step=".01" name="Commission" type="number" class="form-control" id="Commission" placeholder="Commission"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+								<div class="input-group-append">
+									<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+								</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">StripeFee</label>
+							<div class="col-md-8">
+								<div class="input-group">
+								<input value="@Model.StripeFee" step=".01" name="StripeFee" type="number" class="form-control" id="StripeFee" placeholder="StripeFee"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+								<div class="input-group-append">
+									<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+								</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">ProcessingFee</label>
+							<div class="col-md-8">
+								<div class="input-group">
+								<input value="@Model.ProcessingFee" step=".01" name="ProcessingFee" type="number" class="form-control" id="ProcessingFee" placeholder="ProcessingFee"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+								<div class="input-group-append">
+									<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+								</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+					<div class="row col-md-12 mb-3">
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">GGCRedemption</label>
+							<div class="col-md-8">
+								<div class="input-group">
+								<input value="@Model.GGCRedemption" step=".01" name="GGCRedemption" type="number" class="form-control" id="GGCRedemption" placeholder="GGCRedemption"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+								<div class="input-group-append">
+									<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+								</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">TransactionFee</label>
+							<div class="col-md-8">
+								<div class="input-group">
+								<input value="@Model.TransactionFee" step=".01" name="TransactionFee" type="number" class="form-control" id="TransactionFee" placeholder="TransactionFee"
+									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									   maxlength="10">
+								<div class="input-group-append">
+									<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+								</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					
+
+			</div>
+			<!-- /.row -->
+			<div class="card-footer">
+
+				<button style="margin-left:5px;margin-right:5px;float:right;"  type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
+				<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
+			</div>
+			</form>
+		</div>
+		
+		<!-- /.card-body -->
+
+	</div>
+	<!-- /.card -->
+	<!-- /.row -->
+	<!-- /.row -->
+	
+	<!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+<!-- /.content-wrapper -->
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#frmsalesstores").submit(function (e) {
+			debugger
+			e.preventDefault();
+			SaveSalesStores();
+		});
+
+	});
+	
+	
+
+	function SaveSalesStores() {
+		if ($('#RetailerID').val() == null || $('#RetailerID').val() == ""
+			|| $('#RetailerID').val() == "0") {
+			toastr.error("Please enter RetailerID")
+			return;
+		}
+		if ($('#RetailerName').val() == null || $('#RetailerName').val() == ""
+			|| $('#RetailerName').val().trim() == "") {
+			toastr.error("Please enter RetailerName")
+			return;
+		}
+		if ($('#StoreName').val() == null || $('#StoreName').val() == ""
+			|| $('#StoreName').val().trim() == "") {
+			toastr.error("Please enter StoreName")
+			return;
+		}
+		$.ajax({
+			url: "/MetaData/SaveSalesStore",
+			data: $('#frmsalesstores').serialize(),
+			type: "post",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record saved successfully..!!!");
+					$('#ExtraLargeModalPopup').modal('hide');
+					GetSalesStoreLists();
+				}
+				else {
+					toastr.error("Unable to save record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+</script>
