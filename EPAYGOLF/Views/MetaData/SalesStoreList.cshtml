@@ -27,11 +27,11 @@
                     <td>@item.RetailerID</td>
                     <td>@item.RetailerName</td>
                     <td>@item.StoreName</td>
-                    <td>@item.Commission<span>%</span></td>
-                    <td>@item.StripeFee<span>%</span></td>
-                    <td> @item.ProcessingFee<span>%</span></td>
-                    <td>@item.GGCRedemption<span>%</span></td>
-                    <td>@item.TransactionFee<span>%</span></td>
+                    <td>@item.Commission.ToString("0.00")<span>%</span></td>
+                    <td>@item.StripeFee.ToString("0.00")<span>%</span></td>
+                    <td> @item.ProcessingFee.ToString("0.00")<span>%</span></td>
+                    <td>@item.GGCRedemption.ToString("0.00")<span>%</span></td>
+                    <td>@item.TransactionFee.ToString("0.00")<span>%</span></td>
                     <td>
                         <a onclick="AddSalesStores(@item.CommisionID)">  <i class="fa fa-edit" title="Detail"></i></a>&nbsp;
                         <a onclick="ConfirmDeleteSalesStore(@item.CommisionID)"><i class="fa fa-trash" title="Delete"></i></a>

@@ -23,7 +23,7 @@
                     <td>@item.ProductEAN</td>
                     <td>@item.ProductName</td>
                      <td>@item.ProductType</td>
-                    <td>@item.Commission<span>%</span></td>
+                    <td>@item.Commission.ToString("0.00")<span>%</span></td>
                     <td>
                         <a  onclick="AddProduct(@item.ProductID)">  <i class="fa fa-edit" title="Product Detail"></i></a>&nbsp;
                         <a onclick="ConfirmDeleteProduct(@item.ProductID)"><i class="fa fa-trash" title="Delete"></i></a>
