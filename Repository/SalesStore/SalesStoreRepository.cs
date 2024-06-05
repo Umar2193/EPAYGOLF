@@ -1,4 +1,5 @@
-﻿using Entity;
+﻿using DAL;
+using Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +61,19 @@ namespace Repository.SalesStore
 			{
 				Helpers.ApplicationExceptions.SaveAppError(ex);
 				return -1;
+			}
+		}
+		public List<SalesStoreEntity> GetSalesStoreByStoreNo(string storeno)
+		{
+			try
+			{
+
+				return _DALSalesStore.GetSalesStoreByStoreNo(storeno);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
 			}
 		}
 

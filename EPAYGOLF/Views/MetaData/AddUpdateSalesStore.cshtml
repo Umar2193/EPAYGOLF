@@ -17,10 +17,17 @@
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">RetailerID</label>
 							<div class="col-md-8">
+								@{
+									var _readonlyRetailer = "";
+									if(Model.CommisionID > 0)
+									{
+										_readonlyRetailer = "readonly";
+									}
+										<input value="@Model.RetailerID" @_readonlyRetailer required name="RetailerID" type="number" class="form-control" id="RetailerID" placeholder="RetailerID"
+										   	oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+										   	maxlength="19">
+								}
 								
-								<input value="@Model.RetailerID" required name="RetailerID" type="number" class="form-control" id="RetailerID" placeholder="RetailerID"
-									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-									   maxlength="19">
 							</div>
 						</div>
 						<div class="form-group row col-md-6">
@@ -148,7 +155,7 @@
 	
 
 	function SaveSalesStores() {
-		if ($('#RetailerID').val() == null || $('#RetailerID').val() == ""
+		if ($('#CommisionID').val() == '0' && $('#RetailerID').val() == null || $('#RetailerID').val() == ""
 			|| $('#RetailerID').val() == "0") {
 			toastr.error("Please enter RetailerID")
 			return;
@@ -173,6 +180,9 @@
 					toastr.success("Record saved successfully..!!!");
 					$('#ExtraLargeModalPopup').modal('hide');
 					GetSalesStoreLists();
+				}
+				else if (result == -2) {
+					toastr.error("RetailerID already exist in system");
 				}
 				else {
 					toastr.error("Unable to save record..!!!");

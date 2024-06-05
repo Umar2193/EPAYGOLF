@@ -13,5 +13,6 @@ namespace Repository.StoresRedeem
 		StoresRedeemEntity GetStoresRedeemDetail(Int64 ID);
 		int SaveStoresRedeemInformation(StoresRedeemEntity obj);
 		int DeleteStoresRedeemInformation(Int64 ID);
+		List<StoresRedeemEntity> GetStoreRedeemByStoreNo(string storeno);
 	}
 }

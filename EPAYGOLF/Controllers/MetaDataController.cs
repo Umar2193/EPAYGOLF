@@ -122,6 +122,17 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public IActionResult SaveStoresRedeem(StoresRedeemEntity obj)
 		{
+			if (obj != null)
+			{
+				if(obj.StoresRedeemID == 0)
+				{
+					var ifexist = _storesredeemRepository.GetStoresRedeemList().Where(x => x.StoreNo == obj.StoreNo).FirstOrDefault();
+					if(ifexist != null)
+					{
+						return Json(-2);
+					}
+				}
+			}
 			var result = _storesredeemRepository.SaveStoresRedeemInformation(obj);
 			return Json(result);
 		}
@@ -146,6 +157,7 @@ namespace EPAYGOLF.Controllers
 		}
 		public IActionResult AddUpdateSalesStore(Int64 ID)
 		{
+
 			var model = _salesstoreRepository.GetSalesStoreDetail(ID);
 			if (model == null)
 			{
@@ -158,6 +170,16 @@ namespace EPAYGOLF.Controllers
 		{
 			if(obj != null)
 			{
+				
+				if(obj.CommisionID == 0)
+				{
+					var ifexist = _salesstoreRepository.GetSalesStoreList().Where(x => x.RetailerID == obj.RetailerID).FirstOrDefault();
+					if(ifexist != null)
+					{
+						return Json(-2);
+					}
+				}
+			
 				if(obj.Commission > 0)
 				{
 					obj.Commission = obj.Commission / 100;

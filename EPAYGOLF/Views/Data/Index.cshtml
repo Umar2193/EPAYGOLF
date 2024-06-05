@@ -1,8 +1,219 @@
 ﻿@{
-    ViewData["Title"] = "Import Data";
+	ViewData["Title"] = "Import Data";
 }
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    Coming Soon
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-edit" style="color:##2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">Import Data</span>
+							</h3>
+							<button onclick="GenerateReportTransformation()" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-file"></i>  Generate Report</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+						<form id="frmproducts">
+								<div class="row col-md-12 mb-3">
+									<div class="form-group row col-md-12">
+										<label for="inputEmail3" class="col-md-3 col-form-label">Import Sales Data</label>
+										<div class="col-md-4">
+											<input type="file" id="filesalesdata" accept=".csv" name="filesalesdata" class="form-control" />
+										</div>
+										<div class="col-md-4">
+											<button onclick="ImportSalesData()" type="button" class="btn btn-success"><i class="fas fa-upload"></i>  Import Sales Data</button>
+										</div>
+									</div>
+									
+								</div>
+								<div class="row col-md-12 mb-3">
+									<div class="form-group row col-md-12">
+										<label for="inputEmail3" class="col-md-3 col-form-label">Import Redemption Data</label>
+										<div class="col-md-4">
+											<input type="file" id="fileredemptiondata" accept=".csv" name="fileredemptiondata" class="form-control" />
+										</div>
+										<div class="col-md-4">
+											<button onclick="ImportRedemptionsData()" type="button" class="btn btn-success"><i class="fas fa-upload"></i>  Import Redemption Data</button>
+										</div>
+									</div>
+									
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
 </div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$('#filesalesdata').on('change', function () {
+			var fileInput = $(this);
+			var filePath = fileInput.val();
+			var allowedExtensions = /(\.csv)$/i;
+
+			if (!allowedExtensions.exec(filePath)) {
+				toastr.error("Invalid file type.Please upload a.csv file.");
+				fileInput.val(''); // Clear the input value
+			} else {
+				//valid
+			}
+		});
+		$('#fileredemptiondata').on('change', function () {
+			var fileInput = $(this);
+			var filePath = fileInput.val();
+			var allowedExtensions = /(\.csv)$/i;
+
+			if (!allowedExtensions.exec(filePath)) {
+				toastr.error("Invalid file type. Please upload a .csv file.");
+				fileInput.val(''); // Clear the input value
+			} else {
+				//valid
+			}
+		});
+		
+	});
+	function ImportSalesData() {
+		var fileInput = $('#filesalesdata')[0];
+		if (fileInput.files.length === 0) {
+			toastr.error("No file selected. Please select a file.");
+			return;
+		}
+		var formData = new FormData();
+		formData.append('filesalesdata', fileInput.files[0]);
+
+		$.ajax({
+			url: '/Data/uploadfilesalesdata',  // Replace with your server upload URL
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+
+
+				if (response == -1) {
+					toastr.error("File data is not in valid format");
+				}
+				else if (response == -3) {
+					toastr.error("File contain not data");
+				}
+				else if (response == -4) {
+					toastr.error("Transaction type 'LOAD' not found in selected file");
+				}
+				else if (response == -5) {
+					toastr.error("Please select file");
+				}
+				else if (response == -6) {
+					toastr.error("EAN is empty in selected file");
+				}
+				
+				else if (response == -7) {
+					toastr.error("All record should have transaction type value 'LOAD' in selected file.");
+				}
+				else {
+					if (response > 0) {
+						toastr.success("Data import successfully.");
+					}
+					else {
+						toastr.error(response);
+					} 
+					
+				}
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				toastr.error("File upload failed. Please try again.");
+			}
+		});
+	}
+	function ImportRedemptionsData() {
+		var fileInput = $('#fileredemptiondata')[0];
+		if (fileInput.files.length === 0) {
+			toastr.error("No file selected. Please select a file.");
+			return;
+		}
+		var formData = new FormData();
+		formData.append('fileredemptiondata', fileInput.files[0]);
+
+		$.ajax({
+			url: '/Data/uploadfileredemptiondata',  // Replace with your server upload URL
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+
+
+
+				if (response == -1) {
+					toastr.error("File data is not in valid format");
+				}
+				else if (response == -3) {
+					toastr.error("File contain not data");
+				}
+				else if (response == -4) {
+					toastr.error("Transaction type 'LOAD' not found in selected file");
+				}
+				else if (response == -5) {
+					toastr.error("Please select file");
+				}
+				else if (response == -6) {
+					toastr.error("StoreNo is empty in selected file");
+				}
+				else if (response == -7) {
+					toastr.error("All record should have transaction type value 'REDEEM' in selected file.");
+				}
+				else {
+					if (response > 0) {
+						toastr.success("Data import successfully.");
+					}
+					else {
+						toastr.error(response);
+					}
+
+				}
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				toastr.error("File upload failed. Please try again.");
+			}
+		});
+	}
+	function GenerateReportTransformation() {
+		$.ajax({
+			url: "/Data/TransformSalesRedemptionsData",
+			type: "Get",
+			success: function (result) {
+				debugger
+				if (result.salesstatus >= 0 || result.redemstatus >= 0) {
+					toastr.success("Report generated successfully.")
+				}
+				else {
+					toastr.error(result.message);
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	
+
+
+
+</script>

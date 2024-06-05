@@ -13,5 +13,6 @@ namespace Repository.Products
 		ProductEntity GetProductDetail(Int64 ProductID);
 		int SaveProductInformation(ProductEntity obj);
 		int DeleteProductInformation(Int64 ID);
+		List<ProductEntity> GetProductByEAN(string EAN);
 	}
 }

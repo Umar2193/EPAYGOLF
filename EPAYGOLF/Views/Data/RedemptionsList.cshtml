@@ -1,0 +1,182 @@
+﻿@model List<Entity.RedemptionsEntity>
+@{
+	ViewData["Title"] = "Sales List";
+	Layout = null;
+	string floatcolor = "";
+}
+<table id="tblRedemptionsList_datatable" class="table table-striped table-bordered table-hover">
+	@if (Model != null && Model.Count > 0)
+	{
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>AccountName</th>
+				<th>TransactionID</th>
+				<th>TransactionType</th>
+				<th>CardID</th>
+				<th>PAN</th>
+				<th>TransactionDateTime</th>
+				<th>Value</th>
+				<th>BINNumber</th>
+				<th>StoreNo</th>
+				<th>StoreName</th>
+				<th>Product</th>
+				<th>EAN</th>
+				<th>Date</th>
+				<th>ProductCommission</th>
+				<th>ProductAmount</th>
+				<th>VATRate</th>
+				<th>VATDueOnCommission</th>
+				<th>AmountPayableToStore</th>
+				<th>Postcode</th>
+				<th>StatementCreated</th>
+				<th>StatementNumber</th>
+				<th>StatementAmount</th>
+			</tr>
+		</thead>
+		<tbody>
+
+
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.ID</td>
+					<td>@item.AccountName</td>
+					<td>@item.TransactionID</td>
+					<td>@item.TransactionType</td>
+					<td>@item.CardID</td>
+					<td> @item.PAN</td>
+					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:MM:ss")</td>
+					@if (item.Value < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.Value.ToString("0.00")</span></td>
+					<td>@item.BINNumber</td>
+					<td>@item.StoreNo</td>
+					<td>@item.StoreName</td>
+					<td>@item.Product</td>
+					<td> @item.EAN</td>
+					<td>@item.Date.Value.ToString("dd/MM/yyyy")</td>
+					<td>@item.ProductCommission.ToString("0.00")<span>%</span></td>
+					@if (item.ProductAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.ProductAmount.ToString("0.00")</span></td>
+					<td>@item.VATRate.ToString("0.00")<span>%</span></td>
+
+					@if (item.VATDueOnCommission < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.VATDueOnCommission.ToString("0.00")</span></td>
+					@if (item.AmountPayableToStore < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.AmountPayableToStore.ToString("0.00")</span></td>
+					<td> @item.Postcode</td>
+
+					<td>@item.StatementCreated.ToString("dd/MM/yyyy")</td>
+					<td>@item.StatementNumber</td>
+					@if (item.StatementAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.StatementAmount.ToString("0.00")</span></td>
+
+
+
+				</tr>
+			}
+
+
+
+
+
+		</tbody>
+		<tfoot>
+			<tr>
+				<th>ID</th>
+				<th>AccountName</th>
+				<th>TransactionID</th>
+				<th>TransactionType</th>
+				<th>CardID</th>
+				<th>PAN</th>
+				<th>TransactionDateTime</th>
+				<th>Value</th>
+				<th>BINNumber</th>
+				<th>StoreNo</th>
+				<th>StoreName</th>
+				<th>Product</th>
+				<th>EAN</th>
+				<th>Date</th>
+				<th>ProductCommission</th>
+				<th>ProductAmount</th>
+				<th>VATRate</th>
+				<th>VATDueOnCommission</th>
+				<th>AmountPayableToStore</th>
+				<th>Postcode</th>
+				<th>StatementCreated</th>
+				<th>StatementNumber</th>
+				<th>StatementAmount</th>
+			</tr>
+		</tfoot>
+	}
+	else
+	{
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>AccountName</th>
+				<th>TransactionID</th>
+				<th>TransactionType</th>
+				<th>CardID</th>
+				<th>PAN</th>
+				<th>TransactionDateTime</th>
+			</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+		</tr>
+		</tbody>
+	}
+</table>
+
+<script type="text/javascript">
+	$('#tblRedemptionsList_datatable').DataTable({
+		"order": [],
+		"paging": true,
+		"lengthChange": false,
+		"searching": true,
+		"ordering": true,
+		"info": true,
+		"autoWidth": false,
+		"responsive": true,
+		"pageLength": 100,
+		"buttons": ["csv", "excel"]
+	});
+	//.buttons().container().appendTo('#tblSalesList_datatable_wrapper .col-md-6:eq(0)')
+</script>

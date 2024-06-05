@@ -1,0 +1,159 @@
+﻿@{
+	ViewData["Title"] = "Sales";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-edit" style="color:##2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">Sales</span>
+							</h3>
+							<button onclick="ExportGetSalesLists()" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-file-excel"></i>  Export Excel</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div id="tblSalesList">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		GetSalesLists();
+
+	});
+	function GetSalesLists() {
+		$.ajax({
+			url: "/Data/SalesList",
+			type: "Get",
+			success: function (result) {
+				$('#tblSalesList').html(result);
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ExportGetSalesLists() {
+		$.ajax({
+			url: "/Data/ExportSalesList",
+			type: "Get",
+			success: function (result) {
+				var day = moment().utc().date();
+				var month = moment().utc().month() + 1;
+				var year = moment().utc().year()
+				var hour = moment().utc().hour();
+				var mins = moment().utc().minute();
+				var postfix = day + "." + month + "." + year;
+				var a = document.createElement('a');
+				var data_type = 'data:application/vnd.ms-excel';
+				var table_div = result;
+
+				xData = new Blob([table_div], { type: 'text/csv' });
+				var xUrl = URL.createObjectURL(xData);
+				a.href = xUrl;
+				a.download = 'EPAYGOLFSales -' + postfix + '.xls';
+				a.click();
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	// function AddSalesStores(ID) {
+
+	// 	$.ajax({
+	// 		url: "/MetaData/AddUpdateSalesStore",
+	// 		data: { ID: ID },
+	// 		success: function (result) {
+	// 			$('#ExtraLargeModalPopup').modal('show');
+	// 			$('#ExtraLargeModalPopupTitle').html("Sales Stores Detail");
+	// 			$('#ExtraLargeModalPopupBody').html(result);
+	// 		},
+	// 		error: function (result) {
+
+	// 		},
+	// 		beforeSend: function () {
+	// 			$('.preloader').show();
+	// 		},
+	// 		complete: function (result) {
+	// 			$('.preloader').hide();
+	// 		}
+	// 	});
+	// }
+	// function ConfirmDeleteSalesStore(ID) {
+	// 	bootbox.confirm({
+	// 		title: "Delete",
+	// 		message: "Are you sure you want to delete ?",
+	// 		buttons: {
+	// 			confirm: {
+	// 				label: 'Yes',
+	// 				className: 'btn-success'
+	// 			},
+	// 			cancel: {
+	// 				label: 'No',
+	// 				className: 'btn-danger'
+	// 			}
+	// 		},
+	// 		callback: function (result) {
+	// 			if (result) {
+	// 				DeleteSalesStores(ID);
+	// 			}
+	// 		}
+	// 	});
+	// }
+	// function DeleteSalesStores(ID) {
+	// 	$.ajax({
+	// 		url: "/MetaData/DeleteSalesStore",
+	// 		data: { ID: ID },
+	// 		type: "GET",
+	// 		success: function (result) {
+	// 			if (result > 0) {
+
+	// 				toastr.success("Record deleted successfully..!!!");
+	// 				GetSalesStoreLists();
+	// 			}
+	// 			else {
+	// 				toastr.error("Unable to delete record..!!!");
+	// 			}
+
+	// 		},
+	// 		error: function (result) {
+
+	// 		},
+	// 		beforeSend: function () {
+
+	// 		},
+	// 		complete: function (result) {
+
+	// 		}
+	// 	});
+	// }
+
+</script>

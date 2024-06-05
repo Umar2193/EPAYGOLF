@@ -63,5 +63,18 @@ namespace Repository.Products
 				return -1;
 			}
 		}
+		public List<ProductEntity> GetProductByEAN(string EAN)
+		{
+			try
+			{
+
+				return _DALproducts.GetProductByEAN(EAN);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
+			}
+		}
 	}
 }

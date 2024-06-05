@@ -98,5 +98,11 @@ namespace DAL
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
+		public List<StoresRedeemEntity> GetStoreRedeemByStoreNo(string storeno)
+		{
+
+			var result = GetStoresRedeemList().ToList().Where(x => x.StoreNo.ToString() == storeno).ToList();
+			return result;
+		}
 	}
 }

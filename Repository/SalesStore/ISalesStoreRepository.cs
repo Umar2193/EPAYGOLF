@@ -13,5 +13,6 @@ namespace Repository.SalesStore
 		SalesStoreEntity GetSalesStoreDetail(Int64 ID);
 		int SaveSalesStoreInformation(SalesStoreEntity obj);
 		int DeleteSalesStoreInformation(Int64 ID);
+		List<SalesStoreEntity> GetSalesStoreByStoreNo(string storeno);
 	}
 }

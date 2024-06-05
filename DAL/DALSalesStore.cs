@@ -94,6 +94,12 @@ namespace DAL
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
+		public List<SalesStoreEntity> GetSalesStoreByStoreNo(string storeno)
+		{
+
+			var result = GetSalesStoreList().Where(x => x.RetailerID.ToString() == storeno).ToList();
+			return result;
+		}
 	}
 }
 

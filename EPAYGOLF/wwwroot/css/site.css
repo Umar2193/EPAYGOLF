@@ -65,3 +65,9 @@ table.table thead tr {
     background:#2b92ae !important;
     color: white;
 }
+
+.alert-danger {
+    color: #fff;
+    background-color: #c89ba0;
+    border-color: #d32535;
+}

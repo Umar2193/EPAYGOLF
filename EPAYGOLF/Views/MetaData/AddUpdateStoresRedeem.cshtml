@@ -9,19 +9,25 @@
 	<div class="container-fluid">
 		<!-- SELECT2 EXAMPLE -->
 		<div class="card card-default">
-	  <form id="frmstoresredeem">
-			<!-- /.card-header -->
-			<div class="card-body">
-			
+			<form id="frmstoresredeem">
+				<!-- /.card-header -->
+				<div class="card-body">
+
 					<input type="hidden" name="StoresRedeemID" id="StoresRedeemID" value="@Model.StoresRedeemID" />
 					<div class="row col-md-12 mb-3">
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">StoreNo</label>
 							<div class="col-md-8">
-								
-								<input  value="@Model.StoreNo" required name="StoreNo" type="number" class="form-control" id="StoreNo" placeholder="StoreNo"
-									   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-									   maxlength="19">
+								@{
+									var _readonlyStoreNo = "";
+									if (Model.StoresRedeemID > 0)
+									{
+										_readonlyStoreNo = "readonly";
+									}
+									<input value="@Model.StoreNo" @_readonlyStoreNo required name="StoreNo" type="number" class="form-control" id="StoreNo" placeholder="StoreNo"
+										   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+										   maxlength="19">
+								}
 							</div>
 						</div>
 						<div class="form-group row col-md-6">
@@ -32,7 +38,7 @@
 						</div>
 					</div>
 					<div class="row col-md-12 mb-3">
-						
+
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">Address1</label>
 							<div class="col-md-8">
@@ -53,7 +59,7 @@
 								<input value="@Model.Email" name="Email" type="email" class="form-control" autocomplete="off" id="Email" max="200" placeholder="Email">
 							</div>
 						</div>
-						
+
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">CityTown</label>
 							<div class="col-md-8">
@@ -112,25 +118,24 @@
 						</div>
 
 					</div>
-			
 
-			</div>
-			<!-- /.row -->
-			<div class="card-footer">
 
-				<button style="margin-left:5px;margin-right:5px;float:right;"  type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
-				<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
-			</div>
+				</div>
+				<!-- /.row -->
+				<div class="card-footer">
+
+					<button style="margin-left:5px;margin-right:5px;float:right;" type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
+					<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
+				</div>
 			</form>
 		</div>
-		
+
 		<!-- /.card-body -->
 
 	</div>
 	<!-- /.card -->
 	<!-- /.row -->
 	<!-- /.row -->
-	
 	<!-- /.container-fluid -->
 </section>
 <!-- /.content -->
@@ -144,11 +149,11 @@
 		});
 
 	});
-	
-	
+
+
 
 	function SaveRedemptionsStores() {
-		if ($('#StoreNo').val() == null || $('#StoreNo').val() == ""
+		if ($('#StoresRedeemID').val() == '0' && $('#StoreNo').val() == null || $('#StoreNo').val() == ""
 			|| $('#StoreNo').val() == "0") {
 			toastr.error("Please enter StoreNo")
 			return;
@@ -168,6 +173,9 @@
 					toastr.success("Record saved successfully..!!!");
 					$('#ExtraLargeModalPopup').modal('hide');
 					GetRedemptionsStoresLists();
+				}
+				else if (result == -2) {
+					toastr.error("Store no already exist in system");
 				}
 				else {
 					toastr.error("Unable to save record..!!!");

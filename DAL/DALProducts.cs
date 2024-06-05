@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,5 +82,12 @@ namespace DAL
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
+		public List<ProductEntity> GetProductByEAN(string EAN) 
+		{
+
+			var result= GetProductList().Where(x => x.ProductEAN.ToString() == EAN).ToList();
+			return result;
+		}
+		
 	}
 }
