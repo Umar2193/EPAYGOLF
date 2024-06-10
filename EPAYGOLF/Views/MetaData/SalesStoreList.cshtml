@@ -49,19 +49,7 @@
 
      
     </tbody>
-    <tfoot>
-        <tr>
-            <th>RetailerID</th>
-            <th>RetailerName</th>
-            <th>StoreName</th>
-            <th>Commission</th>
-            <th>StripeFee</th>
-            <th>ProcessingFee</th>
-            <th>GGCRedemption</th>
-            <th>TransactionFee</th>
-            <th>Actions</th>
-        </tr>
-    </tfoot>
+   
 </table>
 
 <script type="text/javascript">
@@ -74,5 +62,19 @@
         "info": true,
         "autoWidth": false,
         "responsive": true,
-    });
+        "buttons": [
+            {
+                extend: "csv",
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude the last column
+                }
+            },
+            , {
+                extend: "excel",
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude the last column
+                }
+            }
+        ]
+    }).buttons().container().appendTo('#tblSalesStoresList_datatable_wrapper .col-md-6:eq(0)');
 </script>

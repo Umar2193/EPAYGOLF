@@ -104,7 +104,7 @@ namespace EPAYGOLF.Controllers
 						{
 							return Json(-4); //Transaction type load not found
 						}
-						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower()  != "load").ToList();
+						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower()  != "load" && x.TransactionType.ToLower() !="refund").ToList();
 						if ( findtrantypenotload != null && findtrantypenotload.Count > 0)
 						{
 							return Json(-7); //All record should have transaction type Load.
@@ -180,15 +180,48 @@ namespace EPAYGOLF.Controllers
 					salesEntity.TransactionType = item.TransactionType;
 					salesEntity.CardID = item.CardID;
 					salesEntity.PAN = item.PAN;
-					salesEntity.TransactionDateTime = DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss",CultureInfo.InvariantCulture);
-					salesEntity.Value = Convert.ToDecimal(item.Value);
+                    DateTime _trandate;
+                    if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        salesEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        salesEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        salesEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        salesEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        salesEntity.TransactionDateTime = _trandate;
+
+
+                    }
+					salesEntity.TransactionDateTime = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss",CultureInfo.InvariantCulture);
+
+                    salesEntity.Value = Convert.ToDecimal(item.Value);
 					salesEntity.BINNumber = item.BINNumber;
 					salesEntity.StoreNo = Convert.ToInt64(item.StoreNo);
 					salesEntity.StoreName = item.StoreName;
 					salesEntity.Product = item.Product;
 					salesEntity.EAN = Convert.ToInt64(item.EAN);
-					salesEntity.Date = DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
+					salesEntity.Date = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+                    var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
 					if(_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";
@@ -247,7 +280,7 @@ namespace EPAYGOLF.Controllers
 		}
 		public JsonResult TransformSalesData()
 		{
-			var checkifcommisionnull = _salesRepository.GetSalesList().Where(x => x.Value < 1).ToList();
+			var checkifcommisionnull = _salesRepository.GetSalesList().Where(x => x.Value ==0).ToList();
 			if(checkifcommisionnull != null  && checkifcommisionnull.Count > 0)
 			{
 				return Json(-10);
@@ -392,15 +425,47 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.TransactionType = item.TransactionType;
 					redeemEntity.CardID = item.CardID;
 					redeemEntity.PAN = item.PAN;
-					redeemEntity.TransactionDateTime = DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+					DateTime _trandate;
+					if(DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						redeemEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        redeemEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        redeemEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        redeemEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                   else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+                    {
+                        redeemEntity.TransactionDateTime = _trandate;
+
+
+                    }
+                    //redeemEntity.TransactionDateTime = //DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 					redeemEntity.Value = Convert.ToDecimal(item.Value);
 					redeemEntity.BINNumber = item.BINNumber;
 					redeemEntity.StoreNo = Convert.ToInt64(item.StoreNo);
 					redeemEntity.StoreName = item.StoreName;
 					redeemEntity.Product = item.Product;
 					redeemEntity.EAN = Convert.ToInt64(item.EAN);
-					redeemEntity.Date = DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
+					redeemEntity.Date = redeemEntity.TransactionDateTime;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+                    var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
 					if (_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";

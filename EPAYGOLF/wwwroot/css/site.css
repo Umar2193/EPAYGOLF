@@ -1,24 +1,26 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
+
 [class*=sidebar-dark-] {
     background-color: #2b92ae;
 }
+
 .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl {
     width: 100%;
     padding-right: 0.5px !important;
@@ -26,28 +28,35 @@ body {
     margin-right: auto;
     margin-left: auto
 }
+
 .content-wrapper {
-    margin-top:5px;
+    margin-top: 5px;
 }
+
 .modal-dialog .modal-header {
     background-color: #2b92ae !important;
     color: white !important;
 }
+
 .card-primary.card-outline {
     border-top: 3px solid #2b92ae !important;
 }
+
 section .fa-edit {
     color: #2b92ae !important;
 }
+
 section .fa-trash {
     color: #dc3545 !important;
 }
+
 .page-item.active .page-link {
     z-index: 3;
     color: #fff;
     background-color: #2b92ae;
     border-color: #2b92ae;
 }
+
 .page-link {
     position: relative;
     display: block;
@@ -58,11 +67,13 @@ section .fa-trash {
     background-color: #fff;
     border: 1px solid #dee2e6;
 }
+
 form .card-body {
-    padding:8px;
+    padding: 8px;
 }
+
 table.table thead tr {
-    background:#2b92ae !important;
+    background: #2b92ae !important;
     color: white;
 }
 
@@ -70,4 +81,32 @@ table.table thead tr {
     color: #fff;
     background-color: #c89ba0;
     border-color: #d32535;
+}
+
+table {
+    font-size: 10px !important;
+}
+
+    table td {
+        padding: .35rem !important;
+    }
+
+    table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before, table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+          top :60% !important;
+        margin-top: -2px !important;
+    }
+.col-form-label {
+    font-size:13px;
+}
+table.dataTable td:nth-child(1) {
+    padding-bottom: 13px !important;
+    width: 80px !important;
+}
+/*.content-wrapper > .content {
+    overflow-x:scroll;
+}
+*/
+.card-body{
+
+    overflow-x:auto;
 }

@@ -88,11 +88,21 @@
 					</div>
 					<div class="row col-md-12 mb-3">
 						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">UserEmail</label>
+							<div class="col-md-8">
+								<input value="@Model.UserEmail" name="UserEmail" type="email" class="form-control" autocomplete="off" id="UserEmail" max="100" placeholder="PostCode">
+							</div>
+						</div>
+						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">Title</label>
 							<div class="col-md-8">
 								<input value="@Model.Title" name="Title" type="text" class="form-control" autocomplete="off" id="Title" max="50" placeholder="Title">
 							</div>
 						</div>
+						
+
+					</div>
+					<div class="row col-md-12 mb-3">
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">FirstName</label>
 							<div class="col-md-8">
@@ -100,25 +110,24 @@
 
 							</div>
 						</div>
-
-					</div>
-					<div class="row col-md-12 mb-3">
 						<div class="form-group row col-md-6">
 							<label for="inputEmail3" class="col-md-4 col-form-label">LastName</label>
 							<div class="col-md-8">
 								<input value="@Model.LastName" name="LastName" type="text" class="form-control" autocomplete="off" id="LastName" max="200" placeholder="LastName">
 							</div>
 						</div>
-						<div class="form-group row col-md-6">
-							<label for="inputEmail3" class="col-md-4 col-form-label">StoreNameUser</label>
-							<div class="col-md-8">
-								<input value="@Model.StoreNameUser" name="StoreNameUser" type="text" class="form-control" autocomplete="off" id="StoreNameUser" max="200" placeholder="StoreNameUser">
-
-							</div>
-						</div>
+						
 
 					</div>
+					<div class="row col-md-12 mb-3">
+					<div class="form-group row col-md-6">
+						<label for="inputEmail3" class="col-md-4 col-form-label">StoreNameUser</label>
+						<div class="col-md-8">
+							<input value="@Model.StoreNameUser" name="StoreNameUser" type="text" class="form-control" autocomplete="off" id="StoreNameUser" max="200" placeholder="StoreNameUser">
 
+						</div>
+					</div>
+					</div>
 
 				</div>
 				<!-- /.row -->

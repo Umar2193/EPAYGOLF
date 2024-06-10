@@ -1,75 +1,87 @@
 ﻿@model List<Entity.StoresRedeemEntity>
 @{
-    ViewData["Title"] = "Redemptions Stores";
-    Layout = null;
+	ViewData["Title"] = "Redemptions Stores";
+	Layout = null;
 }
 <table id="tblRedemptionsStoresList_datatable" class="table table-striped table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>StoreNo</th>
-            <th>StoreName</th>
-            <th>Email</th>
-            <th>Address1</th>
-            <th>CityTown</th>
-            <th>User Name</th>
-            <th>StoreNameUser</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if(Model !=null && Model.Count > 0)
-        {    
-            
-            @foreach(var item in Model)
-            {
-                <tr>
-                    <td>@item.StoreNo</td>
-                    <td>@item.StoreName</td>
-                    <td>@item.Email</td>
-                    <td>@item.Address1</td>
-                    <td>@item.CityTown</td>
-                    <td> @item.Title @item.FirstName @item.LastName</td>
-                    <td>@item.StoreNameUser</td>
-                    <td>
-                        <a onclick="AddRedemptionsStores(@item.StoresRedeemID)">  <i class="fa fa-edit" title="Detail"></i></a>&nbsp;
-                        <a onclick="ConfirmDeleteRedemptionsStores(@item.StoresRedeemID)"><i class="fa fa-trash" title="Delete"></i></a>
-                    </td>
-                </tr>
-            }
-           
-        }
-        else
-        {
-         <tr>
-             <td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
-         </tr>
-        }
+	<thead>
+		<tr>
+			<th>StoreNo</th>
+			<th>StoreName</th>
+			<th>UserID</th>
+			<th>UserEmail</th>
+			<th>UserName</th>
+			<th>Address1</th>
+			<th>Address2</th>
+			<th>PostCode</th>
+			<th>CityTown</th>
+		
+			@* <th>StoreNameUser</th> *@
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Count > 0)
+		{
 
-     
-    </tbody>
-    <tfoot>
-        <tr>
-            <th>StoreNo</th>
-            <th>StoreName</th>
-            <th>Email</th>
-            <th>Address1</th>
-            <th>CityTown</th>
-            <th>User FirstName/LastName</th>
-            <th>StoreNameUser</th>
-            <th>Actions</th>
-        </tr>
-    </tfoot>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td >@item.StoreNo</td>
+					<td>@item.StoreName</td>
+					<td>@item.UserID</td>
+					<td>@item.UserEmail</td>
+					<td> @item.Title @item.FirstName @item.LastName</td>
+					<td>@item.Address1</td>
+					<td>@item.Address2</td>
+					<td>@item.PostCode</td>
+					<td>@item.CityTown</td>
+					
+					@* <td>@item.StoreNameUser</td> *@
+					<td>
+						<a onclick="AddRedemptionsStores(@item.StoresRedeemID)">  <i class="fa fa-edit" title="Detail"></i></a>&nbsp;
+						<a onclick="ConfirmDeleteRedemptionsStores(@item.StoresRedeemID)"><i class="fa fa-trash" title="Delete"></i></a>
+					</td>
+				</tr>
+			}
+
+		}
+		else
+		{
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+			</tr>
+		}
+
+
+	</tbody>
+	
 </table>
 
 <script type="text/javascript">
-    $('#tblRedemptionsStoresList_datatable').DataTable({
-        "order": [],
-        "paging": true,
-        "lengthChange": false,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true,
-    });
+	$('#tblRedemptionsStoresList_datatable').DataTable({
+		"order": [],
+		"paging": true,
+		"lengthChange": false,
+		"searching": true,
+		"ordering": true,
+		"info": true,
+		"autoWidth": false,
+
+		"responsive": false,
+		"buttons": [
+			{
+				extend:"csv",
+				 exportOptions: {
+					columns: ':not(:last-child)' // Exclude the last column
+				}
+			},
+			, {
+				extend:"excel",
+				exportOptions: {
+					columns: ':not(:last-child)' // Exclude the last column
+				}
+			}
+		]
+	}).buttons().container().appendTo('#tblRedemptionsStoresList_datatable_wrapper .col-md-6:eq(0)');
 </script>

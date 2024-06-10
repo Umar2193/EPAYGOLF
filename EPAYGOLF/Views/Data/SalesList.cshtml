@@ -15,6 +15,7 @@
 				<th>TransactionType</th>
 				<th>CardID</th>
 				<th>PAN</th>
+				<th>Date</th>
 				<th>TransactionDateTime</th>
 				<th>Value</th>
 				<th>BINNumber</th>
@@ -24,7 +25,7 @@
 				<th>EAN</th>
 				<th>StoreCommission</th>
 				<th>VATRate</th>
-				<th>Date</th>
+				
 				<th>StoreAmount</th>
 				<th>GGCCommission</th>
 				<th>GGCAmount</th>
@@ -46,13 +47,14 @@
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td>@item.ID</td>
+					<td style="padding-bottom:13px !important;width:80px !important;">@item.ID</td>
 					<td>@item.AccountName</td>
 					<td>@item.TransactionID</td>
 					<td>@item.TransactionType</td>
 					<td>@item.CardID</td>
 					<td> @item.PAN</td>
-					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:MM:ss")</td>
+					<td data-order="@item.Date.Value.ToString("yyyyMMdd")">@item.Date.Value.ToString("dd/MM/yyyy")</td>
+					<td data-order="@item.TransactionDateTime.Value.ToString("yyyyMMdd HH:mm:ss")">@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
 					@if (item.Value < 0)
 					{
 						floatcolor = "red";
@@ -69,7 +71,7 @@
 					<td> @item.EAN</td>
 					<td>@item.StoreCommission.ToString("0.00")<span>%</span></td>
 					<td>@item.VATRate.ToString("0.00")<span>%</span></td>
-					<td>@item.Date.Value.ToString("dd/MM/yyyy")</td>
+					
 					@if (item.StoreAmount < 0)
 					{
 						floatcolor = "red";
@@ -128,7 +130,14 @@
 						floatcolor = "";
 					}
 					<td><span style="color:@floatcolor;font-weight:bold;"> @item.NetAmount.ToString("0.00")</span></td>
-					<td>@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
+					@if (item.ExpiryDate != null)
+					{
+						<td>@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
+					}
+					else
+					{
+						<td></td>
+					}
 					@if (item.RedeemedAmount < 0)
 					{
 						floatcolor = "red";
@@ -161,42 +170,10 @@
 			}
 
 
-			
+
 
 		</tbody>
-		<tfoot>
-			<tr>
-				<th>ID</th>
-				<th>AccountName</th>
-				<th>TransactionID</th>
-				<th>TransactionType</th>
-				<th>CardID</th>
-				<th>PAN</th>
-				<th>TransactionDateTime</th>
-				<th>Value</th>
-				<th>BINNumber</th>
-				<th>StoreNo</th>
-				<th>StoreName</th>
-				<th>Product</th>
-				<th>EAN</th>
-				<th>StoreCommission</th>
-				<th>VATRate</th>
-				<th>Date</th>
-				<th>StoreAmount</th>
-				<th>GGCCommission</th>
-				<th>GGCAmount</th>
-				<th>ProcessCommission</th>
-				<th>ProcessAmount</th>
-				<th>StripeCommission</th>
-				<th>StripeAmount</th>
-				<th>TransactionAmount</th>
-				<th>NetAmount</th>
-				<th>ExpiryDate</th>
-				<th>RedeemedAmount</th>
-				<th>UnRedeemedAmount</th>
-				<th>Breakage</th>
-			</tr>
-		</tfoot>
+		
 	}
 	else
 	{
@@ -209,15 +186,15 @@
 				<th>CardID</th>
 				<th>PAN</th>
 				<th>TransactionDateTime</th>
-				
+
 			</tr>
 		</thead>
 		<tbody>
-		<tr>
-			<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
-		
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
 
-		</tr>
+
+			</tr>
 		</tbody>
 	}
 
@@ -226,7 +203,7 @@
 <script type="text/javascript">
 	$('#tblSalesList_datatable').DataTable({
 
-		"order": [],
+		"order": [[7, 'desc']],
 		"paging": true,
 		"lengthChange": false,
 		"searching": true,

@@ -29,7 +29,7 @@ namespace DAL
 	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
 	  $" FROM [dbo].[Sales] " +
 	  $" where IsActive=1 and IsDeleted =0 " +
-	  $"  order by AccountName");
+	  $"  order by TransactionDateTime desc");
 			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}

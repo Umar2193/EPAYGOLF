@@ -41,15 +41,7 @@
 
      
     </tbody>
-    <tfoot>
-        <tr>
-            <th>ProductEAN</th>
-            <th>ProductName</th>
-            <th>ProductType</th>
-            <th>Commision</th>
-            <th>Actions</th>
-        </tr>
-    </tfoot>
+   
 </table>
 
 <script type="text/javascript">
@@ -62,5 +54,19 @@
         "info": true,
         "autoWidth": false,
         "responsive": true,
-    });
+        "buttons": [
+            {
+                extend: "csv",
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude the last column
+                }
+            },
+            , {
+                extend: "excel",
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude the last column
+                }
+            }
+        ]
+    }).buttons().container().appendTo('#tblProductList_datatable_wrapper .col-md-6:eq(0)');
 </script>

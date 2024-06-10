@@ -42,7 +42,6 @@ namespace Entity
 	public class RedeptionImportDataEntity
 	{
 		public Int64 ID { get; set; }
-		public string RetailerNumber { get; set; }
 		public string AccountName { get; set; }
 		public string TransactionID { get; set; }
 		public string TransactionType { get; set; }

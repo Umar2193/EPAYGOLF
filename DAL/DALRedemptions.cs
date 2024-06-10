@@ -28,7 +28,7 @@ namespace DAL
 	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
 	  $" FROM [dbo].[Redemptions] " +
 	  $" where IsActive = 1 and IsDeleted = 0 " +
-	  $" order by AccountName");
+	  $" order by TransactionDateTime desc");
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}

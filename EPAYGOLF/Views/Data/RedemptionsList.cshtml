@@ -15,6 +15,7 @@
 				<th>TransactionType</th>
 				<th>CardID</th>
 				<th>PAN</th>
+				<th>Date</th>
 				<th>TransactionDateTime</th>
 				<th>Value</th>
 				<th>BINNumber</th>
@@ -22,7 +23,7 @@
 				<th>StoreName</th>
 				<th>Product</th>
 				<th>EAN</th>
-				<th>Date</th>
+				
 				<th>ProductCommission</th>
 				<th>ProductAmount</th>
 				<th>VATRate</th>
@@ -46,7 +47,8 @@
 					<td>@item.TransactionType</td>
 					<td>@item.CardID</td>
 					<td> @item.PAN</td>
-					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:MM:ss")</td>
+					<td data-order="@item.Date.Value.ToString("yyyyMMdd")">@item.Date.Value.ToString("dd/MM/yyyy")</td>
+					<td data-order="@item.TransactionDateTime.Value.ToString("yyyyMMdd HH:mm:ss")">@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
 					@if (item.Value < 0)
 					{
 						floatcolor = "red";
@@ -61,7 +63,7 @@
 					<td>@item.StoreName</td>
 					<td>@item.Product</td>
 					<td> @item.EAN</td>
-					<td>@item.Date.Value.ToString("dd/MM/yyyy")</td>
+					
 					<td>@item.ProductCommission.ToString("0.00")<span>%</span></td>
 					@if (item.ProductAmount < 0)
 					{
@@ -116,33 +118,7 @@
 
 
 		</tbody>
-		<tfoot>
-			<tr>
-				<th>ID</th>
-				<th>AccountName</th>
-				<th>TransactionID</th>
-				<th>TransactionType</th>
-				<th>CardID</th>
-				<th>PAN</th>
-				<th>TransactionDateTime</th>
-				<th>Value</th>
-				<th>BINNumber</th>
-				<th>StoreNo</th>
-				<th>StoreName</th>
-				<th>Product</th>
-				<th>EAN</th>
-				<th>Date</th>
-				<th>ProductCommission</th>
-				<th>ProductAmount</th>
-				<th>VATRate</th>
-				<th>VATDueOnCommission</th>
-				<th>AmountPayableToStore</th>
-				<th>Postcode</th>
-				<th>StatementCreated</th>
-				<th>StatementNumber</th>
-				<th>StatementAmount</th>
-			</tr>
-		</tfoot>
+		
 	}
 	else
 	{
@@ -167,7 +143,7 @@
 
 <script type="text/javascript">
 	$('#tblRedemptionsList_datatable').DataTable({
-		"order": [],
+		"order": [[7, 'desc']],
 		"paging": true,
 		"lengthChange": false,
 		"searching": true,
