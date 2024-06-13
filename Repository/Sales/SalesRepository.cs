@@ -89,5 +89,18 @@ namespace Repository.Sales
 				return -1;
 			}
 		}
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		{
+			try
+			{
+
+				return _DALsales.GetSalesListReport(ProductID, SalesStoreNo,startDate,endDate);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
+			}
+		}
 	}
 }

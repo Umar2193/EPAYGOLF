@@ -7,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// Add services to the container.
+builder.Services.AddSingleton<ViewRenderingService>();
+builder.Services.AddHttpContextAccessor(); // Ensure IHttpContextAccessor is registered
+
 var startup = new Startup();
 startup.ConfigureServices(builder.Services);
 

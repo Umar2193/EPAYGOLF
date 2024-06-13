@@ -1,0 +1,356 @@
+﻿@{
+	ViewData["Title"] = "SALES & REDEMPTIONS REPORTING";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-edit" style="color:#2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">SALES & REDEMPTIONS REPORTING</span>
+							</h3>
+							<button onclick="DownloadSalesReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-download"></i>  Download Sales Reporting</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div class="row col-md-12">
+								<div class="col col-md-6">
+									<form id="frmreport">
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-2 col-form-label">
+													Start Date
+												</label>
+												<div class="col-md-4">
+													<input type="text" data-date data-date-format="dd/MM/yyyy" autocomplete="off" value="" disabled id="_redstartdate" placeholder="dd/mm/yyyy" name="_redstartdate" required class="form-control" />
+												</div>
+												<label for="inputEmail3" class="col-md-2 col-form-label">
+													End Date
+												</label>
+												<div class="col-md-4">
+													<input type="text" onchange="ChangeEventReportType()" data-date data-date-format="dd/MM/yyyy" autocomplete="off" value="" id="_redenddate" placeholder="dd/mm/yyyy" name="_redenddate" required class="form-control" />
+												</div>
+
+											</div>
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">Reporting Period</label>
+												<div class="col-md-6">
+													<select onchange="ChangeEventReportType()" class="form-control" id="ddlreportingperiod" name="ddlreportingperiod">
+														<option selected value="YTD">YTD</option>
+														<option value="Monthly">Monthly</option>
+														<option value="Weekly">Weekly</option>
+														<option value="Daily">Daily</option>
+													</select>
+												</div>
+
+											</div>
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">Sales Store Name</label>
+												<div class="col-md-6">
+													<select class="form-control select2bs4" style="width:100%" name="ddlsalesstorename" id="ddlsalesstorename">
+
+														@if (ViewBag.AllSalesStore != null)
+														{
+															@foreach (var item in ViewBag.AllSalesStore)
+															{
+																<option value="@item.RetailerID">@item.RetailerID | @item.RetailerName</option>
+															}
+														}
+													</select>
+												</div>
+
+											</div>
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Redemptions Store Name
+												</label>
+												<div class="col-md-6">
+													<select class="form-control select2bs4" style="width:100%" name="ddlredemstorename" id="ddlredemstorename">
+														<option value="0">0 | All Stores</option>
+														@if (ViewBag.AllRedemStore != null)
+														{
+															@foreach (var item in ViewBag.AllRedemStore)
+															{
+																<option value="@item.StoreNo">@item.StoreNo | @item.StoreName</option>
+															}
+														}
+													</select>
+												</div>
+
+											</div>
+
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Product
+												</label>
+												<div class="col-md-6">
+													<select class="form-control select2bs4 " style="width:100%" name="ddlproduct" id="ddlproduct">
+														<option value="0">All Products</option>
+														@if (ViewBag.AllProducts != null)
+														{
+															@foreach (var item in ViewBag.AllProducts)
+															{
+																<option value="@item.ProductEAN">@item.ProductName</option>
+															}
+														}
+													</select>
+												</div>
+
+											</div>
+
+										</div>
+										<div class="card-footer">
+
+											<button style="margin-left:5px;margin-right:5px;float:right;" onclick="GenerateDetailedReport()" type="button" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-file"></i> Generate Detailed Report</button>
+										</div>
+									</form>
+								</div>
+								<div class="col col-md-6" style="border-left:1px solid #dad8d5">
+									<dl class="row" style="padding-left:5px;">
+										<dd class="col-sm-4"></dd>
+										<dt class="col-sm-8" style=" border: 1px solid black;text-align:center; color: #3327e9;">Summary Overview</dt>
+
+										<dt class="col-sm-4">Reporting Dates</dt>
+
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_startdate">01-01-2023</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_enddate">01-01-2024</dd>
+										<dt class="col-sm-4"></dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;">Sales</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;">Redemptions</dd>
+										<dt class="col-sm-4">Product Units</dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_totalsales">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_totalredeem">-</dd>
+										<dt class="col-sm-4">Gross Sales/Redemp</dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_SaleValue">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;color:red" id="sum_redeemValue">-</dd>
+										<dt class="col-sm-4">Gross Redemp Value</dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_unredeemamount">-</dd>
+										<dd class="col-sm-4" style="border: 1px solid black;"></dd>
+										<dt class="col-sm-4">GGC Liability</dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_ggcliability">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"></dd>
+										<dt class="col-sm-4">GGC Net Profit</dt>
+										<dd class="col-sm-4" style="border: 1px solid black;" id="sum_netamountsales">-</dd>
+										<dd class="col-sm-4" style="border: 1px solid black;"></dd>
+										<dt class="col-sm-4">GGC Breakage</dt>
+										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_breakage">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"></dd>
+									</dl>
+								</div>
+							</div>
+						</div>
+					
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		moment.updateLocale('en', {
+			week: {
+				dow: 1 // Monday is the first day of the week
+			}
+		});
+		$("#_redenddate,#_redstartdate").datepicker({
+			format: 'dd/mm/yyyy',
+			todayBtn: true,
+			autoclose: true,
+
+		});
+		$("#_redenddate").datepicker("setDate", new Date());
+		ReportSummaryView();
+	});
+
+	function GenerateDetailedReport() {
+		if ($("#_redstartdate").val() == null || $("#_redstartdate").val() == "") {
+			toastr.error("Please select start date");
+			return;
+		}
+		if ($("#_redenddate").val() == null || $("#_redenddate").val() == "") {
+			toastr.error("Please select end date");
+			return;
+		}
+		$.ajax({
+			url: "/Report/GenerateDetailedReport",
+			type: "Get",
+			data: {
+				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+				if (result.issalesReportGenerated == true) {
+					DownloadSalesReportExcel();
+				}
+				else {
+					toastr.error("Some Error in generating report.");
+				}
+				// var day = moment().utc().date();
+				// var month = moment().utc().month() + 1;
+				// var year = moment().utc().year()
+				// var hour = moment().utc().hour();
+				// var mins = moment().utc().minute();
+				// var postfix = day + "." + month + "." + year;
+				// var a = document.createElement('a');
+				// var table_div = result.salesReportHTML;
+
+				// xData = new Blob([table_div], { type: 'text/csv' });
+				// var xUrl = URL.createObjectURL(xData);
+				// a.href = xUrl;
+				// a.download = 'SalesReporting.xls';
+				// a.click();
+				
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ChangeEventReportType(){
+		debugger
+		var _crval = $('#ddlreportingperiod').val();
+		if (_crval == "YTD") {
+			const currentDate = moment($("#_redenddate").val(), 'DD/MM/YYYY');
+
+			// Subtract one year from the current date and set the month and date to 1st July
+			const firstJulyPreviousYear = currentDate.subtract(1, 'years').month(6).date(1);
+
+			// Format the date as needed (e.g., YYYY-MM-DD)
+			const formattedDate = firstJulyPreviousYear.format('DD/MM/YYYY');
+
+			$("#_redstartdate").datepicker("setDate", formattedDate);
+		}
+		else if (_crval == "Monthly") {
+			// Get the start of the current month using moment
+			const startOfMonth = moment($("#_redenddate").val(), 'DD/MM/YYYY').startOf('month');
+
+			// Format the date as needed (e.g., YYYY-MM-DD)
+			const formattedDate = startOfMonth.format('DD/MM/YYYY');
+
+
+			$("#_redstartdate").datepicker("setDate", formattedDate);
+		}
+		else if (_crval == "Weekly") {
+			// Get the start of the current startOfWeek  using moment
+			const startOfWeek = moment($("#_redenddate").val(), 'DD/MM/YYYY').startOf('week');
+
+			// Format the date as needed (e.g., YYYY-MM-DD)
+			const formattedDate = startOfWeek.format('DD/MM/YYYY');
+
+
+			$("#_redstartdate").datepicker("setDate", formattedDate);
+		}
+		else if (_crval == "Daily") {
+		
+			$("#_redstartdate").datepicker("setDate", $("#_redenddate").val());
+		}
+	}
+	function DownloadSalesReportExcel() {
+		$.ajax({
+			url: "/Report/DownloadSalesReportExcel",
+			type: "Get",
+			success: function (result) {
+				debugger
+			    var getUrl = window.location;
+				var baseUrl = getUrl.protocol + "//" + getUrl.host + "/Report/DownloadSalesReportExcel/"
+				window.open(baseUrl, '_blank');
+
+
+			},
+			error: function (result) {
+				toastr.error("Please generate sales report");
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ReportSummaryView() {
+		$.ajax({
+			url: "/Report/ReportSummaryView",
+			type: "Get",
+			data: {
+				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+				if (result != null) {
+					var totalValue = result.totalValue;
+					var netAmount = result.netAmount
+					var redeemedAmount = result.redeemedAmount;
+					var unRedeemedAmount = result.unRedeemedAmount;
+					var salesTotalCount = result.salesTotalCount;
+					var redeemTotalCount = result.redeemTotalCount;
+					var ggcBreakage = result.ggcBreakage;
+					if(salesTotalCount > 0){
+						$('#sum_totalsales').html(result.salesTotalCount);
+					}
+					else {
+						$('#sum_totalsales').html("-");
+					}
+					if (redeemTotalCount > 0){
+						$('#sum_totalredeem').html(redeemTotalCount);
+					}
+					else {
+						$('#sum_totalredeem').html("-");
+					}
+
+					if (parseFloat(totalValue) > 0) {
+						$('#sum_SaleValue').html("£" +totalValue);
+					}
+					else {
+						$('#sum_SaleValue').html("-");
+					}
+
+
+				}
+
+
+			},
+			error: function (result) {
+				toastr.error("Please generate sales report");
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+
+
+
+</script>

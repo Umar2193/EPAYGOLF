@@ -37,14 +37,14 @@ namespace DAL
 		{
 
 			string Query = string.Format($"SELECT [SalesID],[ID],[AccountName],[TransactionID],[TransactionType] " +
-      $" , [CardID], [PAN], [TransactionDateTime], [Value], [BINNumber] " +
-      $" , [StoreNo], [StoreName], [Product], [EAN], isnull([StoreCommission],0.0) * 100 as StoreCommission " +
-      $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
-      $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
-      $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
-      $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-      $" FROM [dbo].[Sales] s" +
-      $" where IsActive=1 and IsDeleted =0 " +
+	  $" , [CardID], [PAN], [TransactionDateTime], [Value], [BINNumber] " +
+	  $" , [StoreNo], [StoreName], [Product], [EAN], isnull([StoreCommission],0.0) * 100 as StoreCommission " +
+	  $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
+	  $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
+	  $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
+	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" FROM [dbo].[Sales] s" +
+	  $" where IsActive=1 and IsDeleted =0 " +
 				$" and s.SalesID = " + id);
 			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList().FirstOrDefault();
@@ -129,7 +129,7 @@ namespace DAL
 		public SalesEntity GetSalesDataByID(string ID)
 		{
 
-			var result = GetSalesList().Where(x=>x.ID == (Convert.ToInt64(ID))).FirstOrDefault();
+			var result = GetSalesList().Where(x => x.ID == (Convert.ToInt64(ID))).FirstOrDefault();
 			return result;
 		}
 		public int TransformSalesData()
@@ -141,7 +141,7 @@ namespace DAL
 			//Update Store Commission Value
 
 			Query += "\r\n UPDATE Sales\r\nSET Sales.StoreCommission = Commissions.Commission \r\nfrom \r\nSales\r\nINNER JOIN Commissions ON Sales.StoreNo = Commissions.RetailerID \r\nWHERE (isnull(Sales.StoreCommission,0) = 0) ";
-			
+
 			//Update Store Commission Amount
 
 			Query += "\r\n UPDATE Sales\r\nSET Sales.StoreAmount = (Sales.Value * -1)  * Sales.StoreCommission \r\nWHERE (isnull(Sales.StoreAmount,0) = 0) ";
@@ -189,6 +189,57 @@ namespace DAL
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 
+		}
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		{
+
+			string _Query = $"SELECT [SalesID],[ID],[AccountName],[TransactionID],[TransactionType] " +
+	  $" , [CardID], [PAN], [TransactionDateTime], [Value], [BINNumber] " +
+	  $" , [StoreNo], [StoreName], [Product], [EAN], isnull([StoreCommission],0.0) * 100 as StoreCommission " +
+	  $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
+	  $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
+	  $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
+	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" FROM [dbo].[Sales] " +
+	  $" where IsActive=1 and IsDeleted =0 ";
+
+			//Product
+			if (ProductID == 2) //All Golf Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '5%'";
+			}
+			else if (ProductID == 3) //All Cycling Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '6%'";
+			}
+			else if (ProductID == 4) //All Fishing Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '7%'";
+			}
+			else
+			{
+				if(ProductID > 0)
+				{
+					_Query = _Query + $" and [EAN] = " + ProductID;
+				}
+			}
+
+			// Sales Store
+			if(SalesStoreNo > 0)
+			{
+				_Query = _Query + $" and [StoreNo] = " + SalesStoreNo;
+			}
+
+
+			//Date
+			_Query = _Query + $" and cast([Date] as date) >= Cast('"+startDate+"' as date) ";
+			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+
+
+			_Query = _Query + $"  order by TransactionDateTime desc ";
+			string Query = string.Format(_Query);
+			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
 		}
 	}
 }

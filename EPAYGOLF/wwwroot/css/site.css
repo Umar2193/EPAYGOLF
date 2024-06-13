@@ -109,4 +109,23 @@ table.dataTable td:nth-child(1) {
 .card-body{
 
     overflow-x:auto;
+    padding:0.35rem;
+}
+.card-header {
+    padding :0.35rem 0.35rem;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 0;
+    height: auto;
+    margin-top: -7px;
+}
+dt {
+    font-weight: 700;
+    font-size:13px;
+}
+dd {
+    color: #3327e9;
+}
+.nav-sidebar .nav-link p {
+    font-size:13px;
 }

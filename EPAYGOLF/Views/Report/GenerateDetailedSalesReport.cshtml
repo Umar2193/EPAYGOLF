@@ -1,0 +1,206 @@
+﻿@model List<Entity.SalesEntity>
+@{
+	//Layout = null;
+	string floatcolor = "";
+}
+<style>
+	table, th, td {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+</style>
+<h3 style="text-decoration:underline">Sales Report</h3>
+<div class="row col-md-12 mb-3">
+	<div class="form-group row col-md-12">
+		<label for="inputEmail3" class="col-md-6 col-form-label">STORE NAME: </label>
+		<div class="col-md-6">
+			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.SalesStoreName </label>
+		</div>
+     </div>
+
+</div>
+<div class="row col-md-12 mb-3">
+	<div class="form-group row col-md-12">
+		<label for="inputEmail3" class="col-md-6 col-form-label">PRODUCT NAME: </label>
+		<div class="col-md-6">
+			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.ProductName </label>
+		</div>
+	</div>
+
+</div>
+<div class="row col-md-12 mb-3">
+	<div class="form-group row col-md-12">
+		<label for="inputEmail3" class="col-md-6 col-form-label">REPORTING PERIOD: </label>
+		<div class="col-md-6">
+			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.StartDate To @ViewBag.EndDate </label>
+		</div>
+	</div>
+
+</div>
+<div class="row col-md-12 mb-3">
+	<div class="form-group row col-md-12">
+		<label for="inputEmail3" class="col-md-6 col-form-label">GGC TOTAL NET AMOUNT: </label>
+		<div class="col-md-6">
+			<label for="inputEmail3" class="col-md-6 col-form-label">£@ViewBag.NetAmount </label>
+		</div>
+	</div>
+
+</div>
+<div class="row col-md-12 mb-3">
+	<div class="form-group row col-md-12">
+		<label for="inputEmail3" class="col-md-6 col-form-label">COUNT: </label>
+		<div class="col-md-6">
+			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.TotalCount </label>
+		</div>
+	</div>
+
+</div>
+<table id="tblSalesReportDetail_datatable" class="table table-striped table-bordered table-hover" >
+	<thead style="border:1px solid;">
+		<tr>
+			<th>TransactionDateTime</th>
+			<th>Product</th>
+			<th >TransactionID</th>
+			<th>CardID</th>
+			<th>Value</th>
+			<th>Count</th>
+			<th>StoreNo</th>
+			<th>StoreName</th>
+			<th>StoreComm</th>
+			<th>GGC Redemption</th>
+			<th>Processing Fee</th>
+			<th>Stripe Comm</th>
+			<th>Merchant</th>
+			<th>Net Amount</th>
+			<th>Expiry Date</th>
+			<th>Redeemed Amount</th>
+			<th>UnRedeemed Amt</th>
+			<th>Breakage</th>
+		</tr>
+	</thead>
+	<tbody >
+		@if (Model != null && Model.Count > 0)
+		{
+
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td >@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
+					<td>@item.Product</td>
+					<td>@item.TransactionID</td>
+					<td>@item.CardID</td>
+					@if (item.Value < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">(£)@item.Value.ToString("0.00")</span></td>
+					<td>1</td>
+					<td>@item.StoreNo</td>
+					<td>@item.StoreName</td>
+					@if (item.StoreAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">£ @item.StoreAmount.ToString("0.00")</span></td>
+					
+					@if (item.GGCAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">£ @item.GGCAmount.ToString("0.00")</span></td>
+					@if (item.ProcessAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">£@item.ProcessAmount.ToString("0.00")</span></td>
+					@if (item.StripeAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">£@item.StripeAmount.ToString("0.00")</span></td>
+					@if (item.TransactionAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+
+					<td><span style="color:@floatcolor;font-weight:bold;">£@item.TransactionAmount.ToString("0.00")</span></td>
+					@if (item.NetAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;"> £@item.NetAmount.ToString("0.00")</span></td>
+					<td>@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
+					@if (item.RedeemedAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor">£@item.RedeemedAmount.ToString("0.00")</span></td>
+					@if (item.UnRedeemedAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor">£@item.UnRedeemedAmount.ToString("0.00")</span></td>
+					@if (item.Breakage < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor">£@item.Breakage.ToString("0.00")</span></td>
+
+				</tr>
+			}
+
+		}
+		else
+		{
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+			</tr>
+		}
+
+
+	</tbody>
+
+</table>
+<script type="text/javascript">
+	
+</script>

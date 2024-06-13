@@ -290,7 +290,7 @@ namespace EPAYGOLF.Controllers
 			{
 				return Json(-12);
 			}
-			var checkifproductvaluenull = _productRepository.GetProductList().Where(x => x.Commission < 1).ToList();
+			var checkifproductvaluenull = _productRepository.GetProductList().Where(x => x.Commission < 1 && x.ProductEAN !=2 &&  x.ProductEAN != 3 && x.ProductEAN != 4).ToList();
 			if (checkifproductvaluenull != null && checkifproductvaluenull.Count > 0)
 			{
 				return Json(-11);

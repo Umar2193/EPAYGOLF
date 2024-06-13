@@ -194,7 +194,7 @@
 			success: function (result) {
 				debugger
 				if (result.salesstatus >= 0 || result.redemstatus >= 0) {
-					toastr.success("Report generated successfully.")
+					toastr.success("Data transformed successfully.")
 				}
 				else {
 					toastr.error(result.message);
