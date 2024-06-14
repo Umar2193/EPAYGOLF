@@ -161,5 +161,56 @@ namespace DAL
 			return result;
 
 		}
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate)
+		{
+
+			string _Query = $"SELECT [RedemptionsID] ,[ID],[AccountName],[TransactionID] " +
+	  $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
+	  $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
+	  $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
+	  $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
+	  $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
+	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" FROM [dbo].[Redemptions]  " +
+	  $" where IsActive=1 and IsDeleted =0 ";
+
+			//Product
+			if (ProductID == 2) //All Golf Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '5%'";
+			}
+			else if (ProductID == 3) //All Cycling Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '6%'";
+			}
+			else if (ProductID == 4) //All Fishing Products
+			{
+				_Query = _Query + $" and [EAN] LIKE '7%'";
+			}
+			else
+			{
+				if (ProductID > 0)
+				{
+					_Query = _Query + $" and [EAN] = " + ProductID;
+				}
+			}
+
+			// Sales Store
+			if (redemStoreNo > 0)
+			{
+				_Query = _Query + $" and [StoreNo] = " + redemStoreNo;
+			}
+
+
+			//Date
+			_Query = _Query + $" and cast([Date] as date) >= Cast('" + startDate + "' as date) ";
+			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+
+
+			_Query = _Query + $"  order by TransactionDateTime desc ";
+			string Query = string.Format(_Query);
+			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
+		}
 	}
 }

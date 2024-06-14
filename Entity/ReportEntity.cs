@@ -38,6 +38,8 @@ namespace Entity
         public int SalesTotalCount { get; set; }
 		public int RedeemTotalCount { get; set; }
         public string ggcBreakage { get; set; }
+        public string TotalValueRedemp { get; set; }
+        public string ggliability { get; set; }
     }
 
 }

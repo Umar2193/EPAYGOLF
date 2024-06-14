@@ -15,5 +15,6 @@ namespace Repository.Redemptions
 		int DeleteRedemptionsInformation(Int64 ID);
 		RedemptionsEntity GetredeemDataByID(string ID);
 		int TransformRedeemData();
+		List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate);
 	}
 }

@@ -30,24 +30,25 @@ namespace EPAYGOLF.Controllers
 		public ReportController(ViewRenderingService viewRenderingService, IWebHostEnvironment env)
 		{
 			_viewRenderingService = viewRenderingService;
-		    _env = env;
+			_env = env;
 		}
 		public IActionResult Index()
 		{
 			ViewBag.AllProducts = _productRepository.GetProductList().OrderBy(x => x.ProductEAN).ToList();
 			ViewBag.AllSalesStore = _salesstoreRepository.GetSalesStoreList().OrderBy(x => x.RetailerID).ToList();
 			ViewBag.AllRedemStore = _storesredeemRepository.GetStoresRedeemList().OrderBy(x => x.StoreNo).ToList();
-			
+
 
 			return View();
 		}
 		public async Task<ActionResult> GenerateDetailedReport(ReportSearchParam _request)
 		{
-			var  result = 0;
+			var result = 0;
 			string renderedSalesReportView = "";
 			try
 			{
 				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate, _request.endDate).ToList();
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate, _request.endDate).ToList();
 				//if (salesreportresult != null && salesreportresult.Count > 0)
 				//{
 
@@ -77,7 +78,7 @@ namespace EPAYGOLF.Controllers
 				//ViewBag.ProductName = _request.productName;
 				//ViewBag.StartDate = _request.startDate.ToString("dd/MMM/yyyy");
 				//ViewBag.EndDate = _request.endDate.ToString("dd/MMM/yyyy");
-				 //renderedSalesReportView = await _viewRenderingService.RenderToStringAsync("GenerateDetailedSalesReport", salesreportresult);
+				//renderedSalesReportView = await _viewRenderingService.RenderToStringAsync("GenerateDetailedSalesReport", salesreportresult);
 
 				//	var doc = new HtmlToPdfDocument()
 				//	{
@@ -114,12 +115,12 @@ namespace EPAYGOLF.Controllers
 				//	}
 
 				//	return File(pdf, "application/pdf", pdfFileName);
-				
+
 				// Ensure EPPlus license context is set
 				ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-					string webRootPath = _env.WebRootPath;
-				  string contentRootPath = _env.ContentRootPath;
+				string webRootPath = _env.WebRootPath;
+				string contentRootPath = _env.ContentRootPath;
 
 				string path = "";
 				string dirPath = Path.Combine(webRootPath, "Document");
@@ -130,6 +131,7 @@ namespace EPAYGOLF.Controllers
 				}
 				string filePath = dirPath + "\\SalesReporting.xlsx";
 
+				#region SalesReport
 				// Create a new Excel package
 				using (var package = new ExcelPackage())
 				{
@@ -167,7 +169,7 @@ namespace EPAYGOLF.Controllers
 					worksheet.Cells["B5"].Value = "GGC TOTAL NET AMOUNT: ";
 					worksheet.Cells["B5"].Style.Font.Bold = true;
 					worksheet.Cells["B5"].Style.Font.Size = 12;
-					worksheet.Cells["C5"].Value = salesreportresult != null ? salesreportresult.Sum(x => x.NetAmount):"-";
+					worksheet.Cells["C5"].Value = salesreportresult != null ? salesreportresult.Sum(x => x.NetAmount) : "-";
 					worksheet.Cells["C5"].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
 					worksheet.Cells["C5"].Style.Font.Bold = true;
 					worksheet.Cells["C5"].Style.Font.Size = 12;
@@ -175,11 +177,11 @@ namespace EPAYGOLF.Controllers
 					worksheet.Cells["B6"].Value = "COUNT: ";
 					worksheet.Cells["B6"].Style.Font.Bold = true;
 					worksheet.Cells["B6"].Style.Font.Size = 12;
-					worksheet.Cells["C6"].Value = salesreportresult!=null ? salesreportresult.Count : "";
+					worksheet.Cells["C6"].Value = salesreportresult != null ? salesreportresult.Count : "";
 					worksheet.Cells["C6"].Style.Font.Bold = true;
 					worksheet.Cells["C6"].Style.Font.Size = 12;
 
-				
+
 
 
 					// Define headers for the table
@@ -300,7 +302,7 @@ namespace EPAYGOLF.Controllers
 						worksheet.Cells[lastrow, 18].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
 						worksheet.Cells[lastrow, 18].Style.Font.Bold = true;
 
-						var _ct = salesreportresult != null ? salesreportresult.Count+ 1 : 0;
+						var _ct = salesreportresult != null ? salesreportresult.Count + 1 : 0;
 						// Define the range for the table
 						var tableRange = worksheet.Cells[7, 1, startRow + _ct, headers.Length];
 
@@ -310,19 +312,7 @@ namespace EPAYGOLF.Controllers
 						// Apply a table style
 						table.TableStyle = TableStyles.Medium2;
 
-						//for (int row = 1; row <= 7; row++)
-						//{
-						//	for (int col = 1; col <= headers.Length; col++)
-						//	{
-						//		var cell = worksheet.Cells[row, col];
-						//		cell.Style.Border.Top.Style = ExcelBorderStyle.None;
-						//		cell.Style.Border.Bottom.Style = ExcelBorderStyle.None;
-						//		cell.Style.Border.Left.Style = ExcelBorderStyle.None;
-						//		cell.Style.Border.Right.Style = ExcelBorderStyle.None;
-						//	}
-						//}
 
-						// Auto-fit the columns
 					}
 					// Freeze the top 3 rows
 					worksheet.View.FreezePanes(8, 1);
@@ -331,23 +321,226 @@ namespace EPAYGOLF.Controllers
 					// Save the package to the file
 					FileInfo fileInfo = new FileInfo(filePath);
 					package.SaveAs(fileInfo);
-					return Json(new { issalesReportGenerated = true });
+
 				}
+				#endregion
+
+				string redempfilePath = dirPath + "\\RedemptionsReporting.xlsx";
+
+				#region RedemptionsReport
+				// Create a new Excel package
+				using (var package = new ExcelPackage())
+				{
+					// Add a worksheet to the package
+					var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+					// Add custom information (e.g., title)
+					worksheet.Cells["B1"].Value = "REDEMPTIONS REPORT";
+					worksheet.Cells["B1"].Style.Font.Bold = true;
+					worksheet.Cells["B1"].Style.Font.UnderLine = true;
+					worksheet.Cells["B1"].Style.Font.Size = 16;
+
+					worksheet.Cells["B2"].Value = "STORE NAME: ";
+					worksheet.Cells["B2"].Style.Font.Bold = true;
+					worksheet.Cells["B2"].Style.Font.Size = 12;
+					worksheet.Cells["C2"].Value = _request.redemstorename;
+					worksheet.Cells["C2"].Style.Font.Bold = true;
+					worksheet.Cells["C2"].Style.Font.Size = 12;
+
+					worksheet.Cells["B3"].Value = "PRODUCT NAME: ";
+					worksheet.Cells["B3"].Style.Font.Bold = true;
+					worksheet.Cells["B3"].Style.Font.Size = 12;
+					worksheet.Cells["C3"].Value = _request.productName;
+					worksheet.Cells["C3"].Style.Font.Bold = true;
+					worksheet.Cells["C3"].Style.Font.Size = 12;
+
+
+					worksheet.Cells["B4"].Value = "REPORTING PERIOD: ";
+					worksheet.Cells["B4"].Style.Font.Bold = true;
+					worksheet.Cells["B4"].Style.Font.Size = 12;
+					worksheet.Cells["C4"].Value = _request.startDate.ToString("dd-MMM-yyyy") + " To " + _request.endDate.ToString("dd-MMM-yyyy");
+					worksheet.Cells["C4"].Style.Font.Bold = true;
+					worksheet.Cells["C4"].Style.Font.Size = 12;
+
+					worksheet.Cells["B5"].Value = "TOTAL FACE VALUE: ";
+					worksheet.Cells["B5"].Style.Font.Bold = true;
+					worksheet.Cells["B5"].Style.Font.Size = 12;
+					worksheet.Cells["C5"].Value = redempreportresult != null ? redempreportresult.Sum(x => x.Value) : "-";
+					worksheet.Cells["C5"].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+					worksheet.Cells["C5"].Style.Font.Bold = true;
+					worksheet.Cells["C5"].Style.Font.Size = 12;
+
+					worksheet.Cells["B6"].Value = "TOTAL AMOUNT PAYABLE: ";
+					worksheet.Cells["B6"].Style.Font.Bold = true;
+					worksheet.Cells["B6"].Style.Font.Size = 12;
+					worksheet.Cells["C6"].Value = redempreportresult != null ? redempreportresult.Sum(x=>x.AmountPayableToStore) : "";
+					worksheet.Cells["C6"].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+					worksheet.Cells["C6"].Style.Font.Bold = true;
+					worksheet.Cells["C6"].Style.Font.Size = 12;
+
+
+
+
+					// Define headers for the table
+					string[] headers = { "TransactionDateTime","Value"
+							,"Count", "Product Comm", "VAT Due","Amount Payable"
+							,"Store No","Store Name"
+							,"Postcode", "Transaction ID"
+							, "Card ID","Statement Date","Statement No."
+							,"Statement Amt"
+							};
+
+					// Add headers to the worksheet
+					for (int i = 0; i < headers.Length; i++)
+					{
+						worksheet.Cells[7, i + 1].Value = headers[i];
+						worksheet.Cells[7, i + 1].Style.Font.Bold = true;
+					}
+
+					if (redempreportresult != null && redempreportresult.Count > 0)
+					{
+
+						// Add data to the worksheet
+						int startRow = 8;
+						for (int i = 0; i < redempreportresult.Count; i++)
+						{
+							worksheet.Cells[startRow + i, 1].Value = redempreportresult[i].TransactionDateTime;
+							worksheet.Cells[startRow + i, 1].Style.Numberformat.Format = "dd/mm/yyyy hh:mm:ss";
+
+							worksheet.Cells[startRow + i, 2].Value = redempreportresult[i].Value;
+							worksheet.Cells[startRow + i, 2].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+
+							worksheet.Cells[startRow + i, 3].Value = 1;
+
+
+							worksheet.Cells[startRow + i, 4].Value = redempreportresult[i].ProductAmount;
+							worksheet.Cells[startRow + i, 4].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+
+							worksheet.Cells[startRow + i, 5].Value = redempreportresult[i].VATDueOnCommission;
+							worksheet.Cells[startRow + i, 5].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+
+							worksheet.Cells[startRow + i, 6].Value = redempreportresult[i].AmountPayableToStore;
+							worksheet.Cells[startRow + i, 6].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+
+							worksheet.Cells[startRow + i, 7].Value = redempreportresult[i].StoreNo;
+
+							worksheet.Cells[startRow + i, 8].Value = redempreportresult[i].StoreName;
+
+							worksheet.Cells[startRow + i, 9].Value = redempreportresult[i].Postcode;
+
+							worksheet.Cells[startRow + i, 10].Value = redempreportresult[i].TransactionID;
+
+							worksheet.Cells[startRow + i, 11].Value = redempreportresult[i].CardID;
+
+							worksheet.Cells[startRow + i, 12].Value = redempreportresult[i].StatementCreated;
+							worksheet.Cells[startRow + i, 12].Style.Numberformat.Format = "dd/mm/yyyy";
+							worksheet.Cells[startRow + i, 13].Value = redempreportresult[i].StatementNumber;
+							worksheet.Cells[startRow + i, 14].Value = redempreportresult[i].StatementAmount;
+							worksheet.Cells[startRow + i, 14].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+
+							
+
+						}
+
+						var lastrow = redempreportresult.Count + 8;
+						worksheet.Cells[lastrow, 1].Value = "Totals";
+						worksheet.Cells[lastrow, 1].Style.Font.Bold = true;
+
+						worksheet.Cells[lastrow, 2].Value = redempreportresult.Sum(x => x.Value);
+						worksheet.Cells[lastrow, 2].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+						worksheet.Cells[lastrow, 2].Style.Font.Bold = true;
+						//worksheet.Cells[lastrow, 2].Formula = "=SUM(109:[Value]])";
+
+						worksheet.Cells[lastrow, 3].Value = redempreportresult.Count;
+						worksheet.Cells[lastrow, 3].Style.Font.Bold = true;
+
+						worksheet.Cells[lastrow, 4].Value = redempreportresult.Sum(x => x.ProductAmount);
+						worksheet.Cells[lastrow, 4].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+						worksheet.Cells[lastrow, 4].Style.Font.Bold = true;
+
+						worksheet.Cells[lastrow, 5].Value = redempreportresult.Sum(x => x.VATDueOnCommission);
+						worksheet.Cells[lastrow, 5].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+						worksheet.Cells[lastrow, 5].Style.Font.Bold = true;
+
+						worksheet.Cells[lastrow, 6].Value = redempreportresult.Sum(x => x.AmountPayableToStore);
+						worksheet.Cells[lastrow, 6].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
+						worksheet.Cells[lastrow, 6].Style.Font.Bold = true;
+
+						//package.Workbook.Calculate();
+
+						var _ct = salesreportresult != null ? redempreportresult.Count + 1 : 0;
+						// Define the range for the table
+						var tableRange = worksheet.Cells[7, 1, startRow + _ct, headers.Length];
+
+						// Create a table
+						var table = worksheet.Tables.Add(tableRange, "Table1");
+
+						// Apply a table style
+						table.TableStyle = TableStyles.Medium2;
+
+
+					}
+					// Freeze the top 3 rows
+					worksheet.View.FreezePanes(8, 1);
+
+					worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+					// Save the package to the file
+					FileInfo fileInfo = new FileInfo(redempfilePath);
+					package.SaveAs(fileInfo);
+
+				}
+				#endregion
+				return Json(new { issalesReportGenerated = true , isredempReportGenerated = true });
 			}
 			catch (Exception ex)
 			{
 				Helpers.ApplicationExceptions.SaveAppError(ex);
 			}
-			return Json(new { IsSalesReportGenerated  = false});
+			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
 		}
-		
+
 		public IActionResult DownloadSalesReportExcel()
 		{
 			// Define the path to the Excel file on the server
 			string filename = "SalesReporting.xlsx";
 			string webRootPath = _env.WebRootPath;
 			string contentRootPath = _env.ContentRootPath;
-			
+
+			string dirPath = Path.Combine(webRootPath, "Document");
+
+			if (!System.IO.Directory.Exists(dirPath))
+			{
+				System.IO.Directory.CreateDirectory(dirPath);
+			}
+			string filePath = dirPath + "\\" + filename;
+
+
+			if (!System.IO.File.Exists(filePath))
+			{
+				return NotFound();
+			}
+
+			byte[] fileBytes;
+			try
+			{
+				// Read the Excel file into a byte array
+				fileBytes = System.IO.File.ReadAllBytes(filePath);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Internal server error: {ex.Message}");
+			}
+
+			// Return the file as a response
+			return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+		}
+		public IActionResult DownloadRedempReportExcel()
+		{
+			// Define the path to the Excel file on the server
+			string filename = "RedemptionsReporting.xlsx";
+			string webRootPath = _env.WebRootPath;
+			string contentRootPath = _env.ContentRootPath;
+
 			string dirPath = Path.Combine(webRootPath, "Document");
 
 			if (!System.IO.Directory.Exists(dirPath))
@@ -382,9 +575,14 @@ namespace EPAYGOLF.Controllers
 			try
 			{
 				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate, _request.endDate).ToList();
-				if(salesreportresult == null)
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate, _request.endDate).ToList();
+				if (salesreportresult == null)
 				{
 					salesreportresult = new List<SalesEntity>();
+				}
+				if (redempreportresult == null)
+				{
+					redempreportresult = new List<RedemptionsEntity>();
 				}
 				reportSummaryModel.TotalValue = salesreportresult.Sum(x => x.Value).ToString("N2");
 				reportSummaryModel.StoreAmount = salesreportresult.Sum(x => x.StoreAmount).ToString("N2");
@@ -396,8 +594,13 @@ namespace EPAYGOLF.Controllers
 				reportSummaryModel.UnRedeemedAmount = salesreportresult.Sum(x => x.UnRedeemedAmount).ToString("N2");
 				reportSummaryModel.SalesTotalCount = salesreportresult.Count;
 				reportSummaryModel.ggcBreakage = salesreportresult.Sum(x => x.Breakage).ToString("N2");
+				reportSummaryModel.RedeemTotalCount = redempreportresult.Count;
+				reportSummaryModel.TotalValueRedemp = redempreportresult.Sum(x => x.Value).ToString("N2");
+				decimal liabilitypct = (decimal)0.87;
+				reportSummaryModel.ggliability =  ( Convert.ToDecimal(reportSummaryModel.UnRedeemedAmount) * liabilitypct).ToString("N2"); ;
+
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Helpers.ApplicationExceptions.SaveAppError(ex);
 			}

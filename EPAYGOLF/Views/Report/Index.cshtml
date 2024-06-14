@@ -15,7 +15,8 @@
 								<i class="fas fa-edit" style="color:#2b92ae !important"></i>
 								<span style="font-size:14px;font-weight:bold;">SALES & REDEMPTIONS REPORTING</span>
 							</h3>
-							<button onclick="DownloadSalesReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-download"></i>  Download Sales Reporting</button>
+							<button onclick="DownloadSalesReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download SalesReporting</button>
+							<button onclick="DownloadRedempReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download RedemptionsReporting</button>
 						</div>
 						<!-- /.card-header -->
 						<div class="card-body">
@@ -130,28 +131,28 @@
 
 										<dt class="col-sm-4">Reporting Dates</dt>
 
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_startdate">01-01-2023</dd>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_enddate">01-01-2024</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_startdate"></span></dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_enddate">-</span></dd>
 										<dt class="col-sm-4"></dt>
 										<dd class="col-sm-4" style=" border: 1px solid black;">Sales</dd>
 										<dd class="col-sm-4" style=" border: 1px solid black;">Redemptions</dd>
 										<dt class="col-sm-4">Product Units</dt>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_totalsales">-</dd>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_totalredeem">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_totalsales">-</span></dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_totalredeem">-</span></dd>
 										<dt class="col-sm-4">Gross Sales/Redemp</dt>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_SaleValue">-</dd>
-										<dd class="col-sm-4" style=" border: 1px solid black;color:red" id="sum_redeemValue">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_SaleValue">-</span></dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_redeemValue">-</span></dd>
 										<dt class="col-sm-4">Gross Redemp Value</dt>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_unredeemamount">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;" ><span id="sum_unredeemamount">-</span></dd>
 										<dd class="col-sm-4" style="border: 1px solid black;"></dd>
 										<dt class="col-sm-4">GGC Liability</dt>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_ggcliability">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_ggcliability">-</span></dd>
 										<dd class="col-sm-4" style=" border: 1px solid black;"></dd>
 										<dt class="col-sm-4">GGC Net Profit</dt>
-										<dd class="col-sm-4" style="border: 1px solid black;" id="sum_netamountsales">-</dd>
+										<dd class="col-sm-4" style="border: 1px solid black;"><span id="sum_netamountsales">-</span></dd>
 										<dd class="col-sm-4" style="border: 1px solid black;"></dd>
 										<dt class="col-sm-4">GGC Breakage</dt>
-										<dd class="col-sm-4" style=" border: 1px solid black;" id="sum_breakage">-</dd>
+										<dd class="col-sm-4" style=" border: 1px solid black;"><span id="sum_breakage">-</span></dd>
 										<dd class="col-sm-4" style=" border: 1px solid black;"></dd>
 									</dl>
 								</div>
@@ -202,6 +203,11 @@
 				debugger
 				if (result.issalesReportGenerated == true) {
 					DownloadSalesReportExcel();
+
+				}
+				if (result.isredempReportGenerated == true) {
+					DownloadRedempReportExcel();
+
 				}
 				else {
 					toastr.error("Some Error in generating report.");
@@ -282,7 +288,30 @@
 			    var getUrl = window.location;
 				var baseUrl = getUrl.protocol + "//" + getUrl.host + "/Report/DownloadSalesReportExcel/"
 				window.open(baseUrl, '_blank');
+				ReportSummaryView();
 
+
+			},
+			error: function (result) {
+				toastr.error("Please generate sales report");
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function DownloadRedempReportExcel() {
+		$.ajax({
+			url: "/Report/DownloadRedempReportExcel",
+			type: "Get",
+			success: function (result) {
+				debugger
+				var getUrl = window.location;
+				var baseUrl = getUrl.protocol + "//" + getUrl.host + "/Report/DownloadRedempReportExcel/"
+				window.open(baseUrl, '_blank');
 
 			},
 			error: function (result) {
@@ -314,6 +343,16 @@
 					var salesTotalCount = result.salesTotalCount;
 					var redeemTotalCount = result.redeemTotalCount;
 					var ggcBreakage = result.ggcBreakage;
+					var ggcliabity = result.ggliability;
+					var totalValueRedemp = result.totalValueRedemp;
+
+					if (redeemTotalCount > 0) {
+						$('#sum_redeemValue').html(result.redeemTotalCount);
+					}
+					else {
+						$('#sum_redeemValue').html("-");
+					}
+
 					if(salesTotalCount > 0){
 						$('#sum_totalsales').html(result.salesTotalCount);
 					}
@@ -329,11 +368,95 @@
 
 					if (parseFloat(totalValue) > 0) {
 						$('#sum_SaleValue').html("£" +totalValue);
+						$('#sum_SaleValue').css("color", "#3327e9");
+					}
+					else if (parseFloat(totalValue) < 0) {
+
+						$('#sum_SaleValue').html("£" + totalValue);
+						$('#sum_SaleValue').css("color", "red");
 					}
 					else {
+
 						$('#sum_SaleValue').html("-");
 					}
 
+					if (parseFloat(unRedeemedAmount) > 0) {
+						$('#sum_unredeemamount').html("£" + unRedeemedAmount);
+						$('#sum_unredeemamount').css("color", "#3327e9");
+					}
+					else if (parseFloat(unRedeemedAmount) < 0) {
+
+						$('#sum_unredeemamount').html("£" + unRedeemedAmount);
+						$('#sum_unredeemamount').css("color", "red");
+					}
+					else {
+
+						$('#sum_unredeemamount').html("-");
+					}
+
+
+					if (parseFloat(ggcliabity) > 0) {
+						$('#sum_ggcliability').html("£" + ggcliabity);
+						$('#sum_ggcliability').css("color", "#3327e9");
+					}
+					else if (parseFloat(ggcliabity) < 0) {
+
+						$('#sum_ggcliability').html("£" + ggcliabity);
+						$('#sum_ggcliability').css("color", "red");
+					}
+					else {
+
+						$('#sum_ggcliability').html("-");
+					}
+
+					if (parseFloat(netAmount) > 0) {
+						$('#sum_netamountsales').html("£" + netAmount);
+						$('#sum_netamountsales').css("color", "#3327e9");
+					}
+					else if (parseFloat(netAmount) < 0) {
+
+						$('#sum_netamountsales').html("£" + netAmount);
+						$('#sum_netamountsales').css("color", "red");
+					}
+					else {
+
+						$('#sum_netamountsales').html("-");
+					}
+
+					if (parseFloat(ggcBreakage) > 0) {
+						$('#sum_breakage').html("£" + ggcBreakage);
+						$('#sum_breakage').css("color", "#3327e9");
+					}
+					else if (parseFloat(ggcBreakage) < 0) {
+
+						$('#sum_breakage').html("£" + ggcBreakage);
+						$('#sum_breakage').css("color", "red");
+					}
+					else {
+
+						$('#sum_breakage').html("-");
+					}
+
+					if (parseFloat(totalValueRedemp) > 0) {
+						$('#sum_redeemValue').html("£" + totalValueRedemp);
+						$('#sum_redeemValue').css("color", "#3327e9");
+					}
+					else if (parseFloat(totalValueRedemp) < 0) {
+
+						$('#sum_redeemValue').html("£" + totalValueRedemp);
+						$('#sum_redeemValue').css("color", "red");
+					}
+					else {
+
+						$('#sum_redeemValue').html("-");
+					}
+
+					const _endDate = moment($("#_redenddate").val(), 'DD/MM/YYYY');
+					const formattedendDate = _endDate.format('DD-MMM-YYYY');
+					const _startDate = moment($("#_redstartdate").val(), 'DD/MM/YYYY');
+					const formattedstartDate = _startDate.format('DD-MMM-YYYY');
+					$('#sum_enddate').html(formattedendDate);
+					$('#sum_startdate').html(formattedstartDate);
 
 				}
 
