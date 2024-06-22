@@ -1,4 +1,7 @@
-﻿using DinkToPdf;
+﻿using Aspose.Html.Saving;
+using Aspose.Html;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Entity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +14,10 @@ using Repository.Products;
 using Repository.Redemptions;
 using Repository.Sales;
 using Repository.SalesStore;
+using Repository.Settings;
 using Repository.StoresRedeem;
 using Repository.VATRates;
+using System.Globalization;
 
 namespace EPAYGOLF.Controllers
 {
@@ -25,6 +30,7 @@ namespace EPAYGOLF.Controllers
 		private IVATRatesRepository _vatratesRepository = new VATRatesRepository();
 		private IStoresRedeemRepository _storesredeemRepository = new StoresRedeemRepository();
 		private ISalesStoreRepository _salesstoreRepository = new SalesStoreRepository();
+		private ISettingsRepository _settingsRepository = new SettingsRepository();
 		private readonly ViewRenderingService _viewRenderingService;
 		private readonly IWebHostEnvironment _env;
 		public ReportController(ViewRenderingService viewRenderingService, IWebHostEnvironment env)
@@ -37,18 +43,38 @@ namespace EPAYGOLF.Controllers
 			ViewBag.AllProducts = _productRepository.GetProductList().OrderBy(x => x.ProductEAN).ToList();
 			ViewBag.AllSalesStore = _salesstoreRepository.GetSalesStoreList().OrderBy(x => x.RetailerID).ToList();
 			ViewBag.AllRedemStore = _storesredeemRepository.GetStoresRedeemList().OrderBy(x => x.StoreNo).ToList();
+			var getsettinglist = _settingsRepository.GetSettingsList().FirstOrDefault();
+			var _liabilitypct = (decimal)0.0;
+			var _yearStatDate = "";//"01/01" + DateTime.Now.AddYears(-1).Year;
+			if (getsettinglist != null)
+			{
+				_liabilitypct = getsettinglist.liabilitypct;
+				if (getsettinglist.YearStartDate != null)
+				{
+					var _dtYearStartDate = getsettinglist.YearStartDate.Value.ToString("dd/MM/yyyy");
+					_yearStatDate = DateTime.ParseExact(_dtYearStartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("dd/MM");
+				}
+			}
 
+			ViewBag.configliabilitypct = _liabilitypct;
+			ViewBag.configyearStatDate = _yearStatDate;
 
 			return View();
 		}
+		[HttpPost]
 		public async Task<ActionResult> GenerateDetailedReport(ReportSearchParam _request)
 		{
+			//return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
 			var result = 0;
 			string renderedSalesReportView = "";
+			string errormessage = "";
 			try
 			{
-				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate, _request.endDate).ToList();
-				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate, _request.endDate).ToList();
+				DataController dataController = new DataController();
+				var salestran = dataController.TransformSalesData();
+				var redemtran = dataController.TransformRedeemData();
+				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 				//if (salesreportresult != null && salesreportresult.Count > 0)
 				//{
 
@@ -79,7 +105,28 @@ namespace EPAYGOLF.Controllers
 				//ViewBag.StartDate = _request.startDate.ToString("dd/MMM/yyyy");
 				//ViewBag.EndDate = _request.endDate.ToString("dd/MMM/yyyy");
 				//renderedSalesReportView = await _viewRenderingService.RenderToStringAsync("GenerateDetailedSalesReport", salesreportresult);
+				//string path2 = "";
+				//string webRootPath2 = _env.WebRootPath;
+				//string dirPath2 = Path.Combine(webRootPath2, "Document");
 
+				//if (!System.IO.Directory.Exists(dirPath2))
+				//{
+				//	System.IO.Directory.CreateDirectory(dirPath2);
+				//}
+				//string outputPdfPath = dirPath2 + "\\output.pdf";
+				//// Convert the HTML string to a stream
+				//using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(renderedSalesReportView)))
+				//{
+				//	// Initialize the HTML document from the stream
+				//	using (HTMLDocument htmlDocument = new HTMLDocument(stream, ""))
+				//	{
+				//		// Initialize the PDF save options
+				//		PdfSaveOptions options = new PdfSaveOptions();
+
+				//		// Convert HTML to PDF
+				//		Aspose.Html.Converters.Converter.ConvertHTML(htmlDocument, options, outputPdfPath);
+				//	}
+				//}
 				//	var doc = new HtmlToPdfDocument()
 				//	{
 				//		GlobalSettings = {
@@ -162,7 +209,7 @@ namespace EPAYGOLF.Controllers
 					worksheet.Cells["B4"].Value = "REPORTING PERIOD: ";
 					worksheet.Cells["B4"].Style.Font.Bold = true;
 					worksheet.Cells["B4"].Style.Font.Size = 12;
-					worksheet.Cells["C4"].Value = _request.startDate.ToString("dd-MMM-yyyy") + " To " + _request.endDate.ToString("dd-MMM-yyyy");
+					worksheet.Cells["C4"].Value = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
 					worksheet.Cells["C4"].Style.Font.Bold = true;
 					worksheet.Cells["C4"].Style.Font.Size = 12;
 
@@ -358,7 +405,7 @@ namespace EPAYGOLF.Controllers
 					worksheet.Cells["B4"].Value = "REPORTING PERIOD: ";
 					worksheet.Cells["B4"].Style.Font.Bold = true;
 					worksheet.Cells["B4"].Style.Font.Size = 12;
-					worksheet.Cells["C4"].Value = _request.startDate.ToString("dd-MMM-yyyy") + " To " + _request.endDate.ToString("dd-MMM-yyyy");
+					worksheet.Cells["C4"].Value = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
 					worksheet.Cells["C4"].Style.Font.Bold = true;
 					worksheet.Cells["C4"].Style.Font.Size = 12;
 
@@ -373,7 +420,7 @@ namespace EPAYGOLF.Controllers
 					worksheet.Cells["B6"].Value = "TOTAL AMOUNT PAYABLE: ";
 					worksheet.Cells["B6"].Style.Font.Bold = true;
 					worksheet.Cells["B6"].Style.Font.Size = 12;
-					worksheet.Cells["C6"].Value = redempreportresult != null ? redempreportresult.Sum(x=>x.AmountPayableToStore) : "";
+					worksheet.Cells["C6"].Value = redempreportresult != null ? redempreportresult.Sum(x => x.AmountPayableToStore) : "";
 					worksheet.Cells["C6"].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
 					worksheet.Cells["C6"].Style.Font.Bold = true;
 					worksheet.Cells["C6"].Style.Font.Size = 12;
@@ -438,7 +485,7 @@ namespace EPAYGOLF.Controllers
 							worksheet.Cells[startRow + i, 14].Value = redempreportresult[i].StatementAmount;
 							worksheet.Cells[startRow + i, 14].Style.Numberformat.Format = "£#,##0.00;[Red](£#,##0.00)";
 
-							
+
 
 						}
 
@@ -490,13 +537,15 @@ namespace EPAYGOLF.Controllers
 
 				}
 				#endregion
-				return Json(new { issalesReportGenerated = true , isredempReportGenerated = true });
+				return Json(new { issalesReportGenerated = true, isredempReportGenerated = true });
 			}
+			
 			catch (Exception ex)
 			{
 				Helpers.ApplicationExceptions.SaveAppError(ex);
+				errormessage = ex.InnerException + Environment.NewLine + ex.StackTrace;
 			}
-			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
+			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false, errormessage= errormessage });
 		}
 
 		public IActionResult DownloadSalesReportExcel()
@@ -574,8 +623,14 @@ namespace EPAYGOLF.Controllers
 			ReportSummaryModel reportSummaryModel = new ReportSummaryModel();
 			try
 			{
-				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate, _request.endDate).ToList();
-				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate, _request.endDate).ToList();
+				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var getsettinglist = _settingsRepository.GetSettingsList().FirstOrDefault();
+				var _liabilitypct = (decimal)0.0;
+				if (getsettinglist != null)
+				{
+					_liabilitypct = getsettinglist.liabilitypct;
+				}
 				if (salesreportresult == null)
 				{
 					salesreportresult = new List<SalesEntity>();
@@ -596,8 +651,8 @@ namespace EPAYGOLF.Controllers
 				reportSummaryModel.ggcBreakage = salesreportresult.Sum(x => x.Breakage).ToString("N2");
 				reportSummaryModel.RedeemTotalCount = redempreportresult.Count;
 				reportSummaryModel.TotalValueRedemp = redempreportresult.Sum(x => x.Value).ToString("N2");
-				decimal liabilitypct = (decimal)0.87;
-				reportSummaryModel.ggliability =  ( Convert.ToDecimal(reportSummaryModel.UnRedeemedAmount) * liabilitypct).ToString("N2"); ;
+				decimal liabilitypct = _liabilitypct;
+				reportSummaryModel.ggliability = (Convert.ToDecimal(reportSummaryModel.UnRedeemedAmount) * liabilitypct).ToString("N2"); ;
 
 			}
 			catch (Exception ex)
@@ -606,6 +661,99 @@ namespace EPAYGOLF.Controllers
 			}
 			return Json(reportSummaryModel);
 		}
+		public ActionResult RemittanceReport([FromQuery] ReportSearchParam _request)
+		{
+
+			RedemptionsRemittance redemptionsRemittance = new RedemptionsRemittance();
+			InvoiceEntity invoiceEntity = new InvoiceEntity();
+			Int64 invoiceNumber = 0;
+			string longinvoicenumber = "0";
+			try
+			{
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList().FirstOrDefault();
+				if (redempreportresult == null)
+				{
+					return Content("No Redemption record found in selected time period");
+				}
+				if (invoiceresult != null)
+				{
+					invoiceNumber = invoiceresult.InvoiceNumber + 1;
+				}
+				else
+				{
+					invoiceNumber = invoiceNumber + 1;
+				}
+				longinvoicenumber = ConvertTo7Digits(invoiceNumber);
+				invoiceEntity.InvoiceNumber = invoiceNumber;
+				invoiceEntity.StatementNumber = "GCP" + longinvoicenumber.ToString();
+				invoiceEntity.StatementCreated = DateTime.Now;
+				invoiceEntity.GrossAmount = redempreportresult != null ? redempreportresult.Sum(x => x.Value) * -1 : 0;
+				invoiceEntity.ProductCommission = redempreportresult != null ? redempreportresult.Sum(x => x.ProductAmount) * -1 : 0;
+				invoiceEntity.VATDue = redempreportresult != null ? redempreportresult.Sum(x => x.VATDueOnCommission) * -1 : 0;
+				invoiceEntity.AmountPayable = redempreportresult != null ? redempreportresult.Sum(x => x.AmountPayableToStore) * -1 : 0;
+
+				int invoicesaveresult = _redemptionsRepository.SaveInvoiceInformation(invoiceEntity);
+
+				if (invoicesaveresult > 0)
+				{
+					foreach(var item in redempreportresult)
+					{
+						RedemptionsEntity redemptionsEntity = new RedemptionsEntity();
+						redemptionsEntity.StatementCreated = DateTime.Now;
+						redemptionsEntity.StatementNumber = invoiceEntity.StatementNumber;
+						redemptionsEntity.StatementAmount = invoiceEntity.AmountPayable;
+						redemptionsEntity.RedemptionsID = item.RedemptionsID;
+						_redemptionsRepository.UpdateRedemptionsInvoiceInformation(redemptionsEntity);
+					}
+
+					redemptionsRemittance.StoreID = ConvertTo7Digits(_request.redemstoreno);
+					redemptionsRemittance.StoreName = _request.redemstorename.Split("| ")[1].ToString();
+					redemptionsRemittance.DatePeriod = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
+					redemptionsRemittance.InvoiceNumber = invoiceEntity.StatementNumber;
+					redemptionsRemittance.DocumentDate = DateTime.Now.ToString("dd/MM/yyyy");
+					redemptionsRemittance.GrossAmount = invoiceEntity.GrossAmount;
+					redemptionsRemittance.ProductCommission = invoiceEntity.ProductCommission;
+					redemptionsRemittance.VATDue = invoiceEntity.VATDue;
+					redemptionsRemittance.AmountPayable = invoiceEntity.AmountPayable;
+					redemptionsRemittance.InvoiceTotal = invoiceEntity.ProductCommission + invoiceEntity.VATDue;
+					if (redempreportresult != null && redempreportresult.Count > 0)
+					{
+						redemptionsRemittance.lstRedemptions = redempreportresult;
+					}
+				}
+				else
+				{
+					return Content("Unable to save invoice");
+				}
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Content("Exception occur please contact admin");
+			}
+			return View(redemptionsRemittance);
+		}
+		public static string ConvertTo7Digits(Int64 number)
+		{
+			string numberStr = number.ToString();
+			if (numberStr.Length < 7)
+			{
+				// Pad with leading zeros
+				return numberStr.PadLeft(7, '0');
+			}
+			else if (numberStr.Length > 7)
+			{
+				// Truncate to the first 7 digits
+				return numberStr.Substring(0, 7);
+			}
+			else
+			{
+				// Already 7 digits
+				return numberStr;
+			}
+		}
+
 
 
 	}

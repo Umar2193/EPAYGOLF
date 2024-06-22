@@ -12,8 +12,8 @@ namespace Entity
 	}
 	public class ReportSearchParam
 	{
-        public DateTime startDate { get; set; }
-		public DateTime endDate { get; set; }
+        public DateTime? startDate { get; set; }
+		public DateTime? endDate { get; set; }
         public string reportPeriod  { get; set; }
         public Int64 salesstoreno { get; set; }
 		public string salesstorename { get; set; }

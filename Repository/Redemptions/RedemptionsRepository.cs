@@ -100,6 +100,45 @@ namespace Repository.Redemptions
 				Helpers.ApplicationExceptions.SaveAppError(ex);
 				return null;
 			}
-		}	
+		}
+		public List<InvoiceEntity> GetInvoiceList(Int64 id = 0)
+		{
+			try
+			{
+
+				return _DALredemptions.GetInvoiceList();
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
+			}
+		}
+		public int SaveInvoiceInformation(InvoiceEntity obj)
+		{
+			try
+			{
+
+				return _DALredemptions.SaveInvoiceInformation(obj);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return -1;
+			}
+		}
+		public int UpdateRedemptionsInvoiceInformation(RedemptionsEntity obj)
+		{
+			try
+			{
+
+				return _DALredemptions.UpdateRedemptionsInvoiceInformation(obj);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return -1;
+			}
+		}
 	}
 }

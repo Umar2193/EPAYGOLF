@@ -8,6 +8,26 @@
 		border: 1px solid black;
 		border-collapse: collapse;
 	}
+
+	@@@@page {
+		bottom-center {
+			content: 'Page ' counter(page) ' of ' counter(pages);
+		}
+	}
+
+	body {
+		font-family: Arial, sans-serif;
+	}
+
+	.footer {
+		position: running(footer);
+	}
+
+	@@@@page {
+		bottom-left {
+			content: element(footer);
+		}
+	}
 </style>
 <h3 style="text-decoration:underline">Sales Report</h3>
 <div class="row col-md-12 mb-3">
@@ -16,7 +36,7 @@
 		<div class="col-md-6">
 			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.SalesStoreName </label>
 		</div>
-     </div>
+	</div>
 
 </div>
 <div class="row col-md-12 mb-3">
@@ -55,12 +75,12 @@
 	</div>
 
 </div>
-<table id="tblSalesReportDetail_datatable" class="table table-striped table-bordered table-hover" >
+<table id="tblSalesReportDetail_datatable" class="table table-striped table-bordered table-hover">
 	<thead style="border:1px solid;">
 		<tr>
 			<th>TransactionDateTime</th>
 			<th>Product</th>
-			<th >TransactionID</th>
+			<th>TransactionID</th>
 			<th>CardID</th>
 			<th>Value</th>
 			<th>Count</th>
@@ -78,14 +98,14 @@
 			<th>Breakage</th>
 		</tr>
 	</thead>
-	<tbody >
+	<tbody>
 		@if (Model != null && Model.Count > 0)
 		{
 
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td >@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
+					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
 					<td>@item.Product</td>
 					<td>@item.TransactionID</td>
 					<td>@item.CardID</td>
@@ -110,7 +130,7 @@
 						floatcolor = "";
 					}
 					<td><span style="color:@floatcolor;font-weight:bold;">£ @item.StoreAmount.ToString("0.00")</span></td>
-					
+
 					@if (item.GGCAmount < 0)
 					{
 						floatcolor = "red";
@@ -201,6 +221,10 @@
 	</tbody>
 
 </table>
+<div class='footer'>This is a footer on every page</div>
+<h1>Hello, World!</h1>
+<p>This is a test PDF document generated from HTML string with a footer.</p>
+<p style='page-break-before: always;'>New page with footer.</p>
 <script type="text/javascript">
-	
+
 </script>

@@ -2,11 +2,16 @@
 	ViewData["Title"] = "SALES & REDEMPTIONS REPORTING";
 }
 
+
+	
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 	<!-- Main content -->
 	<section class="content">
 		<div class="container-fluid">
+			<input type="hidden" id="configliabilitypct" value="@ViewBag.configliabilitypct" />
+			<input type="hidden" id="configyearStatDate" value="@ViewBag.configyearStatDate" />
 			<div class="row">
 				<div class="col-12">
 					<div class="card card-info card-outline">
@@ -17,6 +22,7 @@
 							</h3>
 							<button onclick="DownloadSalesReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download SalesReporting</button>
 							<button onclick="DownloadRedempReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download RedemptionsReporting</button>
+							<button onclick="DownloadAccountRedemptionReport();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-print"></i>  Account Redemption Remittance</button>
 						</div>
 						<!-- /.card-header -->
 						<div class="card-body">
@@ -166,8 +172,11 @@
 	</section>
 
 </div>
+
+
 <script type="text/javascript">
 	$(document).ready(function () {
+		
 		moment.updateLocale('en', {
 			week: {
 				dow: 1 // Monday is the first day of the week
@@ -182,6 +191,7 @@
 		$("#_redenddate").datepicker("setDate", new Date());
 		ReportSummaryView();
 	});
+	
 
 	function GenerateDetailedReport() {
 		if ($("#_redstartdate").val() == null || $("#_redstartdate").val() == "") {
@@ -194,7 +204,7 @@
 		}
 		$.ajax({
 			url: "/Report/GenerateDetailedReport",
-			type: "Get",
+			type: "Post",
 			data: {
 				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
 				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
@@ -244,10 +254,20 @@
 		debugger
 		var _crval = $('#ddlreportingperiod').val();
 		if (_crval == "YTD") {
+
 			const currentDate = moment($("#_redenddate").val(), 'DD/MM/YYYY');
 
 			// Subtract one year from the current date and set the month and date to 1st July
-			const firstJulyPreviousYear = currentDate.subtract(1, 'years').month(6).date(1);
+			var firstJulyPreviousYear = currentDate.subtract(1, 'years').month(6).date(1);
+
+			if ($("#configyearStatDate").val() != null && $("#configyearStatDate").val() != "") {
+				debugger
+				var lastyear = firstJulyPreviousYear.year();
+				var configdate = $("#configyearStatDate").val();
+				var newdate = configdate + "/" + lastyear;
+				firstJulyPreviousYear = moment(newdate, 'DD/MM/YYYY');
+
+			}
 
 			// Format the date as needed (e.g., YYYY-MM-DD)
 			const formattedDate = firstJulyPreviousYear.format('DD/MM/YYYY');
@@ -315,7 +335,7 @@
 
 			},
 			error: function (result) {
-				toastr.error("Please generate sales report");
+				toastr.error("Please generate redemption report");
 			},
 			beforeSend: function () {
 				$('.preloader').show();
@@ -464,6 +484,71 @@
 			},
 			error: function (result) {
 				toastr.error("Please generate sales report");
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function DownloadAccountRedemptionReport() {
+		var url = '/Report/RemittanceReport?';
+		queryparam = 'startDate=' + $('#_redstartdate').val();
+		queryparam = queryparam + '&' + 'endDate=' + $('#_redenddate').val();
+		queryparam = queryparam + '&' + 'salesstoreno=' + $('#ddlsalesstorename').val();
+		queryparam = queryparam + '&' + 'salesstorename=' + $('#ddlsalesstorename option:selected').text();
+		queryparam = queryparam + '&' + 'redemstoreno=' + $('#ddlredemstorename').val();
+		queryparam = queryparam + '&' + 'redemstorename=' + $('#ddlredemstorename option:selected').text();
+		queryparam = queryparam + '&' + 'productid=' + $('#ddlproduct').val();
+		queryparam = queryparam + '&' + 'productName=' + $('#ddlproduct option:selected').text();
+		window.open(url + queryparam, '_blank');
+
+		return false;
+		$.ajax({
+			url: "/Report/RemittanceReport",
+			type: "Get",
+			data: {
+				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+				const { jsPDF } = window.jspdf;
+				const DOMPurify = window.DOMPurify;
+				const doc = new jsPDF();
+
+
+				// Convert HTML to PDF using dompurify
+				const htmlContent = DOMPurify.sanitize(result);
+				debugger
+				// Convert HTML to PDF
+				doc.html(htmlContent, {
+					callback: function (doc) {
+						// Save the PDF
+						doc.save('table.pdf');
+					}
+				});
+				//window.open('/Report/RemittanceReport', '_blank');
+				// var printContents = result;
+				// var printWindow = window.open('', '_blank', 'height=600,width=800');
+				// printWindow.document.write('<html><head><title>Account Redemption Remittance</title>');
+
+				// printWindow.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">');
+				// printWindow.document.write('<style> 		* { 			margin: 0; 			padding: 0; 			box-sizing: border-box; 		} 		body { 			display: flex; 			flex-direction: column; 			min-height: 100vh; 			font-family: Arial, sans-serif; 		} 		header { 			/*  background-color: #333; */ 			color: #fff; 			padding: 1rem; 			text-align: center; 			position: fixed; 			top: 0; 			width: 100%; 			/*  z-index: 1000; */ 		} 		footer { 			/* background-color: #333; */ 			color: #fff; 			padding: 1rem; 			text-align: center; 			position: fixed; 			bottom: 0; 			width: 100%; 			/*  z-index: 1000; */ 		} 		main { 			flex: 1; 			padding-top: 60px; /* height of the header */ 			padding-bottom: 60px; /* height of the footer */ 			overflow-y: auto; 		} 		/* page-break-after works, as well */ 		@@media print { 			.pagebreak { 				page-break-before: always; 			} 			.clstorelabel { 				color:white; 				background-color: dimgrey; 			} 			/* page-break-after works, as well */ 		} 		.pagebreak { 			page-break-before: always; 		} 		.clstorelabel { 			color: white; 			background-color: dimgrey; 		} 	</style>'); // Hide print button in print
+
+				// printWindow.document.write(printContents);
+				
+
+
+				// printWindow.document.close();
+				// printWindow.print();
+
+
+			},
+			error: function (result) {
+
 			},
 			beforeSend: function () {
 				$('.preloader').show();

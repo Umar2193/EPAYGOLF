@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Repository.SalesStore;
 using Repository.Settings;
+using System.Globalization;
 
 namespace EPAYGOLF.Controllers
 {
@@ -22,15 +23,30 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public IActionResult SaveSettings(SettingsEntity obj)
 		{
-			if(obj != null)
+			try
 			{
-				if (obj.liabilitypct > 0)
+				if (obj != null)
 				{
-					obj.liabilitypct = obj.liabilitypct / 100;
+					if (!string.IsNullOrEmpty(obj.strYearStartDate))
+					{
+						var currentYear = DateTime.Now.Year;
+						var date = obj.strYearStartDate + "/" + currentYear;
+						obj.YearStartDate = DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+					}
+					if (obj.liabilitypct > 0)
+					{
+						obj.liabilitypct = obj.liabilitypct / 100;
+					}
 				}
+				var result = _settingsRepository.SaveSettingsInformation(obj);
+				return Json(result);
+
 			}
-			var result = _settingsRepository.SaveSettingsInformation(obj);
-			return Json(result);
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Json(-2);
+			}
 		}
 	}
 }

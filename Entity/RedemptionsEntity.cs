@@ -57,4 +57,24 @@ namespace Entity
 
 
 	}
+	public class RedemptionsRemittance
+	{
+		public RedemptionsRemittance()
+		{
+			lstRedemptions = new List<RedemptionsEntity>();
+		}
+		public string StoreID { get; set; }
+		public string StoreName { get; set; }
+		public string DatePeriod { get; set; }
+		public string InvoiceNumber { get; set; }
+		public string DocumentDate { get; set; }
+        public decimal GrossAmount { get; set; }
+		public decimal ProductCommission { get; set; }
+
+		public decimal VATDue { get; set; }
+
+		public decimal AmountPayable { get; set; }
+        public decimal InvoiceTotal { get; set; }
+        public List<RedemptionsEntity> lstRedemptions { get; set; }
+	}
 }

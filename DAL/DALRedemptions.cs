@@ -36,13 +36,13 @@ namespace DAL
 		{
 
 			string Query = string.Format($"SELECT [RedemptionsID] ,[ID],[AccountName],[TransactionID] " +
-      $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
-      $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
-      $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
-      $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
-      $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
-      $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-      $" FROM [dbo].[Redemptions] r" +
+	  $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
+	  $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
+	  $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
+	  $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
+	  $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
+	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" FROM [dbo].[Redemptions] r" +
 				$" where r.IsActive=1 and r.IsDeleted=0 " +
 				$" and r.RedemptionsID = " + id);
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
@@ -211,6 +211,71 @@ namespace DAL
 			string Query = string.Format(_Query);
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
+		}
+		public List<InvoiceEntity> GetInvoiceList(Int64 id = 0)
+		{
+
+			string Query = string.Format($"SELECT [ID],[InvoiceNumber],[StoreNo],[StatementCreated],[StatementNumber],[GrossAmount] " +
+
+		$" , [ProductCommission], [VATDue], [AmountPayable] " +
+
+		$" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+
+		$"  FROM[dbo].[Invoices]" +
+	    $" where IsActive = 1 and IsDeleted = 0 " +
+	    $" order by StatementCreated desc");
+			var Data = dapper.Query<InvoiceEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
+		}
+		public int SaveInvoiceInformation(InvoiceEntity obj)
+		{
+			string Query = "";
+			if (obj.ID > 0)
+			{
+				Query = string.Format($"UPDATE [dbo].[Invoices] " +
+					$"SET [StoreNo] = '" + obj.StoreNo + "'" +
+					$",[StatementCreated] = '" + obj.StatementCreated + "' " +
+					$",[StatementNumber] = '" + obj.StatementNumber + "'" +
+					$",[GrossAmount] ='" + obj.GrossAmount + "'" +
+					$",[ProductCommission] ='" + obj.ProductCommission + "'" +
+					$",[VATDue] ='" + obj.VATDue + "'" +
+					$",[AmountPayable] ='" + obj.AmountPayable + "'" +
+					$",[UpdatedAt] = GetDate() " +
+					$",[UpdatedBy] = 100 " +
+					$" WHERE [InvoiceNumber] = '" + obj.InvoiceNumber + "'");
+			}
+			else
+			{
+				Query = string.Format($"INSERT INTO [dbo].[Invoices] ([InvoiceNumber],[StoreNo],[StatementCreated],[StatementNumber],[GrossAmount],[ProductCommission],[VATDue],[AmountPayable],[IsActive],[IsDeleted],[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy])" +
+					$" VALUES('" + obj.InvoiceNumber + "','" + obj.StoreNo + "'" +
+					$", GetDate() ,'" + obj.StatementNumber + "'" +
+					$",'" + obj.GrossAmount + "' ,'" + obj.ProductCommission + "'" +
+					$",'" + obj.VATDue + "' ,'" + obj.AmountPayable + "'" +
+					$",'1' ,'0'" +
+					$", GetDate() ,GetDate()" +
+					$",'100'" +
+					$",'100' )");
+
+			}
+			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+			return result;
+		}
+		public int UpdateRedemptionsInvoiceInformation(RedemptionsEntity obj)
+		{
+			string Query = "";
+			if (obj.RedemptionsID > 0)
+			{
+				Query = string.Format($"UPDATE [dbo].[Redemptions] " +
+					$" set [StatementCreated] = GetDate()" +
+					$",[StatementNumber] ='" + obj.StatementNumber + "'" +
+					$",[StatementAmount] ='" + obj.StatementAmount + "'" +
+					$",[UpdatedAt] = GetDate() " +
+					$",[UpdatedBy] = 100 " +
+					$" WHERE [RedemptionsID] = '" + obj.RedemptionsID + "'");
+			}
+			
+			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+			return result;
 		}
 	}
 }

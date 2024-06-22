@@ -10,74 +10,75 @@
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-<!-- Main content -->
-<section class="content">
-	<div class="container-fluid">
-		<!-- SELECT2 EXAMPLE -->
-		<div class="card card-default">
-			<form id="frmsettings">
-				<!-- /.card-header -->
-				<div class="card-body">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<!-- SELECT2 EXAMPLE -->
+			<div class="card card-default">
+				<form id="frmsettings">
+					<!-- /.card-header -->
+					<div class="card-body">
 
-					<input type="hidden" name="SettingID" id="SettingID" value="@Model.SettingID" />
-					<div class="row col-md-12 mb-3">
-						<div class="form-group row col-md-6">
-							<label for="inputEmail3" class="col-md-4 col-form-label">Year Start Date</label>
-							<div class="col-md-8">
-								<div class="input-group">
-									@{
-										var currentorderdate = "";
-										if (Model.YearStartDate != null)
-										{
-											currentorderdate = Model.YearStartDate.Value.ToString("dd/MM");
+						<input type="hidden" name="SettingID" id="SettingID" value="@Model.SettingID" />
+						<div class="row col-md-12 mb-3">
+							<div class="form-group row col-md-6">
+								<label for="inputEmail3" class="col-md-4 col-form-label">Year Start Date</label>
+								<div class="col-md-8">
+									<div class="input-group">
+										@{
+											var currentorderdate = "";
+											if (Model.YearStartDate != null)
+											{
+												currentorderdate = Model.YearStartDate.Value.ToString("dd/MM");
+											}
 										}
-									}
-									<input type="text" data-date data-date-format="dd/MM/" autocomplete="off" value="@currentorderdate" id="YearStartDate" placeholder="dd/mm" name="YearStartDate" required class="form-control" />
-									<div class="input-group-append">
-										<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+										<input type="text"  data-date-format="dd/MM/" autocomplete="off" value="@currentorderdate" id="YearStartDate" placeholder="dd/mm" name="YearStartDate" required class="form-control" />
+										<input type="hidden" id="strYearStartDate" name="strYearStartDate" value="@currentorderdate"/>
+										<div class="input-group-append">
+											<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+										</div>
 									</div>
+
 								</div>
-
 							</div>
-						</div>
-						<div class="form-group row col-md-6">
-							<label for="inputEmail3" class="col-md-4 col-form-label">LIABILITY PCT</label>
+							<div class="form-group row col-md-6">
+								<label for="inputEmail3" class="col-md-4 col-form-label">LIABILITY PCT</label>
 
-							<div class="col-md-8">
-								<div class="input-group">
+								<div class="col-md-8">
+									<div class="input-group">
 										<input value="@Model.liabilitypct.ToString("0.00")" type="number" step=".01" class="form-control" name="liabilitypct" id="liabilitypct" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="10" placeholder="">
-									<div class="input-group-append">
-										<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+										<div class="input-group-append">
+											<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+										</div>
+
+
 									</div>
 
-
 								</div>
-
 							</div>
+
+
 						</div>
-						
+
 
 					</div>
+					<!-- /.row -->
+					<div class="card-footer">
 
+						<button style="margin-left:5px;margin-right:5px;float:right;" type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
 
-				</div>
-				<!-- /.row -->
-				<div class="card-footer">
+					</div>
+				</form>
+			</div>
 
-					<button style="margin-left:5px;margin-right:5px;float:right;" type="submit" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
-					
-				</div>
-			</form>
+			<!-- /.card-body -->
+
 		</div>
-
-		<!-- /.card-body -->
-
-	</div>
-	<!-- /.card -->
-	<!-- /.row -->
-	<!-- /.row -->
-	<!-- /.container-fluid -->
-</section>
+		<!-- /.card -->
+		<!-- /.row -->
+		<!-- /.row -->
+		<!-- /.container-fluid -->
+	</section>
 </div>
 <!-- /.content -->
 <!-- /.content-wrapper -->
@@ -86,57 +87,57 @@
 		$("#frmsettings").submit(function (e) {
 			debugger
 			e.preventDefault();
+			$('#strYearStartDate').val($('#YearStartDate').val());
 			SaveSettings();
 		});
 
 
 		$("#YearStartDate").datepicker({
 			format: 'dd/mm',
-	
+
 			minViewMode: "1",
 			autoclose: true,
 			todayHighlight: true
 
-		}).on('changeMonth', function (e) {
-			// Prevent selection of a date outside the current month
-			$(this).datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth(), e.date.getDate()));
+		}).on('changeDate', function (e) {
+			// Value format, here it's the same as display format but you can change it
+			var value = e.format(0, "dd/mm/yyyy");
+			$(this).val(value);
+
 		});
 
 
 	});
+		function SaveSettings() {
+			// if ($('#VATRate').val() == null || $('#VATRate').val() == ""
+			// 	|| $('#VATRate').val() == "0") {
+			// 	toastr.error("Please enter VATRate")
+			// 	return;
+			// }
 
+			$.ajax({
+				url: "/Settings/SaveSettings",
+				data: $('#frmsettings').serialize(),
+				type: "post",
+				success: function (result) {
+					if (result > 0) {
 
+						toastr.success("Record saved successfully..!!!");
+					}
+					else {
+						toastr.error("Unable to save record..!!!");
+					}
 
-	function SaveSettings() {
-		// if ($('#VATRate').val() == null || $('#VATRate').val() == ""
-		// 	|| $('#VATRate').val() == "0") {
-		// 	toastr.error("Please enter VATRate")
-		// 	return;
-		// }
+				},
+				error: function (result) {
 
-		$.ajax({
-			url: "/Settings/SaveSettings",
-			data: $('#frmsettings').serialize(),
-			type: "post",
-			success: function (result) {
-				if (result > 0) {
+				},
+				beforeSend: function () {
 
-					toastr.success("Record saved successfully..!!!");
+				},
+				complete: function (result) {
+
 				}
-				else {
-					toastr.error("Unable to save record..!!!");
-				}
-
-			},
-			error: function (result) {
-
-			},
-			beforeSend: function () {
-
-			},
-			complete: function (result) {
-
-			}
-		});
-	}
+			});
+		}
 </script>

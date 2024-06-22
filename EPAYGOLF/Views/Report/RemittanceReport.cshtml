@@ -1,0 +1,459 @@
+﻿@model Entity.RedemptionsRemittance
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Remittance_@Model.InvoiceNumber _@Model.StoreName</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<!-- Theme style -->
+	@* <link rel="stylesheet" href="~/dist/css/adminlte.min.css"> *@
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			font-family: Arial, sans-serif;
+		}
+
+		header {
+			/*  background-color: #333; */
+			color: #fff;
+			padding: 1rem;
+			text-align: center;
+			position: fixed;
+			top: 0;
+			width: 100%;
+			/*  z-index: 1000; */
+			margin-bottom: 100px !important;
+			page-break-before: always;
+		}
+
+		footer {
+			/* background-color: #333; */
+			color: #fff;
+			padding: 1rem;
+			text-align: center;
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			/*  z-index: 1000; */
+		}
+
+		main {
+			flex: 1;
+			padding-top: 60px; /* height of the header */
+			padding-bottom: 60px; /* height of the footer */
+			overflow-y: auto;
+		}
+
+
+		/* page-break-after works, as well */
+		@@media print {
+			.pagebreak {
+				page-break-before: always;
+			}
+
+			.clstorelabel {
+				font-weight: bold !important;
+				/* color: white !important;
+											background-color: dimgrey !important;
+
+											print-color-adjust: exact !important; */
+			}
+
+			a::after {
+				content: none !important;
+			}
+
+			#redemptabl1 tr:nth-child(24n+1) {
+				page-break-before: always;
+				margin-top: 200px;
+			}
+
+
+
+
+			thead {
+				display: table-header-group; /* Ensures header is repeated on each page */
+			}
+
+			tr {
+				display: table-row;
+				page-break-inside: avoid;
+			}
+			/* page-break-after works, as well */
+		}
+
+		@@page {
+			size: auto; /* auto is the initial value */
+			margin: 10px; /* this affects the margin in the printer settings */
+		}
+
+		.pagebreak {
+			page-break-before: always;
+		}
+
+		.clstorelabel {
+			font-weight: bold !important;
+			/* color: white !important;
+									background-color: dimgrey !important;
+
+									print-color-adjust: exact !important; */
+		}
+
+		.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+			padding: 3px;
+			line-height: 1.12857143;
+		}
+
+		#redemptabl1 tr:nth-child(24n+1) {
+			page-break-before: always;
+			margin-top: 200px;
+		}
+
+
+
+
+		thead {
+			display: table-header-group; /* Ensures header is repeated on each page */
+		}
+
+		tr {
+			display: table-row;
+			page-break-inside: avoid;
+		}
+	</style>
+
+</head>
+<body>
+	<header>
+		<img src="~/dist/img/golfreportlogo.png" alt="logo" style="float:right;" />
+	</header>
+	<main>
+		<h1>Remittance Advice</h1>
+
+		<div class="col col-md-12">
+			<label class="col-md-4">All Stores</label>
+			<div class="col col-md-8" style="float:right;">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td class="clstorelabel">Store Name:</td>
+							<td>@Model.StoreName</td>
+
+						</tr>
+						<tr>
+							<td class="clstorelabel">StoreID:</td>
+							<td>@Model.StoreID</td>
+						</tr>
+
+						<tr>
+							<td class="clstorelabel">
+								Claim Period:
+							</td>
+							<td>@Model.DatePeriod</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Invoice Number:
+							</td>
+							<td>@Model.InvoiceNumber</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Document Date:
+							</td>
+							<td>@Model.DocumentDate</td>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+
+		<div class="col col-md-12">
+			<div class="col col-md-8" style="text-align:center;">
+				<table class="table table-bordered">
+					<thead class="clstorelabel">
+					<th class="clstorelabel" style="text-align:center;">Claim Face Value</th>
+					<th class="clstorelabel" style="text-align:center;">Service Charge</th>
+					<th class="clstorelabel" style="text-align:center;">Service Charge VAT</th>
+					<th class="clstorelabel" style="text-align:center;">
+						Net Claim Total
+					</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>£@Model.GrossAmount.ToString("0.00")</td>
+							<td>£@Model.ProductCommission.ToString("0.00")</td>
+							<td>£@Model.VATDue.ToString("0.00")</td>
+							<td>£@Model.AmountPayable.ToString("0.00")</td>
+
+						</tr>
+						<br style="margin-top:200px;" />
+
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+		<div class="col col-md-12">
+
+			<label style="margin-left:250px; text-align:center;color:lightgreen !important">Remittance Detail</label>
+		</div>
+		<div class="col col-md-12">
+
+			<div class="col col-md-8" style="text-align:center;">
+				<table class="table table-bordered" style="text-align:center;width:60%;margin-left:150px;">
+					<thead class="clstorelabel">
+					<th class="clstorelabel" style="text-align:center;">Date</th>
+					<th class="clstorelabel" style="text-align:center;">Reference</th>
+					<th class="clstorelabel" style="text-align:center;">
+						Amount
+					</th>
+
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								@Model.DocumentDate
+							</td>
+							<td>GCR00084499</td>
+							<td>
+								£@Model.AmountPayable.ToString("0.00")
+							</td>
+
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+		<div class="col col-md-12">
+			<p style="text-align:center;">For all enquiries please refer to the Golf Gift Card Finance team at: <a href="mailto:partner@thegolfgiftcard.com">partner@thegolfgiftcard.com</a> </p>
+		</div>
+		<hr />
+		<div class="pagebreak"> </div>
+
+
+	</main>
+	<main>
+		<h1>Invoice</h1>
+		<div class="col col-md-12">
+			<label class="col-md-4">All Stores</label>
+			<div class="col col-md-8" style="float:right;">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td class="clstorelabel">Account Name:</td>
+							<td>@Model.StoreName</td>
+
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Finance No:
+							</td>
+							<td>@Model.StoreID</td>
+						</tr>
+
+						<tr>
+							<td class="clstorelabel">
+								Claim Period:
+							</td>
+							<td>@Model.DatePeriod</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Invoice Number:
+							</td>
+							<td>@Model.InvoiceNumber</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Document Date:
+							</td>
+							<td>@Model.DocumentDate</td>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+		<br />
+		<div class="col col-md-12" @* style="margin-bottom:20px;" *@>
+			<table class="table table-bordered" id="redemptabl1">
+				<thead>
+				<th>Location</th>
+				<th>Number of Transactions</th>
+				<th>Face Value</th>
+				<th>Service Charge</th>
+				</thead>
+				<tbody>
+					@{
+						int pagecount = 0;
+					}
+					@foreach (var item in Model.lstRedemptions.OrderBy(x => x.StoreNo))
+					{
+						pagecount++;
+
+						<tr>
+							<td>Store: @item.CardID</td>
+							<td>@Model.lstRedemptions.Count</td>
+							@{
+								var valdcm = Model.lstRedemptions.Where(x => x.CardID == item.CardID).Sum(x => x.Value);
+								valdcm = valdcm * -1;
+							}
+							<td>£@valdcm.ToString("0.00")</td>
+							@{
+								var strpdcm = "-";
+								var prdcm = item.ProductAmount * -1;
+								if (prdcm > 0)
+								{
+									strpdcm = "£" + prdcm.ToString("0.00");
+								}
+							}
+							<td>@strpdcm</td>
+
+						</tr>
+
+
+					}
+
+
+				</tbody>
+			</table>
+			<div class="col col-md-6" style="float:right;right:0px;">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td class="clstorelabel">Claim Face Value</td>
+							<td>£@Model.GrossAmount.ToString("0.00")</td>
+
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Service Charge
+							</td>
+							<td>£@Model.ProductCommission.ToString("0.00")</td>
+						</tr>
+
+						<tr>
+							<td class="clstorelabel">
+								VAT
+							</td>
+							<td>£@Model.VATDue.ToString("0.00")</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Invoice Total
+							</td>
+							<td>£@Model.InvoiceTotal.ToString("0.00")</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+			</div>
+
+		</div>
+	</main>
+	<div class="pagebreak"> </div>
+	<main>
+		<h1>Transaction Detail</h1>
+		<br />
+		<p>The following information forms part of Invoice: @Model.InvoiceNumber</p>
+		<br />
+		<div class="col col-md-12" @* style="margin-bottom:20px;" *@>
+			<table class="table table-bordered" id="redemptabl1">
+				<thead>
+				<th>Transaction Date</th>
+				<th>Transaction Time</th>
+				<th>Transaction ID</th>
+				<th>External ID</th>
+				<th>Face Value</th>
+				</thead>
+				<tbody>
+
+					@foreach (var item in Model.lstRedemptions.OrderByDescending(x => x.TransactionDateTime))
+					{
+
+
+						<tr>
+							<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy")</td>
+							<td>@item.TransactionDateTime.Value.ToString("HH:mm:ss")</td>
+							<td>@item.Postcode</td>
+							<td>@item.TransactionID</td>
+							@{
+								var valdcm_value = item.Value;
+								valdcm_value = valdcm_value * -1;
+							}
+							<td>£@valdcm_value.ToString("0.00")</td>
+
+
+						</tr>
+
+
+
+					}
+
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td style="font-weight:bold;background-color:dimgray;">Total:</td>
+						<td style="font-weight:bold;background-color:dimgray;">£@Model.GrossAmount.ToString("0.00")</td>
+					</tr>
+				</tbody>
+			</table>
+
+
+		</div>
+	</main>
+	<footer>
+		<div style="float:left;text-align:left">
+			<p>The Golf Gift Card Company Limited</p>
+			<p>A company registered by guarantee</p>
+			<p>
+				Company Registration: 14242436
+			</p>
+			<p>
+				VAT Number: 438075778
+			</p>
+		</div>
+		<div style="float:right;text-align:left;">
+			<br />
+			<br />
+			Invoice No: @Model.InvoiceNumber
+		</div>
+	</footer>
+
+
+
+</body>
+</html>
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<script>
+	$(document).ready(function () {
+		window.setTimeout(function () {
+			window.print();
+		}, 1000);
+		// Close the window after printing
+		window.onafterprint = function () {
+			window.close();
+		};
+
+	});
+</script>
