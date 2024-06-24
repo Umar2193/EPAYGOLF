@@ -96,7 +96,7 @@
 					<td><span style="color:@floatcolor;font-weight:bold;">@item.AmountPayableToStore.ToString("0.00")</span></td>
 					<td> @item.Postcode</td>
 
-					<td>@item.StatementCreated.ToString("dd/MM/yyyy")</td>
+					<td>@item.StatementCreated.Value.ToString("dd/MM/yyyy")</td>
 					<td>@item.StatementNumber</td>
 					@if (item.StatementAmount < 0)
 					{

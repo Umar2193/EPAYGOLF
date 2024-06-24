@@ -29,7 +29,7 @@ namespace Entity
 		public decimal VATDueOnCommission { get; set; }
 		public decimal AmountPayableToStore { get; set; }
 		public string Postcode { get; set; }
-		public DateTime StatementCreated { get; set; }
+		public DateTime? StatementCreated { get; set; }
 		public string StatementNumber { get; set; }
 		public decimal StatementAmount { get; set; }
 		public bool IsActive { get; set; }

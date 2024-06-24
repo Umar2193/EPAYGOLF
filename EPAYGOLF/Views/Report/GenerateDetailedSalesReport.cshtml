@@ -1,101 +1,110 @@
 ﻿@model List<Entity.SalesEntity>
 @{
-	//Layout = null;
+	Layout = null;
 	string floatcolor = "";
 }
 <style>
-	table, th, td {
-		border: 1px solid black;
-		border-collapse: collapse;
+	.tblfontstyle {
+		font-weight: bold;
+		font-size: 14px;
 	}
 
-	@@@@page {
-		bottom-center {
-			content: 'Page ' counter(page) ' of ' counter(pages);
-		}
+	table.dataTable {
+		width: auto;
 	}
 
-	body {
-		font-family: Arial, sans-serif;
+
+	table td {
+		padding: .15rem !important;
 	}
 
-	.footer {
-		position: running(footer);
+	table.dataTable td:nth-child(1) {
+		padding-bottom: 6px !important;
+		width: auto !important;
 	}
 
-	@@@@page {
-		bottom-left {
-			content: element(footer);
-		}
+	table.dataTable > thead > tr > th:not(.sorting_disabled), table.dataTable > thead > tr > td:not(.sorting_disabled) {
+		padding-right: 20px;
+		padding-left: 8px;
 	}
+
+	.thclass {
+		font-size: 9px;
+	}
+
+	.tdclass {
+		font-size: 9px;
+	}
+
 </style>
-<h3 style="text-decoration:underline">Sales Report</h3>
-<div class="row col-md-12 mb-3">
-	<div class="form-group row col-md-12">
-		<label for="inputEmail3" class="col-md-6 col-form-label">STORE NAME: </label>
-		<div class="col-md-6">
-			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.SalesStoreName </label>
-		</div>
-	</div>
+<table class="table table-striped table-bordered table-hover">
+	<tr>
+		<td colspan="10" class="tblfontstyle">Sales Report</td>
 
-</div>
-<div class="row col-md-12 mb-3">
-	<div class="form-group row col-md-12">
-		<label for="inputEmail3" class="col-md-6 col-form-label">PRODUCT NAME: </label>
-		<div class="col-md-6">
-			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.ProductName </label>
-		</div>
-	</div>
+	</tr>
+	<tr>
+		<td class="tblfontstyle">STORE NAME: </td>
+		<td>@ViewBag.StoreName</td>
 
-</div>
-<div class="row col-md-12 mb-3">
-	<div class="form-group row col-md-12">
-		<label for="inputEmail3" class="col-md-6 col-form-label">REPORTING PERIOD: </label>
-		<div class="col-md-6">
-			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.StartDate To @ViewBag.EndDate </label>
-		</div>
-	</div>
+	</tr>
+	<tr>
+		<td class="tblfontstyle">PRODUCT NAME: </td>
+		<td>@ViewBag.ProductName</td>
 
-</div>
-<div class="row col-md-12 mb-3">
-	<div class="form-group row col-md-12">
-		<label for="inputEmail3" class="col-md-6 col-form-label">GGC TOTAL NET AMOUNT: </label>
-		<div class="col-md-6">
-			<label for="inputEmail3" class="col-md-6 col-form-label">£@ViewBag.NetAmount </label>
-		</div>
-	</div>
+	</tr>
+	<tr>
+		<td class="tblfontstyle">REPORTING PERIOD: </td>
+		<td>@ViewBag.StartDate To @ViewBag.EndDate</td>
 
-</div>
-<div class="row col-md-12 mb-3">
-	<div class="form-group row col-md-12">
-		<label for="inputEmail3" class="col-md-6 col-form-label">COUNT: </label>
-		<div class="col-md-6">
-			<label for="inputEmail3" class="col-md-6 col-form-label">@ViewBag.TotalCount </label>
-		</div>
-	</div>
+	</tr>
+	<tr>
+		<td class="tblfontstyle">
+			GGC TOTAL NET AMOUNT:
+		</td>
+		@{
 
-</div>
-<table id="tblSalesReportDetail_datatable" class="table table-striped table-bordered table-hover">
+			if (ViewBag.NetAmount < 0)
+			{
+				floatcolor = "red";
+			}
+			else
+			{
+				floatcolor = "";
+			}
+		}
+		<td><span style="color:@floatcolor;">£@ViewBag.NetAmount.ToString("N2")</span></td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">
+			COUNT:
+		</td>
+
+		<td>@ViewBag.TotalCount</td>
+
+	</tr>
+</table>
+<table id="tblsalesreportlist_datatable" class="table table-striped table-bordered table-hover">
 	<thead style="border:1px solid;">
 		<tr>
-			<th>TransactionDateTime</th>
-			<th>Product</th>
-			<th>TransactionID</th>
-			<th>CardID</th>
-			<th>Value</th>
-			<th>Count</th>
-			<th>StoreNo</th>
-			<th>StoreName</th>
-			<th>StoreComm</th>
-			<th>GGC Redemption</th>
-			<th>Processing Fee</th>
-			<th>Stripe Comm</th>
-			<th>Merchant</th>
-			<th>Net Amount</th>
-			<th>Expiry Date</th>
-			<th>Redeemed Amount</th>
-			<th>UnRedeemed Amt</th>
-			<th>Breakage</th>
+			<th class="thclass">TransactionDateTime</th>
+			<th class="thclass">Product</th>
+			<th class="thclass">TransactionID</th>
+			<th class="thclass">CardID</th>
+			<th class="thclass">Value</th>
+			<th class="thclass">Count</th>
+			<th class="thclass">StoreNo</th>
+			<th class="thclass">StoreName</th>
+			<th class="thclass">StoreComm</th>
+			<th class="thclass">GGC Redemption</th>
+			<th class="thclass">Processing Fee</th>
+			<th class="thclass">Stripe Comm</th>
+			<th class="thclass">Merchant</th>
+			<th class="thclass">Net Amount</th>
+			<th class="thclass">Expiry Date</th>
+			<th class="thclass">Redeemed Amount</th>
+			<th class="thclass">UnRedeemed Amt</th>
+			<th class="thclass">Breakage</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -105,10 +114,10 @@
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
-					<td>@item.Product</td>
-					<td>@item.TransactionID</td>
-					<td>@item.CardID</td>
+					<td class="tdclass">@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
+					<td class="tdclass">@item.Product</td>
+					<td class="tdclass">@item.TransactionID</td>
+					<td class="tdclass">@item.CardID</td>
 					@if (item.Value < 0)
 					{
 						floatcolor = "red";
@@ -117,10 +126,10 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;">(£)@item.Value.ToString("0.00")</span></td>
-					<td>1</td>
-					<td>@item.StoreNo</td>
-					<td>@item.StoreName</td>
+					<td class="tdclass"><span style="color:@floatcolor;">£@item.Value.ToString("0.00")</span></td>
+					<td class="tdclass">1</td>
+					<td class="tdclass">@item.StoreNo</td>
+					<td class="tdclass">@item.StoreName</td>
 					@if (item.StoreAmount < 0)
 					{
 						floatcolor = "red";
@@ -129,7 +138,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;">£ @item.StoreAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor;">£ @item.StoreAmount.ToString("0.00")</span></td>
 
 					@if (item.GGCAmount < 0)
 					{
@@ -139,7 +148,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;">£ @item.GGCAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor;">£ @item.GGCAmount.ToString("0.00")</span></td>
 					@if (item.ProcessAmount < 0)
 					{
 						floatcolor = "red";
@@ -148,7 +157,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;">£@item.ProcessAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor;">£@item.ProcessAmount.ToString("0.00")</span></td>
 					@if (item.StripeAmount < 0)
 					{
 						floatcolor = "red";
@@ -157,7 +166,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;">£@item.StripeAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor;">£@item.StripeAmount.ToString("0.00")</span></td>
 					@if (item.TransactionAmount < 0)
 					{
 						floatcolor = "red";
@@ -167,7 +176,7 @@
 						floatcolor = "";
 					}
 
-					<td><span style="color:@floatcolor;font-weight:bold;">£@item.TransactionAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor;">£@item.TransactionAmount.ToString("0.00")</span></td>
 					@if (item.NetAmount < 0)
 					{
 						floatcolor = "red";
@@ -176,8 +185,8 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor;font-weight:bold;"> £@item.NetAmount.ToString("0.00")</span></td>
-					<td>@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
+					<td class="tdclass"><span style="color:@floatcolor;"> £@item.NetAmount.ToString("0.00")</span></td>
+					<td class="tdclass">@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
 					@if (item.RedeemedAmount < 0)
 					{
 						floatcolor = "red";
@@ -186,7 +195,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor">£@item.RedeemedAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor">£@item.RedeemedAmount.ToString("0.00")</span></td>
 					@if (item.UnRedeemedAmount < 0)
 					{
 						floatcolor = "red";
@@ -195,7 +204,7 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor">£@item.UnRedeemedAmount.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor">£@item.UnRedeemedAmount.ToString("0.00")</span></td>
 					@if (item.Breakage < 0)
 					{
 						floatcolor = "red";
@@ -204,10 +213,144 @@
 					{
 						floatcolor = "";
 					}
-					<td><span style="color:@floatcolor">£@item.Breakage.ToString("0.00")</span></td>
+					<td class="tdclass"><span style="color:@floatcolor">£@item.Breakage.ToString("0.00")</span></td>
 
 				</tr>
+				
 			}
+			<tr>
+				<td class="tdclass" style="font-weight:bold;">Totals</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				@{
+
+					if (ViewBag.TotalValue < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.TotalValue.ToString("N2")</td>
+				<td class="tdclass" style="font-weight:bold;">@ViewBag.TotalCount</td>
+				<td></td>
+				<td></td>
+				@{
+
+					if (ViewBag.StoreAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.StoreAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.GGCAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.GGCAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.ProcessAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.ProcessAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.StripeAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.StripeAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.TransactionAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.TransactionAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.NetAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">
+					£@ViewBag.NetAmount</td>
+				<td></td>
+				@{
+
+					if (ViewBag.RedeemedAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.RedeemedAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.UnRedeemedAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.UnRedeemedAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.Breakage < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="color:@floatcolor;font-weight:bold;">£@ViewBag.Breakage.ToString("N2")</td>
+			</tr>
+
 
 		}
 		else
@@ -221,10 +364,23 @@
 	</tbody>
 
 </table>
-<div class='footer'>This is a footer on every page</div>
-<h1>Hello, World!</h1>
-<p>This is a test PDF document generated from HTML string with a footer.</p>
-<p style='page-break-before: always;'>New page with footer.</p>
-<script type="text/javascript">
 
+<script type="text/javascript">
+	$('#tblsalesreportlist_datatable').DataTable({
+		"order": [],
+		"paging": false,
+		"lengthChange": false,
+		"searching": false,
+		"ordering": true,
+		"info": true,
+		"autoWidth": true,
+		"responsive": false,
+	});
+	var table = $('#tblsalesreportlist_datatable').DataTable();
+
+	table.on('order.dt search.dt', function () {
+		var lastRow = $('#tblsalesreportlist_datatable tbody tr.no-sort');
+		lastRow.remove();
+		$('#tblsalesreportlist_datatable tbody').append(lastRow);
+	}).draw();
 </script>

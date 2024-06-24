@@ -1,0 +1,286 @@
+﻿@model List<Entity.RedemptionsEntity>
+@{
+	Layout = null;
+	var floatcolor = "";
+}
+<style>
+	.tblfontstyle {
+		font-weight: bold;
+		font-size: 14px;
+	}
+
+	table.dataTable {
+		width: auto;
+	}
+
+
+	table td {
+		padding: .15rem !important;
+	}
+
+	table.dataTable td:nth-child(1) {
+		padding-bottom: 6px !important;
+		width: auto !important;
+	}
+
+	table.dataTable > thead > tr > th:not(.sorting_disabled), table.dataTable > thead > tr > td:not(.sorting_disabled) {
+		padding-right: 20px;
+		padding-left: 8px;
+	}
+
+	.thclass {
+		font-size: 9px;
+	}
+
+	.tdclass {
+		font-size: 9px;
+	}
+
+</style>
+<table class="table table-striped table-bordered table-hover">
+	<tr>
+		<td colspan="10" class="tblfontstyle">REDEMPTIONS REPORT</td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">STORE NAME: </td>
+		<td>@ViewBag.StoreName</td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">PRODUCT NAME: </td>
+		<td>@ViewBag.ProductName</td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">REPORTING PERIOD: </td>
+		<td>@ViewBag.StartDate To @ViewBag.EndDate</td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">TOTAL FACE VALUE: </td>
+		@{
+
+			if (ViewBag.TotalValue < 0)
+			{
+				floatcolor = "red";
+			}
+			else
+			{
+				floatcolor = "";
+			}
+		}
+		<td><span style="color:@floatcolor;">£@ViewBag.TotalValue.ToString("N2")</span></td>
+
+	</tr>
+	<tr>
+		<td class="tblfontstyle">TOTAL AMOUNT PAYABLE: </td>
+		@{
+
+			if (ViewBag.AmountPayableToStore < 0)
+			{
+				floatcolor = "red";
+			}
+			else
+			{
+				floatcolor = "";
+			}
+		}
+		<td><span style="color:@floatcolor;">£@ViewBag.AmountPayableToStore.ToString("N2")</span></td>
+
+	</tr>
+</table>
+<table id="tblredemptionreportlist_datatable" class="table table-striped table-bordered table-hover">
+	<thead>
+	<th class="thclass">TransactionDateTime</th>
+	<th class="thclass">Value</th>
+	<th class="thclass">Count</th>
+	<th class="thclass">Product Comm</th>
+	<th class="thclass">VAT Due</th>
+	<th class="thclass">Amount Payable</th>
+	<th class="thclass">Store No</th>
+	<th class="thclass">Store Name</th>
+	<th class="thclass">Postcode</th>
+	<th class="thclass">Transaction ID</th>
+	<th class="thclass">Card ID</th>
+	<th class="thclass">Statement Date</th>
+	<th class="thclass">Statement No.</th>
+	<th class="thclass">Statement Amt</th>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Count > 0)
+		{
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.TransactionDateTime.Value.ToString("dd/mm/yyyy hh:mm:ss")</td>
+					@{
+
+						if (item.Value < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.Value</td>
+					<td>1</td>
+					@{
+
+						if (item.ProductAmount < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.ProductAmount</td>
+					@{
+
+						if (item.VATDueOnCommission < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.VATDueOnCommission</td>
+					@{
+
+						if (item.AmountPayableToStore < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.AmountPayableToStore</td>
+					<td>@item.StoreNo</td>
+					<td>@item.StoreName</td>
+					<td>@item.Postcode</td>
+					<td>@item.TransactionID</td>
+					<td>@item.CardID</td>
+					@if (item.StatementCreated != null)
+					{
+						<td>@item.StatementCreated.Value.ToString("dd/mm/yyyy")</td>
+					}
+					else
+					{
+						<td></td>
+					}
+					<td>@item.StatementNumber</td>
+					@{
+
+						if (item.StatementAmount < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.StatementAmount</td>
+
+				</tr>
+			}
+
+			<tr class="no-sort">
+				<td class="tdclass" style="font-weight:bold">Totals</td>
+				@{
+
+					if (ViewBag.TotalValue < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.TotalValue.ToString("N2")</td>
+				<td class="tdclass" style="font-weight:bold;">@ViewBag.TotalCount</td>
+				@{
+
+					if (ViewBag.VATDueOnCommission < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">
+					£@ViewBag.VATDueOnCommission.ToString("N2")
+				</td>
+				@{
+
+					if (ViewBag.ProductAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.ProductAmount.ToString("N2")</td>
+				@{
+
+					if (ViewBag.AmountPayableToStore < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td  class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.AmountPayableToStore.ToString("N2")</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		}
+		else
+		{
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+<script type="text/javascript">
+	$('#tblredemptionreportlist_datatable').DataTable({
+		"order": [],
+		"paging": false,
+		"lengthChange": false,
+		"searching": false,
+		"ordering": true,
+		"info": true,
+		"autoWidth": true,
+		"responsive": false,
+	});
+	var table = $('#tblredemptionreportlist_datatable').DataTable();
+
+	table.on('order.dt search.dt', function () {
+		var lastRow = $('#tblredemptionreportlist_datatable tbody tr.no-sort');
+		lastRow.remove();
+		$('#tblredemptionreportlist_datatable tbody').append(lastRow);
+	}).draw();
+</script>

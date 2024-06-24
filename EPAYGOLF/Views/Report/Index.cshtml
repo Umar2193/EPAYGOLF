@@ -168,6 +168,35 @@
 					</div>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-12 col-sm-12">
+					<div class="card card-primary card-outline card-tabs">
+						<div class="card-header p-0 pt-1 border-bottom-0">
+							<ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active" id="custom-tabs-three-sales-tab" data-toggle="pill" href="#custom-tabs-three-sales" role="tab" aria-controls="custom-tabs-three-sales" aria-selected="true">Sales</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" id="custom-tabs-three-redemptions-tab" data-toggle="pill" href="#custom-tabs-three-redemptions" role="tab" aria-controls="custom-tabs-three-redemptions" aria-selected="false">Redemptions</a>
+								</li>
+							
+								
+							</ul>
+						</div>
+						<div class="card-body">
+							<div class="tab-content" id="custom-tabs-three-tabContent">
+								<div class="tab-pane fade show active" id="custom-tabs-three-sales" role="tabpanel" aria-labelledby="custom-tabs-three-sales-tab">
+									To view report please click on Generate Detailed Report
+								</div>
+								<div class="tab-pane fade" id="custom-tabs-three-redemptions" role="tabpanel" aria-labelledby="custom-tabs-three-redemptions-tab">
+									To view report please click on Generate Detailed Report
+								</div>
+								
+							</div>
+						</div>
+						<!-- /.card -->
+					</div>
+				</div>
 		</div>
 	</section>
 
@@ -176,6 +205,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
+		
 		
 		moment.updateLocale('en', {
 			week: {
@@ -190,6 +220,7 @@
 		});
 		$("#_redenddate").datepicker("setDate", new Date());
 		ReportSummaryView();
+		setTimeout(function () { $('#custom-tabs-three-sales-tab').click() }, 1000);
 	});
 	
 
@@ -202,6 +233,10 @@
 			toastr.error("Please select end date");
 			return;
 		}
+		GenerateSalesDetailedReport();
+		GenerateRedemptionsDetailedReport();
+		ReportSummaryView();
+		return false;
 		$.ajax({
 			url: "/Report/GenerateDetailedReport",
 			type: "Post",
@@ -237,6 +272,86 @@
 				// a.download = 'SalesReporting.xls';
 				// a.click();
 				
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function GenerateSalesDetailedReport() {
+		// if ($("#_redstartdate").val() == null || $("#_redstartdate").val() == "") {
+		// 	toastr.error("Please select start date");
+		// 	return;
+		// }
+		// if ($("#_redenddate").val() == null || $("#_redenddate").val() == "") {
+		// 	toastr.error("Please select end date");
+		// 	return;
+		// }
+		$.ajax({
+			url: "/Report/GenerateDetailedReport",
+			type: "Post",
+			data: {
+				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+				if (result.issalesReportGenerated == false) {
+					toastr.error("Some Error in generating sales report.");
+
+				}
+				else {
+					$('#custom-tabs-three-sales').html(result);
+				}
+
+
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function GenerateRedemptionsDetailedReport() {
+		// if ($("#_redstartdate").val() == null || $("#_redstartdate").val() == "") {
+		// 	toastr.error("Please select start date");
+		// 	return;
+		// }
+		// if ($("#_redenddate").val() == null || $("#_redenddate").val() == "") {
+		// 	toastr.error("Please select end date");
+		// 	return;
+		// }
+		$.ajax({
+			url: "/Report/GenerateRedemptionsDetailedReport",
+			type: "Post",
+			data: {
+				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+				if (result.isredempReportGenerated == false) {
+					toastr.error("Some Error in generating redemption report.");
+
+				}
+				else {
+					$('#custom-tabs-three-redemptions').html(result);
+				}
+				
+
 
 			},
 			error: function (result) {
