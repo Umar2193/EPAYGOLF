@@ -13,5 +13,7 @@ namespace Repository.Settings
 		SettingsEntity GetSettingsDetail(Int64 ID);
 		int SaveSettingsInformation(SettingsEntity obj);
 		int DeleteSettingsInformation(Int64 ID);
-	}
+		UsersEntity GetUserDetail(string username, string password);
+
+    }
 }

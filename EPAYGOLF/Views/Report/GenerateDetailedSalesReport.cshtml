@@ -9,6 +9,9 @@
 		font-size: 14px;
 	}
 
+	.tblfontstyle_Summ {
+		font-size: 14px;
+	}
 	table.dataTable {
 		width: auto;
 	}
@@ -29,11 +32,11 @@
 	}
 
 	.thclass {
-		font-size: 9px;
+		font-size: 10px;
 	}
 
 	.tdclass {
-		font-size: 9px;
+		font-size: 10px;
 	}
 
 </style>
@@ -44,17 +47,17 @@
 	</tr>
 	<tr>
 		<td class="tblfontstyle">STORE NAME: </td>
-		<td>@ViewBag.StoreName</td>
+		<td class="tblfontstyle_Summ">@ViewBag.StoreName</td>
 
 	</tr>
 	<tr>
 		<td class="tblfontstyle">PRODUCT NAME: </td>
-		<td>@ViewBag.ProductName</td>
+		<td class="tblfontstyle_Summ">@ViewBag.ProductName</td>
 
 	</tr>
 	<tr>
 		<td class="tblfontstyle">REPORTING PERIOD: </td>
-		<td>@ViewBag.StartDate To @ViewBag.EndDate</td>
+		<td class="tblfontstyle_Summ">@ViewBag.StartDate To @ViewBag.EndDate</td>
 
 	</tr>
 	<tr>
@@ -72,7 +75,7 @@
 				floatcolor = "";
 			}
 		}
-		<td><span style="color:@floatcolor;">£@ViewBag.NetAmount.ToString("N2")</span></td>
+		<td class="tblfontstyle_Summ"><span style="color:@floatcolor;">£@ViewBag.NetAmount.ToString("N2")</span></td>
 
 	</tr>
 	<tr>
@@ -80,7 +83,7 @@
 			COUNT:
 		</td>
 
-		<td>@ViewBag.TotalCount</td>
+		<td class="tblfontstyle_Summ">@ViewBag.TotalCount</td>
 
 	</tr>
 </table>
@@ -218,7 +221,7 @@
 				</tr>
 				
 			}
-			<tr>
+			<tr class="no-sort no-count">
 				<td class="tdclass" style="font-weight:bold;">Totals</td>
 				<td></td>
 				<td></td>
@@ -367,6 +370,21 @@
 
 <script type="text/javascript">
 	$('#tblsalesreportlist_datatable').DataTable({
+		"drawCallback": function (settings) {
+			var api = this.api();
+			var rows = api.rows({ page: 'current' }).nodes();
+			var lastRow = $(rows).filter('.no-count');
+			lastRow.appendTo(api.table().body()); // Re-append to keep it in view
+
+			// Update the info display to exclude the last row from the count
+			var info = api.page.info();
+			var totalRecords = info.recordsTotal - 1; // Subtract 1 for the last row
+			var start = info.start;
+			var end = info.end - 1; // Subtract 1 for the last row
+
+			// Display the information
+			$('#tblsalesreportlist_datatable_info').html(`Showing ${start + 1} to ${end} of ${totalRecords} entries`);
+		},
 		"order": [],
 		"paging": false,
 		"lengthChange": false,

@@ -8,7 +8,8 @@ using System.Text.Json.Serialization;
 
 namespace EPAYGOLF.Controllers
 {
-    public class MetaDataController : Controller
+	[ConditionalAuthorize(requireAuthorization: true)]
+	public class MetaDataController : Controller
     {
 		private IProductRepository _productRepository = new ProductRepository();
 

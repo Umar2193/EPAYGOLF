@@ -20,5 +20,10 @@ namespace Entity
 		public DateTime? UpdatedAt { get; set; }
 		public Int64 UpdatedBy { get; set; }
         public string strYearStartDate { get; set; }
+        public string SMTP_ServerName { get; set; }
+		public string SMTP_Port { get; set; }
+		public string SMTP_SenderEmail { get; set; }
+		public string SMTP_Password { get; set; }
+        public bool EnableSendEmail { get; set; }
     }
 }

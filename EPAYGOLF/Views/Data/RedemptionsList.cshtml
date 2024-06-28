@@ -9,6 +9,7 @@
 	{
 		<thead>
 			<tr>
+			
 				<th>ID</th>
 				<th>AccountName</th>
 				<th>TransactionID</th>
@@ -41,8 +42,20 @@
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td>@item.ID</td>
-					<td>@item.AccountName</td>
+					
+					
+					<td>@item.ID
+						
+					</td>
+					<td>@item.AccountName
+						@if (string.IsNullOrEmpty(item.StatementNumber))
+						{
+							
+								<i style="color:red" onclick="ConfirmDeleteRedemptionsrecord(@item.RedemptionsID)" title="Click here to delete record" class="far fa-trash-alt"></i>
+							
+
+						}
+					</td>
 					<td>@item.TransactionID</td>
 					<td>@item.TransactionType</td>
 					<td>@item.CardID</td>
@@ -96,7 +109,12 @@
 					<td><span style="color:@floatcolor;font-weight:bold;">@item.AmountPayableToStore.ToString("0.00")</span></td>
 					<td> @item.Postcode</td>
 
-					<td>@item.StatementCreated.Value.ToString("dd/MM/yyyy")</td>
+
+					<td>
+						@if (item.StatementCreated !=null){
+							@item.StatementCreated.Value.ToString("dd/MM/yyyy")
+						}
+		            </td>
 					<td>@item.StatementNumber</td>
 					@if (item.StatementAmount < 0)
 					{
@@ -143,7 +161,7 @@
 
 <script type="text/javascript">
 	$('#tblRedemptionsList_datatable').DataTable({
-		"order": [[7, 'desc']],
+		"order": [[8, 'desc']],
 		"paging": true,
 		"lengthChange": false,
 		"searching": true,
@@ -155,4 +173,52 @@
 		"buttons": ["csv", "excel"]
 	});
 	//.buttons().container().appendTo('#tblSalesList_datatable_wrapper .col-md-6:eq(0)')
+	function ConfirmDeleteRedemptionsrecord(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteRedemptions(ID);
+				}
+			}
+		});
+	}
+	function DeleteRedemptions(ID) {
+		$.ajax({
+			url: "/Data/DeleteRedemptions",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetRedemptionsLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
 </script>

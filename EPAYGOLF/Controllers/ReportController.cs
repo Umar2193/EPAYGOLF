@@ -1,7 +1,5 @@
 ﻿using Aspose.Html.Saving;
 using Aspose.Html;
-using DinkToPdf;
-using DinkToPdf.Contracts;
 using Entity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +16,15 @@ using Repository.Settings;
 using Repository.StoresRedeem;
 using Repository.VATRates;
 using System.Globalization;
+using Org.BouncyCastle.Asn1.Ocsp;
+
+using SelectPdf;
+using NPOI.HPSF;
+using EPAYGOLF.Models;
 
 namespace EPAYGOLF.Controllers
 {
+	[ConditionalAuthorize(requireAuthorization: true)]
 	public class ReportController : Controller
 	{
 		private ISalesRepository _salesRepository = new SalesRepository();
@@ -74,7 +78,7 @@ namespace EPAYGOLF.Controllers
 				var salestran = dataController.TransformSalesData();
 				var redemtran = dataController.TransformRedeemData();
 				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
-				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				//var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 				if (salesreportresult != null && salesreportresult.Count > 0)
 				{
 
@@ -392,13 +396,23 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public async Task<ActionResult> GenerateRedemptionsDetailedReport(ReportSearchParam _request)
 		{
-			//return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
+			DataController dataController = new DataController();
+			var salestran = dataController.TransformSalesData();
+			var redemtran = dataController.TransformRedeemData();
 			var result = 0;
 			string renderedSalesReportView = "";
 			string errormessage = "";
 			try
 			{
-				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				if (_request.isWeeklyReport)
+				{
+					if(_request.redemstoreno > 0)
+					{
+						_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
+					}
+					
+				}
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value, _request.userId).ToList();
 				if(redempreportresult == null)
 				{
 					redempreportresult = new List<RedemptionsEntity>();
@@ -734,7 +748,11 @@ namespace EPAYGOLF.Controllers
 			string longinvoicenumber = "0";
 			try
 			{
-				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				if (_request.redemstoreno > 0)
+				{
+					_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
+				}
+				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value, _request.userId).ToList();
 				var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList().FirstOrDefault();
 				if (redempreportresult == null)
 				{
@@ -840,7 +858,274 @@ namespace EPAYGOLF.Controllers
 
 			return View();
 		}
+		public JsonResult LoadStoreListForSelectedPeriod(ReportSearchParam _request)
+		{
+			var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+			var result = new List<StoresRedeemEntity>();
+			List<Int64> filterIds = new List<Int64>();
+			if (redempreportresult !=null && redempreportresult.Count > 0)
+			{
+				foreach(var item in redempreportresult.DistinctBy(x=>x.StoreNo).DistinctBy(x=>x.UserID).OrderBy(x=>x.StoreNo))
+				{
+					
+					filterIds.Add(item.StoreNo);
+				}
+				
+				result = _storesredeemRepository.GetStoresRedeemList().Where(x=> filterIds.Contains(x.StoreNo)).OrderBy(x => x.StoreNo).ToList();
 
+			}
+			else
+			{
+
+			}
+		 
+			return Json(result);
+		}
+		public async Task<ActionResult> RemittanceReport_PDF([FromQuery] ReportSearchParam _request)
+		{
+
+			string webRootPath = _env.WebRootPath;
+			string contentRootPath = _env.ContentRootPath;
+			string serverfilepath = "";
+
+			try
+			{
+				string dirPath = Path.Combine(webRootPath, "RemittanceReport");
+
+				if (!System.IO.Directory.Exists(dirPath))
+				{
+					System.IO.Directory.CreateDirectory(dirPath);
+				}
+
+
+				RedemptionsRemittance redemptionsRemittance = new RedemptionsRemittance();
+				InvoiceEntity invoiceEntity = new InvoiceEntity();
+				Int64 invoiceNumber = 0;
+				string longinvoicenumber = "0";
+				string renderhtml = "";
+				try
+				{
+					if (_request.redemstoreno > 0)
+					{
+						_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
+					}
+					var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value, _request.userId).ToList();
+					var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList().FirstOrDefault();
+					if (redempreportresult == null)
+					{
+						renderhtml = "No Redemption record found in selected time period";
+						return Json(new { isError = true, ErrorMessage = "No Redemption record found in selected time period" });
+					}
+					else
+					{
+						foreach(var item in redempreportresult)
+						{
+							if (string.IsNullOrEmpty(item.Email))
+							{
+								return Json(new { isemailmissing = true, StoreName = item.StoreName });
+							}
+						}
+					}
+
+					if (invoiceresult != null)
+					{
+						invoiceNumber = invoiceresult.InvoiceNumber + 1;
+					}
+					else
+					{
+						invoiceNumber = invoiceNumber + 1;
+					}
+					longinvoicenumber = ConvertTo7Digits(invoiceNumber);
+					invoiceEntity.InvoiceNumber = invoiceNumber;
+					invoiceEntity.StatementNumber = "GCP" + longinvoicenumber.ToString();
+					invoiceEntity.StatementCreated = DateTime.Now;
+					invoiceEntity.GrossAmount = redempreportresult != null ? redempreportresult.Sum(x => x.Value) * -1 : 0;
+					invoiceEntity.ProductCommission = redempreportresult != null ? redempreportresult.Sum(x => x.ProductAmount) * -1 : 0;
+					invoiceEntity.VATDue = redempreportresult != null ? redempreportresult.Sum(x => x.VATDueOnCommission) * -1 : 0;
+					invoiceEntity.AmountPayable = redempreportresult != null ? redempreportresult.Sum(x => x.AmountPayableToStore) * -1 : 0;
+
+					int invoicesaveresult = _redemptionsRepository.SaveInvoiceInformation(invoiceEntity);
+
+					if (invoicesaveresult > 0)
+					{
+						foreach (var item in redempreportresult)
+						{
+							RedemptionsEntity redemptionsEntity = new RedemptionsEntity();
+							redemptionsEntity.StatementCreated = DateTime.Now;
+							redemptionsEntity.StatementNumber = invoiceEntity.StatementNumber;
+							redemptionsEntity.StatementAmount = invoiceEntity.AmountPayable;
+							redemptionsEntity.RedemptionsID = item.RedemptionsID;
+							_redemptionsRepository.UpdateRedemptionsInvoiceInformation(redemptionsEntity);
+						}
+
+						redemptionsRemittance.StoreID = ConvertTo7Digits(_request.redemstoreno);
+						redemptionsRemittance.StoreName = _request.redemstorename.Split("| ")[1].ToString();
+						redemptionsRemittance.DatePeriod = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
+						redemptionsRemittance.InvoiceNumber = invoiceEntity.StatementNumber;
+						redemptionsRemittance.DocumentDate = DateTime.Now.ToString("dd/MM/yyyy");
+						redemptionsRemittance.GrossAmount = invoiceEntity.GrossAmount;
+						redemptionsRemittance.ProductCommission = invoiceEntity.ProductCommission;
+						redemptionsRemittance.VATDue = invoiceEntity.VATDue;
+						redemptionsRemittance.AmountPayable = invoiceEntity.AmountPayable;
+						redemptionsRemittance.InvoiceTotal = invoiceEntity.ProductCommission + invoiceEntity.VATDue;
+						if (redempreportresult != null && redempreportresult.Count > 0)
+						{
+							redemptionsRemittance.lstRedemptions = redempreportresult;
+						}
+					}
+					else
+					{
+						renderhtml = "Unable to save invoice";
+					}
+				}
+				catch (Exception ex)
+				{
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					renderhtml = "Exception occur please contact admin";
+					return Json(new { isError = true, ErrorMessage = renderhtml });
+				}
+
+				renderhtml = await _viewRenderingService.RenderToStringAsync("RemittanceReportpdf", redemptionsRemittance);
+				// HTML content for the header
+				string htmlHeader = @"
+            <html>
+                <head>
+                    <style>
+                        .header { text-align: right; font-size: 10pt; }
+                    </style>
+                </head>
+                <body>
+                    <div class='header'>
+                        <img src='file:///" + Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/dist/img/golfreportlogonew.png").Replace("\\", "/") + @"'  />
+                    </div>
+                </body>
+            </html>";
+
+				// HTML content for the footer
+				string htmlFooter = "<html>\r\n                <head>\r\n                    <style>\r\n                        .footer { text-align: center; font-size: 10pt; }\r\n                    </style>\r\n                </head>\r\n                <body> <div class='footer'><div style =\"float:left;text-align:left\">\r\n\t\t\t<p>The Golf Gift Card Company Limited</p>\r\n\t\t\t<p>A company registered by guarantee</p>\r\n\t\t\t<p>\r\n\t\t\t\tCompany Registration: 14242436\r\n\t\t\t</p>\r\n\t\t\t<p>\r\n\t\t\t\tVAT Number: 438075778\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div style=\"float:right;text-align:left;\">\r\n\t\t\t<br />\r\n\t\t\t<br />\r\n\t\t\tInvoice No: " + redemptionsRemittance.InvoiceNumber + "\r\n\t\t</div></div>\r\n                </body>\r\n            </html> ";
+				// Create the PDF converter
+				HtmlToPdf converter = new HtmlToPdf();
+
+				// Set header settings
+				converter.Options.DisplayHeader = true;
+				converter.Header.DisplayOnFirstPage = true;
+				converter.Header.DisplayOnOddPages = true;
+				converter.Header.DisplayOnEvenPages = true;
+				converter.Header.Height = 60;
+				PdfHtmlSection headerHtml = new PdfHtmlSection(htmlHeader, "");
+				headerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+				converter.Header.Add(headerHtml);
+
+				// Set footer settings
+				converter.Options.DisplayFooter = true;
+				converter.Footer.DisplayOnFirstPage = true;
+				converter.Footer.DisplayOnOddPages = true;
+				converter.Footer.DisplayOnEvenPages = true;
+				converter.Footer.Height = 90;
+				PdfHtmlSection footerHtml = new PdfHtmlSection(htmlFooter, "");
+				footerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+				converter.Footer.Add(footerHtml);
+
+                converter.Options.MaxPageLoadTime = 240;
+
+
+                // Base URL for resolving relative paths
+                string baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+                Helpers.ApplicationExceptions.SaveActivityLog(htmlHeader);
+                Helpers.ApplicationExceptions.SaveActivityLog(baseUrl);
+                Helpers.ApplicationExceptions.SaveActivityLog(renderhtml);
+				// Convert the HTML string to a PDF document
+				SelectPdf.PdfDocument doc = converter.ConvertHtmlString(renderhtml, baseUrl);
+				string filename = "Remittance_" + redemptionsRemittance.InvoiceNumber + "_" + redemptionsRemittance.StoreID + "_" + redemptionsRemittance.StoreName + ".pdf";
+				string filePath = dirPath + "\\" + filename;
+				serverfilepath = baseUrl + "/RemittanceReport/" + filename;
+
+				// Save the PDF document to file
+				string outputPath = filePath;
+				doc.Save(outputPath);
+
+				// Close the PDF document
+				doc.Close();
+
+				var model = _settingsRepository.GetSettingsList().FirstOrDefault();
+				if (model == null)
+				{
+					Helpers.ApplicationExceptions.SaveActivityLog("SMTP Config is missing");
+				}
+				if(model != null)
+				{
+					if (model.EnableSendEmail)
+					{
+						EmailService emailService = new EmailService();
+						var _subject = "Redemptions Remittance Advice " + redemptionsRemittance.InvoiceNumber+" Period: " + redemptionsRemittance.DatePeriod;
+						var _body = $"Dear {redemptionsRemittance.lstRedemptions.FirstOrDefault().FirstName} {redemptionsRemittance.lstRedemptions.FirstOrDefault().LastName}," + Environment.NewLine + Environment.NewLine +
+					   
+						$"Please find attached your Golf Gift Card Redemptions account statement for the period: {redemptionsRemittance.DatePeriod}" + Environment.NewLine + Environment.NewLine +
+						$"For any queries please email the Finance Team at: partner@thegolfgiftcard.com";
+						var _emailto = redemptionsRemittance.lstRedemptions.FirstOrDefault().Email;
+						emailService.SendSMTPEmail(_emailto, _subject, _body, filePath);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Json("");
+			}
+
+			return Json(serverfilepath);
+
+
+		}
+
+		public IActionResult InvoiceList()
+		{
+			var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList();
+			return View(invoiceresult);
+        }
+		//static void AddHeaderFooter(PdfPage page)
+		//{
+		//	// Get an XGraphics object for drawing on the page
+		//	XGraphics gfx = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Append);
+
+		//	// Define the fonts to use
+		//	XFont footerFont = new XFont("Verdana", 10, XFontStyle.Regular);
+		//	XTextFormatter tf = new XTextFormatter(gfx);
+
+		//	// Define logo dimensions and path
+		//	string logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/dist/img", "golfreportlogo.png");
+		//	XImage logo = XImage.FromFile(logoPath);
+		//	double logoWidth = 50; // Desired width of the logo
+		//	double logoHeight = 50; // Desired height of the logo
+
+		//	// Draw the header image (logo) on the most right side
+		//	gfx.DrawImage(logo, page.Width - logoWidth - 20, 20, logoWidth, logoHeight);
+
+			
+
+		//	string htmlContent = "<div style=\"float:left;text-align:left\">\r\n\t\t\t<p>The Golf Gift Card Company Limited</p>\r\n\t\t\t<p>A company registered by guarantee</p>\r\n\t\t\t<p>\r\n\t\t\t\tCompany Registration: 14242436\r\n\t\t\t</p>\r\n\t\t\t<p>\r\n\t\t\t\tVAT Number: 438075778\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div style=\"float:right;text-align:left;\">\r\n\t\t\t<br />\r\n\t\t\t<br />\r\n\t\t\tInvoice No: @Model.InvoiceNumber\r\n\t\t</div>";
+		//	// Define the rectangle for the footer
+		//	XRect rect = new XRect(50, page.Height - 70, page.Width - 100, 50);
+
+		//	// Draw the HTML content in the footer
+		//	string htmlFooterContent = @"
+  //          <html>
+  //              <head>
+  //                  <style>
+  //                      body { font-family: Arial, sans-serif; font-size: 10pt; }
+  //                      .footer-text { text-align: center; color: #666; }
+  //                  </style>
+  //              </head>
+  //              <body>
+  //                  <div class='footer-text'>
+  //                      <p>This is an example of HTML content in the footer.</p>
+  //                      <p>Generated on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"</p>
+  //                  </div>
+  //              </body>
+  //          </html>";
+		//	tf.DrawString(htmlFooterContent, footerFont, XBrushes.Black, rect);
+		//}
 
 
 	}

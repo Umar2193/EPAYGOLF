@@ -22,7 +22,7 @@
 							</h3>
 							<button onclick="DownloadSalesReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download SalesReporting</button>
 							<button onclick="DownloadRedempReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download RedemptionsReporting</button>
-							<button onclick="DownloadAccountRedemptionReport();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-print"></i>  Account Redemption Remittance</button>
+							@* <button onclick="DownloadAccountRedemptionReport();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-print"></i>  Account Redemption Remittance</button> *@
 						</div>
 						<!-- /.card-header -->
 						<div class="card-body">
@@ -35,13 +35,23 @@
 													Start Date
 												</label>
 												<div class="col-md-4">
+													<div class="input-group">
 													<input type="text" data-date data-date-format="dd/MM/yyyy" autocomplete="off" value="" disabled id="_redstartdate" placeholder="dd/mm/yyyy" name="_redstartdate" required class="form-control" />
+													<div class="input-group-append">
+														<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+													</div>
+													</div>
 												</div>
 												<label for="inputEmail3" class="col-md-2 col-form-label">
 													End Date
 												</label>
 												<div class="col-md-4">
+													<div class="input-group">
 													<input type="text" onchange="ChangeEventReportType()" data-date data-date-format="dd/MM/yyyy" autocomplete="off" value="" id="_redenddate" placeholder="dd/mm/yyyy" name="_redenddate" required class="form-control" />
+													<div class="input-group-append">
+														<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+													</div>
+													</div>
 												</div>
 
 											</div>
@@ -197,6 +207,7 @@
 						<!-- /.card -->
 					</div>
 				</div>
+		</div>
 		</div>
 	</section>
 

@@ -9,13 +9,17 @@
 		font-size: 14px;
 	}
 
+	.tblfontstyle_Summ {
+		font-size: 14px;
+	}
+
 	table.dataTable {
 		width: auto;
 	}
 
 
 	table td {
-		padding: .15rem !important;
+		padding: .25rem !important;
 	}
 
 	table.dataTable td:nth-child(1) {
@@ -24,16 +28,16 @@
 	}
 
 	table.dataTable > thead > tr > th:not(.sorting_disabled), table.dataTable > thead > tr > td:not(.sorting_disabled) {
-		padding-right: 20px;
-		padding-left: 8px;
+		padding-right: 21px;
+		padding-left: 13px;
 	}
 
 	.thclass {
-		font-size: 9px;
+		font-size: 10px;
 	}
 
 	.tdclass {
-		font-size: 9px;
+		font-size: 10px;
 	}
 
 </style>
@@ -44,17 +48,17 @@
 	</tr>
 	<tr>
 		<td class="tblfontstyle">STORE NAME: </td>
-		<td>@ViewBag.StoreName</td>
+		<td class="tblfontstyle_Summ">@ViewBag.StoreName</td>
 
 	</tr>
 	<tr>
 		<td class="tblfontstyle">PRODUCT NAME: </td>
-		<td>@ViewBag.ProductName</td>
+		<td class="tblfontstyle_Summ">@ViewBag.ProductName</td>
 
 	</tr>
 	<tr>
 		<td class="tblfontstyle">REPORTING PERIOD: </td>
-		<td>@ViewBag.StartDate To @ViewBag.EndDate</td>
+		<td class="tblfontstyle_Summ">@ViewBag.StartDate To @ViewBag.EndDate</td>
 
 	</tr>
 	<tr>
@@ -70,7 +74,7 @@
 				floatcolor = "";
 			}
 		}
-		<td><span style="color:@floatcolor;">£@ViewBag.TotalValue.ToString("N2")</span></td>
+		<td class="tblfontstyle_Summ"><span style="color:@floatcolor;">£@ViewBag.TotalValue.ToString("N2")</span></td>
 
 	</tr>
 	<tr>
@@ -86,7 +90,7 @@
 				floatcolor = "";
 			}
 		}
-		<td><span style="color:@floatcolor;">£@ViewBag.AmountPayableToStore.ToString("N2")</span></td>
+		<td class="tblfontstyle_Summ" ><span style="color:@floatcolor;">£@ViewBag.AmountPayableToStore.ToString("N2")</span></td>
 
 	</tr>
 </table>
@@ -113,7 +117,7 @@
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td>@item.TransactionDateTime.Value.ToString("dd/mm/yyyy hh:mm:ss")</td>
+					<td>@item.TransactionDateTime.Value.ToString("dd/MM/yyyy hh:mm:ss")</td>
 					@{
 
 						if (item.Value < 0)
@@ -125,7 +129,7 @@
 							floatcolor = "";
 						}
 					}
-					<td style="color:@floatcolor">£@item.Value</td>
+					<td style="color:@floatcolor">£@item.Value.ToString("0.00")</td>
 					<td>1</td>
 					@{
 
@@ -138,7 +142,7 @@
 							floatcolor = "";
 						}
 					}
-					<td style="color:@floatcolor">£@item.ProductAmount</td>
+					<td style="color:@floatcolor">£@item.ProductAmount.ToString("0.00")</td>
 					@{
 
 						if (item.VATDueOnCommission < 0)
@@ -150,7 +154,7 @@
 							floatcolor = "";
 						}
 					}
-					<td style="color:@floatcolor">£@item.VATDueOnCommission</td>
+					<td style="color:@floatcolor">£@item.VATDueOnCommission.ToString("0.00")</td>
 					@{
 
 						if (item.AmountPayableToStore < 0)
@@ -162,7 +166,7 @@
 							floatcolor = "";
 						}
 					}
-					<td style="color:@floatcolor">£@item.AmountPayableToStore</td>
+					<td style="color:@floatcolor">£@item.AmountPayableToStore.ToString("0.00")</td>
 					<td>@item.StoreNo</td>
 					<td>@item.StoreName</td>
 					<td>@item.Postcode</td>
@@ -170,7 +174,7 @@
 					<td>@item.CardID</td>
 					@if (item.StatementCreated != null)
 					{
-						<td>@item.StatementCreated.Value.ToString("dd/mm/yyyy")</td>
+						<td>@item.StatementCreated.Value.ToString("dd/MM/yyyy")</td>
 					}
 					else
 					{
@@ -188,12 +192,12 @@
 							floatcolor = "";
 						}
 					}
-					<td style="color:@floatcolor">£@item.StatementAmount</td>
+					<td style="color:@floatcolor">£@item.StatementAmount.ToString("0.00")</td>
 
 				</tr>
 			}
 
-			<tr class="no-sort">
+			<tr class="no-sort no-count">
 				<td class="tdclass" style="font-weight:bold">Totals</td>
 				@{
 
@@ -267,6 +271,21 @@
 </table>
 <script type="text/javascript">
 	$('#tblredemptionreportlist_datatable').DataTable({
+		"drawCallback": function (settings) {
+			var api = this.api();
+			var rows = api.rows({ page: 'current' }).nodes();
+			var lastRow = $(rows).filter('.no-count');
+			lastRow.appendTo(api.table().body()); // Re-append to keep it in view
+
+			// Update the info display to exclude the last row from the count
+			var info = api.page.info();
+			var totalRecords = info.recordsTotal - 1; // Subtract 1 for the last row
+			var start = info.start;
+			var end = info.end - 1; // Subtract 1 for the last row
+
+			// Display the information
+			$('#tblredemptionreportlist_datatable_info').html(`Showing ${start + 1} to ${end} of ${totalRecords} entries`);
+		},
 		"order": [],
 		"paging": false,
 		"lengthChange": false,
@@ -274,7 +293,8 @@
 		"ordering": true,
 		"info": true,
 		"autoWidth": true,
-		"responsive": false,
+		"responsive": false
+
 	});
 	var table = $('#tblredemptionreportlist_datatable').DataTable();
 
@@ -283,4 +303,6 @@
 		lastRow.remove();
 		$('#tblredemptionreportlist_datatable tbody').append(lastRow);
 	}).draw();
+
+	
 </script>

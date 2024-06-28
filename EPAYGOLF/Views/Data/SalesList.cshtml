@@ -47,8 +47,12 @@
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td style="padding-bottom:13px !important;width:80px !important;">@item.ID</td>
-					<td>@item.AccountName</td>
+					<td style="padding-bottom:13px !important;width:80px !important;">@item.ID
+						
+					</td>
+					<td>@item.AccountName
+						<span><i style="color:red" onclick="ConfirmDeleteSalesrecord(@item.SalesID)" class="far fa-trash-alt" title="Click here to delete record"></i></span>
+					</td>
 					<td>@item.TransactionID</td>
 					<td>@item.TransactionType</td>
 					<td>@item.CardID</td>
@@ -215,4 +219,52 @@
 		"buttons": ["csv", "excel"]
 	});
 	//.buttons().container().appendTo('#tblSalesList_datatable_wrapper .col-md-6:eq(0)')
+	function ConfirmDeleteSalesrecord(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteSales(ID);
+				}
+			}
+		});
+	}
+	function DeleteSales(ID) {
+		$.ajax({
+			url: "/Data/DeleteSales",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetSalesLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
 </script>

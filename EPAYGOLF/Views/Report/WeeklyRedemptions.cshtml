@@ -1,0 +1,371 @@
+﻿@{
+	ViewData["Title"] = "Weekly Redemptions Runs";
+}
+
+
+
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title">
+								<i class="fas fa-edit" style="color:#2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">Weekly Redemptions Runs</span>
+							</h3>
+							<button onclick="DownloadRedempReportExcel();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;"><i class="fa fa-download"></i>  Download RedemptionsReporting</button>
+							<button id="btnprintremittance" onclick="DownloadAccountRedemptionReport();" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;margin-right:5px;display:none;"><i class="fa fa-file-pdf"></i>  Account Redemption Remittance</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div class="row col-md-12">
+								<div class="col col-md-12">
+									<form id="frmreport">
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Week Beginning
+												</label>
+												<div class="col-md-6">
+													<div class="input-group">
+														<input type="text" data-date-format="dd/MM/yyyy" autocomplete="off" value="" disabled id="_weekredstartdate" placeholder="dd/mm/yyyy" name="_redstartdate" required class="form-control" />
+														<div class="input-group-append">
+															<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+														</div>
+													</div>
+												</div>
+
+
+											</div>
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Week Ending
+												</label>
+												<div class="col-md-6">
+													<div class="input-group">
+														<input type="text" onchange="ChangeWeekdatestart()" data-date-format="dd/MM/yyyy" autocomplete="off" value="" id="_weekredenddate" placeholder="dd/mm/yyyy" name="_redenddate" required class="form-control" />
+														<div class="input-group-append">
+															<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+														</div>
+													</div>
+												</div>
+
+											</div>
+
+										</div>
+
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													List of Stores with Redemptions
+												</label>
+												<div class="col-md-6">
+													<div class="input-group">
+														<select class="form-control select2bs4" name="ddlredemstorename" id="ddlredemstorename">
+															@* <option value="0">--Select--</option>
+															@if (ViewBag.AllRedemStore != null)
+															{
+															@foreach (var item in ViewBag.AllRedemStore)
+															{
+															<option value="@item.StoreNo">@item.StoreNo | @item.StoreName</option>
+															}
+															} *@
+														</select>
+														<div class="input-group-append">
+															<span class="input-group-text"><i class="fas fa-sync-alt" style="cursor:pointer" title="Click here to refresh list" onclick="LoadStoreListForSelectedPeriod()"></i></span>
+														</div>
+													</div>
+
+
+												</div>
+
+
+
+											</div>
+
+
+										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Product
+												</label>
+												<div class="col-md-6">
+													<select class="form-control select2bs4 " disabled style="width:100%" name="ddlproduct" id="ddlproduct">
+														<option value="0">All Products</option>
+														@* @if (ViewBag.AllProducts != null)
+														{
+														@foreach (var item in ViewBag.AllProducts)
+														{
+														<option value="@item.ProductEAN">@item.ProductName</option>
+														}
+														} *@
+													</select>
+												</div>
+
+											</div>
+
+										</div>
+										<div class="card-footer" style="padding:7px;">
+
+											<button style="margin-left:5px;margin-right:5px;float:right;" onclick="GenerateWeeklyRedemptionsReport()" type="button" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-file"></i> Create Redemption Report for Selected Store</button>
+										</div>
+									</form>
+								</div>
+
+							</div>
+						</div>
+						<div class="col-12 col-sm-12">
+							<div class="card card-primary card-outline card-tabs">
+
+								<div class="card-body">
+									<div id="weeklyredempreprttbl"></div>
+								</div>
+								<!-- /.card -->
+							</div>
+						</div>
+
+					</div>
+
+
+
+				</div>
+			</div>
+
+		</div>
+
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+
+
+		moment.updateLocale('en', {
+			week: {
+				dow: 1 // Monday is the first day of the week
+			}
+		});
+		$("#_weekredenddate,#_weekredstartdate").datepicker({
+			format: 'dd/mm/yyyy',
+			todayBtn: true,
+			autoclose: true,
+
+		});
+		$("#_weekredenddate").datepicker("setDate", new Date());
+
+
+	});
+	function ChangeWeekdatestart() {
+		debugger
+
+
+		// Get the start of the current startOfWeek  using moment
+		const startOfWeek = moment($("#_weekredenddate").val(), 'DD/MM/YYYY').subtract(6, 'days');
+
+		// Format the date as needed (e.g., YYYY-MM-DD)
+		const formattedDate = startOfWeek.format('DD/MM/YYYY');
+
+
+		$("#_weekredstartdate").datepicker("setDate", formattedDate);
+
+		LoadStoreListForSelectedPeriod();
+	}
+	function DownloadAccountRedemptionReport() {
+		if ($('#tblredemptionreportlist_datatable tbody tr').length == 1) {
+			toastr.error("No Redemption data found for generating remittance");
+			return;
+		}
+		if ($("#_weekredstartdate").val() == null || $("#_weekredstartdate").val() == "") {
+			toastr.error("Please select Week Beginning date");
+			return;
+		}
+		if ($("#_weekredenddate").val() == null || $("#_weekredenddate").val() == "") {
+			toastr.error("Please select Week Ending date");
+			return;
+		}
+		if ($("#ddlredemstorename").val() == null || $("#ddlredemstorename").val() == "" || $("#ddlredemstorename").val() == "0") {
+			toastr.error("Please select store");
+			return;
+		}
+		// var url = '/Report/RemittanceReport_PDF?';
+		// queryparam = 'startDate=' + $('#_weekredstartdate').val();
+		// queryparam = queryparam + '&' + 'endDate=' + $('#_weekredenddate').val();
+		// queryparam = queryparam + '&' + 'salesstoreno=' + $('#ddlsalesstorename').val();
+		// queryparam = queryparam + '&' + 'salesstorename=' + $('#ddlsalesstorename option:selected').text();
+		// queryparam = queryparam + '&' + 'redemstoreno=' + $('#ddlredemstorename').val();
+		// queryparam = queryparam + '&' + 'redemstorename=' + $('#ddlredemstorename option:selected').text();
+		// queryparam = queryparam + '&' + 'productid=' + $('#ddlproduct').val();
+		// queryparam = queryparam + '&' + 'productName=' + $('#ddlproduct option:selected').text();
+		// window.open(url + queryparam, '_blank');
+
+		// return false;
+		$.ajax({
+			url: "/Report/RemittanceReport_PDF",
+			type: "Get",
+			data: {
+				startDate: $('#_weekredstartdate').val(), endDate: $('#_weekredenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+			},
+			success: function (result) {
+				debugger
+
+				if (result.isemailmissing == true){
+					toastr.error("Please fill email for store " + result.storeName);
+					return;
+				}
+				if (result.isError == true) {
+					toastr.error(result.errorMessage);
+					return;
+				}
+				if (result == null || result == "") {
+					toastr.error("Some error occur in generating remittance report");
+					return;
+				}
+				else {
+					window.open(result, '_blank');
+				}
+
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.loader-overlay').show();
+			},
+			complete: function (result) {
+				$('.loader-overlay').hide();
+			}
+		});
+	}
+	function GenerateRedemptionsDetailedReport() {
+		if ($("#_weekredstartdate").val() == null || $("#_weekredstartdate").val() == "") {
+			toastr.error("Please select Week Beginning date");
+			return;
+		}
+		if ($("#_weekredenddate").val() == null || $("#_weekredenddate").val() == "") {
+			toastr.error("Please select Week Ending date");
+			return;
+		}
+		if ($("#ddlredemstorename").val() == null || $("#ddlredemstorename").val() == "" || $("#ddlredemstorename").val() == "0") {
+			toastr.error("Please select store");
+			return;
+		}
+		$.ajax({
+			url: "/Report/GenerateRedemptionsDetailedReport",
+			type: "Post",
+			data: {
+				startDate: $('#_weekredstartdate').val(), endDate: $('#_weekredenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
+				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+				, isWeeklyReport: true
+			},
+			success: function (result) {
+				debugger
+				if (result.isredempReportGenerated == false) {
+					toastr.error("Some Error in generating redemption report.");
+
+				}
+				else {
+					$('#weeklyredempreprttbl').html(result);
+				}
+				if ($('#tblredemptionreportlist_datatable tbody tr').length > 1) {
+					$('#btnprintremittance').show();
+				}
+				else {
+					$('#btnprintremittance').hide();
+				}
+
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function GenerateWeeklyRedemptionsReport() {
+		GenerateRedemptionsDetailedReport();
+	}
+	function LoadStoreListForSelectedPeriod() {
+		$.ajax({
+			url: "/Report/LoadStoreListForSelectedPeriod",
+			type: "Post",
+			data: {
+				startDate: $('#_weekredstartdate').val(), endDate: $('#_weekredenddate').val()
+			},
+			success: function (data) {
+				debugger
+				var selectedvalue = $('#ddlredemstorename').val();
+				var dropdown = $('#ddlredemstorename');
+				dropdown.empty(); // Clear existing options
+				dropdown.append('<option value="">--Select--</option>'); // Add default option
+
+				// Loop through the data and append options to the dropdown
+				$.each(data, function (key, entry) {
+					dropdown.append($('<option></option>').attr('value', entry.storeNo).text(entry.storeNo + " | " + entry.storeName));
+				});
+
+				if (data == null || data.length == 0) {
+					toastr.error("No Redemptions found for selected period");
+					return;
+				}
+				else {
+					if (selectedvalue > 0) {
+						$('#ddlredemstorename').val(selectedvalue).trigger("chosen:updated");
+					}
+				}
+				$('.select2bs4').select2({
+					theme: 'bootstrap4'
+				});
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function DownloadRedempReportExcel() {
+		$.ajax({
+			url: "/Report/DownloadRedempReportExcel",
+			type: "Get",
+			success: function (result) {
+				debugger
+				var getUrl = window.location;
+				var baseUrl = getUrl.protocol + "//" + getUrl.host + "/Report/DownloadRedempReportExcel/"
+				window.open(baseUrl, '_blank');
+
+			},
+			error: function (result) {
+				toastr.error("Please generate redemption report");
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+
+</script>

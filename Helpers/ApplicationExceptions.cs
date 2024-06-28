@@ -30,20 +30,22 @@ namespace Helpers
 		public static string GENERALERROR = "An error has occurred while processing your request." + CONTACTSYSTEMADMINISTRATOR;
 
 		public static string INCONSISTENTDATAERROR = "The data is inconsistent, all screens will be refreshed/closed now.";
-		//public static Boolean ShowErrors = false;
+		public static string _BaselogPath = Directory.GetCurrentDirectory() + "\\wwwroot\\Logs";
 
-		/// <summary>
-		/// Exception Event
-		/// </summary>
-		//public static event EventHandler<ExceptionArgs> evtExceptionOccoured;
+        //public static Boolean ShowErrors = false;
 
-		#region Public Methods
+        /// <summary>
+        /// Exception Event
+        /// </summary>
+        //public static event EventHandler<ExceptionArgs> evtExceptionOccoured;
 
-		/// <summary>
-		/// Method for Handling Exception
-		/// </summary>
-		/// <param name="pobjExp"></param>
-		public static void HandleAppExc(Exception pobjExp)
+        #region Public Methods
+
+        /// <summary>
+        /// Method for Handling Exception
+        /// </summary>
+        /// <param name="pobjExp"></param>
+        public static void HandleAppExc(Exception pobjExp)
 		{
 			HandleAppExc(null, new ExceptionArgs(pobjExp, null));
 		}
@@ -155,11 +157,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }Exception.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }Exception.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -210,11 +212,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }SessionErrorException.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }SessionErrorException.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -265,11 +267,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }FilterErrorException_{2}.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now, filterType);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }FilterErrorException_{2}.txt", _BaselogPath, System.DateTime.Now, filterType);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -320,11 +322,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }{2}_ErrorException.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now, FileName);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }{2}_ErrorException.txt", _BaselogPath, System.DateTime.Now, FileName);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -377,11 +379,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }Exception.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }Exception.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -403,11 +405,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\" + FolderName) == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\" + FolderName);
+				if (Directory.Exists(_BaselogPath + @"\" + FolderName) == false)
+					Directory.CreateDirectory(_BaselogPath + @"\" + FolderName);
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\" + FolderName + @"\{1:yyyy-MM-dd }Log.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\" + FolderName + @"\{1:yyyy-MM-dd }Log.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -431,12 +433,12 @@ namespace Helpers
 			{
 				if (IsProfileLogEnable == true)
 				{
-					if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\" + FolderName) == false)
-						Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\" + FolderName);
+					if (Directory.Exists(_BaselogPath + @"\" + FolderName) == false)
+						Directory.CreateDirectory(_BaselogPath + @"\" + FolderName);
 
 					FileStream objFS = null;
 					string strFileName = string.Concat(UserID, "_", UserLoggingID);
-					string strFilePath = String.Format(@"{0}\" + FolderName + @"\{1:yyyy-MM-dd }Log_{2}.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now, strFileName);
+					string strFilePath = String.Format(@"{0}\" + FolderName + @"\{1:yyyy-MM-dd }Log_{2}.txt", _BaselogPath, System.DateTime.Now, strFileName);
 					if (File.Exists(strFilePath))
 					{
 						UpdateActivityLog(strFilePath, 60);
@@ -464,11 +466,11 @@ namespace Helpers
 			try
 			{
 				
-					if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log") == false)
-						Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log");
+					if (Directory.Exists(_BaselogPath + @"\Activity Log") == false)
+						Directory.CreateDirectory(_BaselogPath + @"\Activity Log");
 
 					FileStream objFS = null;
-					string strFilePath = String.Format(@"{0}\Activity Log\{1:yyyy-MM-dd }Activity.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+					string strFilePath = String.Format(@"{0}\Activity Log\{1:yyyy-MM-dd }Activity.txt", _BaselogPath, System.DateTime.Now);
 					if (File.Exists(strFilePath))
 					{
 						UpdateActivityLog(strFilePath, 120);
@@ -558,11 +560,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Exception Log");
+				if (Directory.Exists(_BaselogPath + @"\Exception Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Exception Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }AppError.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Exception Log\{1:yyyy-MM-dd }AppError.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -588,11 +590,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Connectivity Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Connectivity Log");
+				if (Directory.Exists(_BaselogPath + @"\Connectivity Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Connectivity Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Connectivity Log\{1:yyyy-MM-dd }Connectivity.log", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Connectivity Log\{1:yyyy-MM-dd }Connectivity.log", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -620,11 +622,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Testing Log") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Testing Log");
+				if (Directory.Exists(_BaselogPath + @"\Testing Log") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Testing Log");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Testing Log\{1:yyyy-MM-dd }Testing.log", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Testing Log\{1:yyyy-MM-dd }Testing.log", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -651,11 +653,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log\Access Rights\" + PracticeID.ToString()) == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log\Access Rights\" + PracticeID.ToString());
+				if (Directory.Exists(_BaselogPath + @"\Activity Log\Access Rights\" + PracticeID.ToString()) == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Activity Log\Access Rights\" + PracticeID.ToString());
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Activity Log\Access Rights\\" + PracticeID.ToString() + "\\{1:yyyy-MM-dd}.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Activity Log\Access Rights\\" + PracticeID.ToString() + "\\{1:yyyy-MM-dd}.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);
@@ -677,11 +679,11 @@ namespace Helpers
 		{
 			try
 			{
-				if (Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log\NES\") == false)
-					Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\Activity Log\NES\");
+				if (Directory.Exists(_BaselogPath + @"\Activity Log\NES\") == false)
+					Directory.CreateDirectory(_BaselogPath + @"\Activity Log\NES\");
 
 				FileStream objFS = null;
-				string strFilePath = String.Format(@"{0}\Activity Log\NES\\{1:yyyy-MM-dd}.txt", AppDomain.CurrentDomain.BaseDirectory, System.DateTime.Now);
+				string strFilePath = String.Format(@"{0}\Activity Log\NES\\{1:yyyy-MM-dd}.txt", _BaselogPath, System.DateTime.Now);
 				if (!File.Exists(strFilePath))
 				{
 					objFS = new FileStream(strFilePath, FileMode.Create);

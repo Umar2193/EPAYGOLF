@@ -21,6 +21,8 @@ namespace Entity
 		public string redemstorename { get; set; }
 		public Int64 productid { get; set; }
         public string  productName { get; set; }
+        public bool isWeeklyReport { get; set; }
+        public Int64 userId{ get; set; }
 
     }
 

@@ -6,6 +6,7 @@ using System.Globalization;
 
 namespace EPAYGOLF.Controllers
 {
+	[ConditionalAuthorize(requireAuthorization: true)]
 	public class SettingsController : Controller
 	{
 		private ISettingsRepository _settingsRepository = new SettingsRepository();

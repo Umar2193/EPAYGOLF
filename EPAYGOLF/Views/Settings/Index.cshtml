@@ -59,6 +59,72 @@
 
 
 						</div>
+						<fieldset>
+						<legend>
+							SMTP Email Setting
+						</legend>
+							<div class="row col-md-12 mb-3">
+								<div class="form-group row col-md-4">
+									<label for="inputEmail3" class="col-md-4 col-form-label">Server Name</label>
+									<div class="col-md-8">
+
+										<input type="text" autocomplete="off" value="@Model.SMTP_ServerName" id="SMTP_ServerName" name="SMTP_ServerName" class="form-control" />
+											
+									</div>
+								</div>
+								<div class="form-group row col-md-4">
+									<label for="inputEmail3" class="col-md-4 col-form-label">Port</label>
+									<div class="col-md-8">
+
+
+										<input type="number" autocomplete="off" value="@Model.SMTP_Port" id="SMTP_Port" name="SMTP_Port"  class="form-control" />
+
+
+									</div>
+								</div>
+								<div class="form-group row col-md-4">
+									<label for="inputEmail3" class="col-md-4 col-form-label">Sender Email</label>
+									<div class="col-md-8">
+
+
+										<input type="email" autocomplete="off" value="@Model.SMTP_SenderEmail" id="SMTP_SenderEmail" name="SMTP_SenderEmail"  class="form-control" />
+
+
+									</div>
+								</div>
+
+
+							</div>
+							<div class="row col-md-12 mb-3">
+								<div class="form-group row col-md-4">
+									<label for="inputEmail3" class="col-md-4 col-form-label">Password</label>
+									<div class="col-md-8">
+
+
+										<input type="password" autocomplete="off" value="@Model.SMTP_Password" id="SMTP_Password" name="SMTP_Password"  class="form-control" />
+
+
+									</div>
+								</div>
+								
+								<div class="row col-md-4" style="margin-left:5px;">
+									<div class="form-group clearfix">
+									<div class="icheck-success d-inline">
+											
+										<input  type="checkbox" checked="@Model.EnableSendEmail" id="EnableSendEmail" name="EnableSendEmail" >
+											<label for="EnableSendEmail">
+												Enable Send Email
+											</label>
+											
+										</div>
+									</div>
+		
+								</div>
+								
+
+
+							</div>
+						</fieldset>
 
 
 					</div>
@@ -88,6 +154,7 @@
 			debugger
 			e.preventDefault();
 			$('#strYearStartDate').val($('#YearStartDate').val());
+			$('#EnableSendEmail').val($('#EnableSendEmail').is(':checked'));
 			SaveSettings();
 		});
 

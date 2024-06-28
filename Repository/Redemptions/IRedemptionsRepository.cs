@@ -15,7 +15,7 @@ namespace Repository.Redemptions
 		int DeleteRedemptionsInformation(Int64 ID);
 		RedemptionsEntity GetredeemDataByID(string ID);
 		int TransformRedeemData();
-		List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate);
+		List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID=0);
 		List<InvoiceEntity> GetInvoiceList(Int64 id = 0);
 		int SaveInvoiceInformation(InvoiceEntity obj);
 		int UpdateRedemptionsInvoiceInformation(RedemptionsEntity obj);

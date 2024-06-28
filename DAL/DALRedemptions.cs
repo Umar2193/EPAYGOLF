@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace DAL
 {
@@ -19,31 +20,35 @@ namespace DAL
 		public List<RedemptionsEntity> GetRedemptionsList(Int64 id = 0)
 		{
 
-			string Query = string.Format($"SELECT [RedemptionsID] ,[ID],[AccountName],[TransactionID] " +
-	  $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
-	  $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
-	  $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
-	  $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
-	  $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
-	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-	  $" FROM [dbo].[Redemptions] " +
-	  $" where IsActive = 1 and IsDeleted = 0 " +
-	  $" order by TransactionDateTime desc");
+			string Query = string.Format($"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
+	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
+	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
+	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , sr.[PostCode]  Postcode" +
+	  $" FROM [dbo].[Redemptions]  r" +
+	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
+	  $" where r.IsActive = 1 and r.IsDeleted = 0 " +
+	  $" order by r.TransactionDateTime desc");
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
 		public RedemptionsEntity GetRedemptionsDetail(Int64 id = 0)
 		{
 
-			string Query = string.Format($"SELECT [RedemptionsID] ,[ID],[AccountName],[TransactionID] " +
-	  $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
-	  $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
-	  $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
-	  $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
-	  $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
-	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-	  $" FROM [dbo].[Redemptions] r" +
-				$" where r.IsActive=1 and r.IsDeleted=0 " +
+			string Query = string.Format($"SELECT r.[RedemptionsID], r.[ID], r.[AccountName], r.[TransactionID] " +
+	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
+	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
+	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , sr.[PostCode]  Postcode" +
+	  $" FROM [dbo].[Redemptions]  r" +
+	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
+	  $" where r.IsActive = 1 and r.IsDeleted = 0 " +
 				$" and r.RedemptionsID = " + id);
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList().FirstOrDefault();
@@ -83,7 +88,7 @@ namespace DAL
 			}
 			else
 			{
-				Query = string.Format($"INSERT INTO [dbo].[Redemptions] ([ID],[AccountName],[TransactionID]\r\n      ,[TransactionType],[CardID],[PAN],[TransactionDateTime]\r\n      ,[Value],[BINNumber],[StoreNo],[StoreName],[Product]\r\n      ,[EAN],[Date],[ProductCommission],[ProductAmount],[VATRate]\r\n      ,[VATDueOnCommission],[AmountPayableToStore],[Postcode],[StatementCreated]\r\n      ,[StatementNumber],[IsActive],[IsDeleted]\r\n      ,[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy])" +
+				Query = string.Format($"INSERT INTO [dbo].[Redemptions] ([ID],[AccountName],[TransactionID]\r\n      ,[TransactionType],[CardID],[PAN],[TransactionDateTime]\r\n      ,[Value],[BINNumber],[StoreNo],[StoreName],[Product]\r\n      ,[EAN],[Date],[ProductCommission],[ProductAmount],[VATRate]\r\n      ,[VATDueOnCommission],[AmountPayableToStore],[Postcode],[IsActive],[IsDeleted]\r\n      ,[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy])" +
 					$" VALUES('" + obj.ID + "','" + obj.AccountName + "'" +
 					$",'" + obj.TransactionID + "' ,'" + obj.TransactionType + "'" +
 					$",'" + obj.CardID + "' ,'" + obj.PAN + "'" +
@@ -94,7 +99,6 @@ namespace DAL
 					$",'" + obj.ProductCommission + "' ,'" + obj.ProductAmount + "'" +
 					$",'" + obj.VATRate + "' ,'" + obj.VATDueOnCommission + "'" +
 					$",'" + obj.AmountPayableToStore + "' ,'" + obj.Postcode + "'" +
-					$",'" + obj.StatementCreated + "' ,'" + obj.StatementNumber + "'" +
 					$",'1' ,'0'" +
 					$", GetDate() ,GetDate()" +
 					$",'100'" +
@@ -161,53 +165,64 @@ namespace DAL
 			return result;
 
 		}
-		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate)
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID= 0)
 		{
 
-			string _Query = $"SELECT [RedemptionsID] ,[ID],[AccountName],[TransactionID] " +
-	  $" , [TransactionType], [CardID], [PAN], [TransactionDateTime] " +
-	  $" , [Value], [BINNumber], [StoreNo], [StoreName], [Product] " +
-	  $" , [EAN], [Date], isnull([ProductCommission],0.0) * 100 as ProductCommission, [ProductAmount],  isnull([VATRate],0.0) * 100 as VATRate " +
-	  $" , [VATDueOnCommission], [AmountPayableToStore], [Postcode], [StatementCreated] " +
-	  $" , [StatementNumber], [StatementAmount], [IsActive], [IsDeleted] " +
-	  $" , [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-	  $" FROM [dbo].[Redemptions]  " +
-	  $" where IsActive=1 and IsDeleted =0 ";
+			string _Query = $"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
+	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
+	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
+	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , sr.[PostCode]  Postcode" +
+	   $" , sr.[UserID]  UserID " +
+	   $" , sr.[Email]  Email " +
+	   $" , sr.[UserEmail]  UserEmail " +
+		 $" , sr.[Title]  Title " +
+		   $" , sr.[FirstName]  FirstName " +
+			 $" , sr.[LastName]  LastName " +
+	  $" FROM [dbo].[Redemptions]  r" +
+	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
+	  $" where r.IsActive = 1 and r.IsDeleted = 0 ";
 
 			//Product
 			if (ProductID == 2) //All Golf Products
 			{
-				_Query = _Query + $" and [EAN] LIKE '5%'";
+				_Query = _Query + $" and r.[EAN] LIKE '5%'";
 			}
 			else if (ProductID == 3) //All Cycling Products
 			{
-				_Query = _Query + $" and [EAN] LIKE '6%'";
+				_Query = _Query + $" and r.[EAN] LIKE '6%'";
 			}
 			else if (ProductID == 4) //All Fishing Products
 			{
-				_Query = _Query + $" and [EAN] LIKE '7%'";
+				_Query = _Query + $" and r.[EAN] LIKE '7%'";
 			}
 			else
 			{
 				if (ProductID > 0)
 				{
-					_Query = _Query + $" and [EAN] = " + ProductID;
+					_Query = _Query + $" and r.[EAN] = " + ProductID;
 				}
 			}
 
 			// Sales Store
-			if (redemStoreNo > 0)
+			if (redemStoreNo > 0 && UserID ==0)
 			{
-				_Query = _Query + $" and [StoreNo] = " + redemStoreNo;
+				_Query = _Query + $" and r.[StoreNo] = " + redemStoreNo;
+			}
+			if(UserID > 0)
+			{
+				_Query = _Query + $" and sr.[UserID] = " + UserID;
 			}
 
-
 			//Date
-			_Query = _Query + $" and cast([Date] as date) >= Cast('" + startDate + "' as date) ";
-			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+			_Query = _Query + $" and cast(r.[Date] as date) >= Cast('" + startDate + "' as date) ";
+			_Query = _Query + $" and cast(r.[Date] as date) <= Cast('" + endDate + "' as date) ";
 
 
-			_Query = _Query + $"  order by TransactionDateTime desc ";
+			_Query = _Query + $"  order by r.TransactionDateTime desc ";
 			string Query = string.Format(_Query);
 			var Data = dapper.Query<RedemptionsEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();

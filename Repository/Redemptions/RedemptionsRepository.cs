@@ -88,12 +88,12 @@ namespace Repository.Redemptions
 				return -1;
 			}
 		}
-		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate)
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID= 0)
 		{
 			try
 			{
 
-				return _DALredemptions.GetRedemptionsListReport(ProductID, redemStoreNo, startDate, endDate);
+				return _DALredemptions.GetRedemptionsListReport(ProductID, redemStoreNo, startDate, endDate, UserID);
 			}
 			catch (Exception ex)
 			{

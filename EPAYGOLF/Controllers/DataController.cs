@@ -19,6 +19,7 @@ using System.Text.Json.Serialization;
 
 namespace EPAYGOLF.Controllers
 {
+	[ConditionalAuthorize(requireAuthorization: true)]
 	public class DataController : Controller
 	{
 		private ISalesRepository _salesRepository = new SalesRepository();
@@ -50,10 +51,15 @@ namespace EPAYGOLF.Controllers
 
             return View(_list);
         }
+		public IActionResult DeleteSales(Int64 ID)
+		{
+			var result = _salesRepository.DeleteSalesInformation(ID);
+			return Json(result);
+		}
 
-        #endregion
-        #region Redemptions
-        public IActionResult RedemptionsIndex()
+		#endregion
+		#region Redemptions
+		public IActionResult RedemptionsIndex()
 		{
 			Helpers.ApplicationExceptions.SaveActivityLog("RedemptionsIndex action method called.");
 
@@ -65,7 +71,12 @@ namespace EPAYGOLF.Controllers
 
 			return View(_list);
 		}
-        public IActionResult ExportRedemptionsList()
+		public IActionResult DeleteRedemptions(Int64 ID)
+		{
+			var result = _redemptionsRepository.DeleteRedemptionsInformation(ID);
+			return Json(result);
+		}
+		public IActionResult ExportRedemptionsList()
         {
             var _list = _redemptionsRepository.GetRedemptionsList();
 
@@ -465,6 +476,8 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.EAN = Convert.ToInt64(item.EAN);
 					redeemEntity.Date = redeemEntity.TransactionDateTime;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
+					//redeemEntity.Postcode = _storeredeemRepository.GetStoreRedeemByStoreNo(Convert.ToInt64(item.StoreNo).ToString()).FirstOrDefault().PostCode;
+
                     var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
 					if (_vatrate == null)
 					{
@@ -476,7 +489,7 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.ProductAmount = 0;
 					redeemEntity.VATDueOnCommission = 0;
 					redeemEntity.AmountPayableToStore = 0;
-					redeemEntity.StatementCreated = redeemEntity.TransactionDateTime.Value;
+					
 
 					var saveredemresult = _redemptionsRepository.SaveRedemptionsInformation(redeemEntity);
 					if(saveredemresult < 0)

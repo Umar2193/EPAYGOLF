@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers", "Helpers\Helpers.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAYGOLF", "EPAYGOLF\EPAYGOLF.csproj", "{066442A2-E0CC-49C1-87A6-FB8F73DF4198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDLCReport", "RDLCReport\RDLCReport.csproj", "{94666070-5A48-450E-96DB-760C3AA38B46}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{066442A2-E0CC-49C1-87A6-FB8F73DF4198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{066442A2-E0CC-49C1-87A6-FB8F73DF4198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{066442A2-E0CC-49C1-87A6-FB8F73DF4198}.Release|Any CPU.Build.0 = Release|Any CPU
-		{94666070-5A48-450E-96DB-760C3AA38B46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94666070-5A48-450E-96DB-760C3AA38B46}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94666070-5A48-450E-96DB-760C3AA38B46}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94666070-5A48-450E-96DB-760C3AA38B46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

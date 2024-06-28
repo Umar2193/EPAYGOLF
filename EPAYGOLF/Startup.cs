@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using static System.Net.WebRequestMethods;
+using System.Text;
 
 namespace EPAYGOLF
 {
@@ -20,14 +22,17 @@ namespace EPAYGOLF
 				options.ModelBinderProviders.Insert(0, new CustomDateTimeModelBinderProvider());
 			});
 
-		}
+          
+        }
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			var localizationOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
 			app.UseRequestLocalization(localizationOptions.Value);
 
 
-		}
+
+
+        }
 
 		public class CustomDateTimeModelBinderProvider : IModelBinderProvider
 		{

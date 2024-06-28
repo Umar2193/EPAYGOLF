@@ -38,7 +38,13 @@ namespace Entity
 		public Int64 CreatedBy { get; set; }
 		public DateTime? UpdatedAt { get; set; }
 		public Int64 UpdatedBy { get; set; }
-	}
+        public Int64 UserID { get; set; }
+        public string Email { get; set; }
+		public string UserEmail { get; set; }
+        public string Title { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
 	public class RedeptionImportDataEntity
 	{
 		public Int64 ID { get; set; }

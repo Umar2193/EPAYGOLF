@@ -70,12 +70,16 @@
 	<script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
 	<!-- Toastr -->
 	<script src="~/plugins/toastr/toastr.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.2/dist/purify.min.js"></script>
+	
 
 	</head>
+
 	<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="loader-overlay">
+		<div class="loader">
+			<img src="~/dist/img/Spinner-2.gif" alt="Loading..." />
+		</div>
+	</div>
 		<div class="wrapper">
 			<!-- Preloader -->
 			<div class="preloader flex-column justify-content-center align-items-center">
@@ -151,7 +155,7 @@
 								
 								
 								<li class="nav-item">
-									<a href="~/Report/Index/" class="nav-link">
+									<a href="~/Report/Index/" class="nav-link active">
 										<i class="far fa-circle nav-icon"></i>
 										<p>
 											Sales & Redemptions
@@ -165,6 +169,14 @@
 								Weekly Redemptions
 								</p>
 								</a>
+								</li>
+								<li class="nav-item">
+									<a href="~/Report/InvoiceList/" class="nav-link">
+										<i class="far fa-circle nav-icon"></i>
+										<p>
+											Invoices
+										</p>
+									</a>
 								</li>
 
 							</ul>
@@ -180,7 +192,7 @@
 								</a>
 								<ul class="nav nav-treeview">
 									<li class="nav-item">
-										<a href="~/Data/Index" class="nav-link active">
+										<a href="~/Data/Index" class="nav-link">
 											<i class="far fa-circle nav-icon"></i>
 											<p>Import Data</p>
 										</a>
@@ -256,8 +268,18 @@
 									</a>
 								</li>
 							
+								
 
 							</ul>
+							@if (User.Identity.IsAuthenticated)
+							{
+								<li class="nav-item">
+									<a href="/Account/Logout" class="nav-link">
+										<i class="fas fa-sign-out-alt nav-icon"></i>
+										<p>Logout</p>
+									</a>
+								</li>
+							}
 						</li>
 							
 						</ul>

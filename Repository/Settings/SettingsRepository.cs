@@ -62,5 +62,18 @@ namespace Repository.Settings
 				return -1;
 			}
 		}
-	}
+        public UsersEntity GetUserDetail(string username, string password)
+        {
+            try
+            {
+
+                return _DALSettings.GetUserDetail(username,password);
+            }
+            catch (Exception ex)
+            {
+                Helpers.ApplicationExceptions.SaveAppError(ex);
+                return null;
+            }
+        }
+    }
 }
