@@ -1,5 +1,4 @@
-﻿using Aspose.Html.Saving;
-using Aspose.Html;
+﻿
 using Entity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +17,11 @@ using Repository.VATRates;
 using System.Globalization;
 using Org.BouncyCastle.Asn1.Ocsp;
 
-using SelectPdf;
 using NPOI.HPSF;
 using EPAYGOLF.Models;
+using System.Threading.Tasks;
+
+
 
 namespace EPAYGOLF.Controllers
 {
@@ -37,10 +38,13 @@ namespace EPAYGOLF.Controllers
 		private ISettingsRepository _settingsRepository = new SettingsRepository();
 		private readonly ViewRenderingService _viewRenderingService;
 		private readonly IWebHostEnvironment _env;
+	
 		public ReportController(ViewRenderingService viewRenderingService, IWebHostEnvironment env)
 		{
 			_viewRenderingService = viewRenderingService;
 			_env = env;
+			
+		
 		}
 		public IActionResult Index()
 		{
@@ -984,69 +988,67 @@ namespace EPAYGOLF.Controllers
 					renderhtml = "Exception occur please contact admin";
 					return Json(new { isError = true, ErrorMessage = renderhtml });
 				}
+				string baseUrl = $"{Request.Scheme}://{Request.Host}";
+				redemptionsRemittance.baseURL = baseUrl;
+				var _logopath = "/dist/img/golfreportlogonew.png";
+				var headerimgpath = redemptionsRemittance.baseURL +"/" + _logopath;
 
 				renderhtml = await _viewRenderingService.RenderToStringAsync("RemittanceReportpdf", redemptionsRemittance);
 				// HTML content for the header
-				string htmlHeader = @"
-            <html>
-                <head>
-                    <style>
-                        .header { text-align: right; font-size: 10pt; }
-                    </style>
-                </head>
-                <body>
-                    <div class='header'>
-                        <img src='file:///" + Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/dist/img/golfreportlogonew.png").Replace("\\", "/") + @"'  />
-                    </div>
-                </body>
-            </html>";
+				string htmlHeader = "<html><head><style>    .header { text-align: right; font-size: 10pt;margin-top:10px; }</style></head><body> <div class='header'><img src='"+headerimgpath+"'  />  </div></body></html>";
 
 				// HTML content for the footer
-				string htmlFooter = "<html>\r\n                <head>\r\n                    <style>\r\n                        .footer { text-align: center; font-size: 10pt; }\r\n                    </style>\r\n                </head>\r\n                <body> <div class='footer'><div style =\"float:left;text-align:left\">\r\n\t\t\t<p>The Golf Gift Card Company Limited</p>\r\n\t\t\t<p>A company registered by guarantee</p>\r\n\t\t\t<p>\r\n\t\t\t\tCompany Registration: 14242436\r\n\t\t\t</p>\r\n\t\t\t<p>\r\n\t\t\t\tVAT Number: 438075778\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div style=\"float:right;text-align:left;\">\r\n\t\t\t<br />\r\n\t\t\t<br />\r\n\t\t\tInvoice No: " + redemptionsRemittance.InvoiceNumber + "\r\n\t\t</div></div>\r\n                </body>\r\n            </html> ";
-				// Create the PDF converter
-				HtmlToPdf converter = new HtmlToPdf();
-
-				// Set header settings
-				converter.Options.DisplayHeader = true;
-				converter.Header.DisplayOnFirstPage = true;
-				converter.Header.DisplayOnOddPages = true;
-				converter.Header.DisplayOnEvenPages = true;
-				converter.Header.Height = 60;
-				PdfHtmlSection headerHtml = new PdfHtmlSection(htmlHeader, "");
-				headerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-				converter.Header.Add(headerHtml);
-
-				// Set footer settings
-				converter.Options.DisplayFooter = true;
-				converter.Footer.DisplayOnFirstPage = true;
-				converter.Footer.DisplayOnOddPages = true;
-				converter.Footer.DisplayOnEvenPages = true;
-				converter.Footer.Height = 90;
-				PdfHtmlSection footerHtml = new PdfHtmlSection(htmlFooter, "");
-				footerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
-				converter.Footer.Add(footerHtml);
-
-                converter.Options.MaxPageLoadTime = 240;
-
-
-                // Base URL for resolving relative paths
-                string baseUrl = $"{Request.Scheme}://{Request.Host}";
-
-                Helpers.ApplicationExceptions.SaveActivityLog(htmlHeader);
-                Helpers.ApplicationExceptions.SaveActivityLog(baseUrl);
-                Helpers.ApplicationExceptions.SaveActivityLog(renderhtml);
-				// Convert the HTML string to a PDF document
-				SelectPdf.PdfDocument doc = converter.ConvertHtmlString(renderhtml, baseUrl);
+				string htmlFooter = "<html>\r\n                <head>\r\n                    <style>\r\n                        .footer { text-align: center; font-size: 10pt; height: 100px;}\r\n                    </style>\r\n                </head>\r\n                <body> <div class='footer'><div style =\"float:left;text-align:left\">\r\n\t\t\t<p>The Golf Gift Card Company Limited</p>\r\n\t\t\t<p>A company registered by guarantee</p>\r\n\t\t\t<p>\r\n\t\t\t\tCompany Registration: 14242436\r\n\t\t\t</p>\r\n\t\t\t<p>\r\n\t\t\t\tVAT Number: 438075778\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div style=\"float:right;text-align:left;\">\r\n\t\t\t<br />\r\n\t\t\t<br />\r\n\t\t\tInvoice No: " + redemptionsRemittance.InvoiceNumber + "\r\n\t\t</div></div>\r\n                </body>\r\n            </html> ";
+				
 				string filename = "Remittance_" + redemptionsRemittance.InvoiceNumber + "_" + redemptionsRemittance.StoreID + "_" + redemptionsRemittance.StoreName + ".pdf";
 				string filePath = dirPath + "\\" + filename;
 				serverfilepath = baseUrl + "/RemittanceReport/" + filename;
 
-				// Save the PDF document to file
-				string outputPath = filePath;
-				doc.Save(outputPath);
+				// Create a new PDF generator
+				var converter = new Rocket.PdfGenerator.HtmlToPdfConverter();
 
-				// Close the PDF document
-				doc.Close();
+				// Set header and footer
+				converter.PageHeaderHtml = htmlHeader;
+				converter.PageFooterHtml = htmlFooter;
+				// Set footer height
+
+
+				// Generate PDF from body HTML with the base URL
+				byte[] pdfBytes = converter.GeneratePdf(renderhtml);
+
+
+
+
+				//var chromePdfRenderer = new ChromePdfRenderer();
+
+				//// Set header and footer
+				//var printOptions = new ChromePdfRenderOptions
+				//{
+				//	HtmlHeader = new HtmlHeaderFooter
+				//	{
+				//		MaxHeight = 60,
+				//		HtmlFragment = htmlHeader
+				//	},
+				//	HtmlFooter = new HtmlHeaderFooter
+				//	{
+				//		MaxHeight = 60,
+				//		HtmlFragment = htmlFooter
+				//	}
+				//};
+				//chromePdfRenderer.RenderingOptions = printOptions;
+
+				//// Render the PDF
+				//var pdf = chromePdfRenderer.RenderHtmlAsPdf(renderhtml);
+				System.IO.File.WriteAllBytes(filePath, pdfBytes);
+				InvoiceEntity invoiceEntity1 = new InvoiceEntity();
+
+				invoiceEntity1.InvoiceNumber = invoiceNumber;
+				invoiceEntity1.document_url = serverfilepath;
+
+				Helpers.ApplicationExceptions.SaveActivityLog("_redemptionsRepository.UpdateInvoiceDocument(invoiceEntity1)");
+				int updatedocument=_redemptionsRepository.UpdateInvoiceDocument(invoiceEntity1);
+				Helpers.ApplicationExceptions.SaveActivityLog("_redemptionsRepository.UpdateInvoiceDocument(invoiceEntity1) result " + updatedocument);
+
 
 				var model = _settingsRepository.GetSettingsList().FirstOrDefault();
 				if (model == null)

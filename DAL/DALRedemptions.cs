@@ -235,10 +235,11 @@ namespace DAL
 		$" , [ProductCommission], [VATDue], [AmountPayable] " +
 
 		$" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+		$" , document_url " +
 
 		$"  FROM[dbo].[Invoices]" +
 	    $" where IsActive = 1 and IsDeleted = 0 " +
-	    $" order by StatementCreated desc");
+	    $" order by InvoiceNumber desc");
 			var Data = dapper.Query<InvoiceEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
@@ -287,6 +288,21 @@ namespace DAL
 					$",[UpdatedAt] = GetDate() " +
 					$",[UpdatedBy] = 100 " +
 					$" WHERE [RedemptionsID] = '" + obj.RedemptionsID + "'");
+			}
+			
+			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+			return result;
+		}
+		public int UpdateInvoiceDocument(InvoiceEntity obj)
+		{
+			string Query = "";
+			if (obj.InvoiceNumber > 0)
+			{
+				Query = string.Format($"UPDATE [dbo].[Invoices] " +
+					$"SET [document_url] = '" + obj.document_url + "'" +
+					$",[UpdatedAt] = GetDate() " +
+					$",[UpdatedBy] = 100 " +
+					$" WHERE [InvoiceNumber] = '" + obj.InvoiceNumber + "'");
 			}
 			
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);

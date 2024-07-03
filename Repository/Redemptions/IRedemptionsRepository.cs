@@ -19,5 +19,6 @@ namespace Repository.Redemptions
 		List<InvoiceEntity> GetInvoiceList(Int64 id = 0);
 		int SaveInvoiceInformation(InvoiceEntity obj);
 		int UpdateRedemptionsInvoiceInformation(RedemptionsEntity obj);
+		int UpdateInvoiceDocument(InvoiceEntity obj);
 	}
 }

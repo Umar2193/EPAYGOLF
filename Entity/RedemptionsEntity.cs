@@ -81,6 +81,7 @@ namespace Entity
 
 		public decimal AmountPayable { get; set; }
         public decimal InvoiceTotal { get; set; }
+        public string baseURL { get; set; }
         public List<RedemptionsEntity> lstRedemptions { get; set; }
 	}
 }

@@ -2,6 +2,7 @@
 @{
 	Layout = null;
 	
+	
 }
 
 
@@ -12,28 +13,19 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Remittance_@Model.InvoiceNumber _@Model.StoreName</title>
-	<link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 
 	<style>
-		.footer {
-			text-align:center;
-			font-size:12px;
-			color:whitesmoke;
-		}
-
+		
 		* {
 			margin: 0;
 			padding: 0;
 			box-sizing: border-box;
 		}
 
-		body {
-			
-			flex-direction: column;
-			min-height: 100vh;
-			font-family: Arial, sans-serif;
-		}
+		
 		
 
 		.clstorelabel {
@@ -108,7 +100,7 @@
 		
 
 		<div class="col col-md-12">
-			<div class="col col-md-8 offset-2" style="text-align:center;">
+			<div class="col col-md-6" style="text-align:center;">
 				<table class="table table-bordered">
 					<thead class="clstorelabel">
 					<th class="clstorelabel" style="text-align:center;">Claim Face Value</th>
@@ -221,6 +213,8 @@
 		</div>
 
 		<div class="col col-md-12">
+			<div class="col col-md-12">
+
 			<table class="table table-bordered" id="redemptabl1">
 				<thead>
 				<th>Location</th>
@@ -262,41 +256,43 @@
 
 				</tbody>
 			</table>
+			</div>
+			<div class="col col-md-6" style="float:right;right:0px;">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td class="clstorelabel">Claim Face Value</td>
+							<td>£@Model.GrossAmount.ToString("0.00")</td>
+
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Service Charge
+							</td>
+							<td>£@Model.ProductCommission.ToString("0.00")</td>
+						</tr>
+
+						<tr>
+							<td class="clstorelabel">
+								VAT
+							</td>
+							<td>£@Model.VATDue.ToString("0.00")</td>
+						</tr>
+						<tr>
+							<td class="clstorelabel">
+								Invoice Total
+							</td>
+							<td>£@Model.InvoiceTotal.ToString("0.00")</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+			</div>
 			
 
 		</div>
-		<div class="col col-md-6 offset-6">
-			<table class="table table-bordered">
-				<tbody>
-					<tr>
-						<td class="clstorelabel">Claim Face Value</td>
-						<td>£@Model.GrossAmount.ToString("0.00")</td>
-
-					</tr>
-					<tr>
-						<td class="clstorelabel">
-							Service Charge
-						</td>
-						<td>£@Model.ProductCommission.ToString("0.00")</td>
-					</tr>
-
-					<tr>
-						<td class="clstorelabel">
-							VAT
-						</td>
-						<td>£@Model.VATDue.ToString("0.00")</td>
-					</tr>
-					<tr>
-						<td class="clstorelabel">
-							Invoice Total
-						</td>
-						<td>£@Model.InvoiceTotal.ToString("0.00")</td>
-					</tr>
-
-				</tbody>
-			</table>
-
-		</div>
+	
 
 	</div>
 	

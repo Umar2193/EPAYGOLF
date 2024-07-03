@@ -140,5 +140,18 @@ namespace Repository.Redemptions
 				return -1;
 			}
 		}
+		public int UpdateInvoiceDocument(InvoiceEntity obj)
+		{
+			try
+			{
+
+				return _DALredemptions.UpdateInvoiceDocument(obj);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return -1;
+			}
+		}
 	}
 }

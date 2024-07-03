@@ -8,6 +8,7 @@ using System.Runtime.Intrinsics.X86;
 using Microsoft.AspNetCore.Owin;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,7 +22,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
             });
-
 
 
 var startup = new Startup();
@@ -50,17 +50,21 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Access configuration settings
+var configuration = builder.Configuration;
 
 
-string enableAuthorization = ConfigurationHelper.GetConnectionString("EnableAuthorization");
+
+
+string enableAuthorization = configuration.GetSection("AuthorizationSettings:EnableAuthorization").Value;
 
 var defaultController = "Report";
 var defaultaction = "Index";
-if (enableAuthorization == "true")
-{
-	defaultController = "Account";
-    defaultaction = "Login";
-}
+//if (enableAuthorization == "ttrue")
+//{
+//	defaultController = "Account";
+//    defaultaction = "Login";
+//}
 
     app.MapControllerRoute(
 	name: "default",

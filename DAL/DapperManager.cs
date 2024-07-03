@@ -34,6 +34,7 @@ namespace DAL
                 {
                     result = false;
                     connection.Close();
+                    Helpers.ApplicationExceptions.SaveAppError(ex);
                     throw ex;
                 }
             };
@@ -58,7 +59,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             };
 
@@ -85,7 +87,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             }
             return result;
@@ -110,7 +113,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             }
 
@@ -135,7 +139,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             }
             return result;
@@ -159,7 +164,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             }
             return result;
@@ -192,7 +198,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             }
             return result;
@@ -216,7 +223,8 @@ namespace DAL
                 catch (SqlException ex)
                 {
                     connection.Close();
-                    throw ex;
+					Helpers.ApplicationExceptions.SaveAppError(ex);
+					throw ex;
                 }
             };
             return result;

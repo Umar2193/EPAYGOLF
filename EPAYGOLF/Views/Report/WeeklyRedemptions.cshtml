@@ -232,8 +232,32 @@
 					toastr.error("Some error occur in generating remittance report");
 					return;
 				}
+			
 				else {
-					window.open(result, '_blank');
+					var mywindow = window.open(result, "_blank");
+					if (mywindow == null) {
+						bootbox.confirm({
+							title: "Browser pop-ups are blocked",
+						message: "Browser pop-ups are blocked. Please allow access to proceed. Also can open URL from here <a target='_blank' href='" + result + "''>Click here</a>",
+							buttons: {
+							confirm: {
+								label: 'OK',
+								className: 'd-none'
+							},
+								cancel: {
+									label: 'OK',
+									className: 'btn-danger'
+								}
+							},
+						callback: function (result) {
+							if (result) {
+								
+							}
+						}
+							
+						});
+						return;
+					}
 				}
 
 

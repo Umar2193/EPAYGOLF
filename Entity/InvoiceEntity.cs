@@ -23,5 +23,6 @@ namespace Entity
 		public Int64 CreatedBy { get; set; }
 		public DateTime? UpdatedAt { get; set; }
 		public Int64 UpdatedBy { get; set; }
-	}
+        public  string document_url { get; set; }
+    }
 }
