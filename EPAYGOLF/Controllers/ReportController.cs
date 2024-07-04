@@ -1086,6 +1086,15 @@ namespace EPAYGOLF.Controllers
 			var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList();
 			return View(invoiceresult);
         }
+		public IActionResult TestMail()
+		{
+			EmailService emailService = new EmailService();
+			var _subject = "Test Mail Subject";
+			var _body = $"Test Mail body";
+			var _emailto = "umar2193@outlook.com";
+			emailService.SendSMTPEmail(_emailto, _subject, _body);
+			return Json(1);
+		}
 		//static void AddHeaderFooter(PdfPage page)
 		//{
 		//	// Get an XGraphics object for drawing on the page
