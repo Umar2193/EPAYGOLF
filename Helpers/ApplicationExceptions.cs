@@ -471,10 +471,6 @@ namespace Helpers
 
 					FileStream objFS = null;
 					string strFilePath = String.Format(@"{0}\Activity Log\{1:yyyy-MM-dd }Activity.txt", _BaselogPath, System.DateTime.Now);
-					if (File.Exists(strFilePath))
-					{
-						UpdateActivityLog(strFilePath, 120);
-					}
 					if (!File.Exists(strFilePath))
 					{
 						objFS = new FileStream(strFilePath, FileMode.Create);

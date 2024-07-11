@@ -66,6 +66,7 @@
 														<option value="Monthly">Monthly</option>
 														<option value="Weekly">Weekly</option>
 														<option value="Daily">Daily</option>
+														<option value="CustomDate">Custom Date</option>
 													</select>
 												</div>
 
@@ -82,7 +83,7 @@
 														{
 															@foreach (var item in ViewBag.AllSalesStore)
 															{
-																<option value="@item.RetailerID">@item.RetailerID | @item.RetailerName</option>
+																<option value="@item.RetailerID">@item.RetailerID | @item.StoreName</option>
 															}
 														}
 													</select>
@@ -230,11 +231,28 @@
 
 		});
 		$("#_redenddate").datepicker("setDate", new Date());
+		GetLastSundayDate();
 		ReportSummaryView();
 		setTimeout(function () { $('#custom-tabs-three-sales-tab').click() }, 1000);
 	});
 	
+	function GetLastSundayDate() {
+		var selectedDate = $('#_redenddate').val();
 
+		// Parse the date using Moment.js
+		var date = moment(selectedDate, 'DD/MM/YYYY');
+
+		// Check if the selected date is a Sunday
+		if (date.day() === 0) {
+
+		} else {
+			// Calculate the days until the previous Sunday
+			var daysUntilPreviousSunday = date.day(); // Number of days back to the previous Sunday
+			var previousSunday = date.subtract(daysUntilPreviousSunday, 'days');
+			$("#_redenddate").datepicker("setDate", previousSunday.format('DD/MM/YYYY'));
+
+		}
+	}
 	function GenerateDetailedReport() {
 		if ($("#_redstartdate").val() == null || $("#_redstartdate").val() == "") {
 			toastr.error("Please select start date");
@@ -242,6 +260,10 @@
 		}
 		if ($("#_redenddate").val() == null || $("#_redenddate").val() == "") {
 			toastr.error("Please select end date");
+			return;
+		}
+		if (moment($("#_redenddate").val(), 'DD/MM/YYYY') < moment($("#_redstartdate").val(), 'DD/MM/YYYY')) {
+			toastr.error("End date should be greater than start date");
 			return;
 		}
 		GenerateSalesDetailedReport();
@@ -378,7 +400,15 @@
 	}
 	function ChangeEventReportType(){
 		debugger
+
 		var _crval = $('#ddlreportingperiod').val();
+		if (_crval == "CustomDate") {
+			$('#_redstartdate').attr("disabled", false);
+		}
+		else {
+			 $('#_redstartdate').attr("disabled", true);
+			
+		}
 		if (_crval == "YTD") {
 
 			const currentDate = moment($("#_redenddate").val(), 'DD/MM/YYYY');

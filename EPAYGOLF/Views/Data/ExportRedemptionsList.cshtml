@@ -30,6 +30,9 @@
             <th>StatementCreated</th>
             <th>StatementNumber</th>
             <th>StatementAmount</th>
+			<th>SortCode</th>
+			<th>AccountNumber</th>
+			<th>AccountHolder</th>
         </tr>
     </thead>
     <tbody>
@@ -93,7 +96,15 @@
 					<td><span style="color:@floatcolor;font-weight:bold;">@item.AmountPayableToStore.ToString("0.00")</span></td>
 					<td> @item.Postcode</td>
 
-					<td>@item.StatementCreated.Value.ToString("dd/MM/yyyy")</td>
+					@if (item.StatementCreated != null)
+					{
+						<td>@item.StatementCreated.Value.ToString("dd/MM/yyyy")</td>
+					}
+					else
+					{
+						<td></td>
+					}
+					
 					<td>@item.StatementNumber</td>
 					@if (item.StatementAmount < 0)
 					{
@@ -104,6 +115,9 @@
 						floatcolor = "";
 					}
 					<td><span style="color:@floatcolor;font-weight:bold;">@item.StatementAmount.ToString("0.00")</span></td>
+					<td>@item.SortCode</td>
+					<td>@item.AccountNumber</td>
+					<td>@item.NameBankAccountHolder</td>
 
 
 

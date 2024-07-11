@@ -23,6 +23,7 @@ namespace DAL
 	  $" , [Address1], [Address2], [CityTown], [PostCode], [UserID] " +
 	  $" , [Title], [FirstName], [LastName], [UserEmail], [StoreNameUser] " +
 	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" ,[SortCode],[AccountNumber],[NameBankAccountHolder] " +
 	  $" FROM [dbo].[StoresRedeem] " +
 	  $" where IsActive = 1 and IsDeleted = 0 " +
 	  $" order by CreatedAt desc");
@@ -36,6 +37,7 @@ namespace DAL
 	  $" , [Address1], [Address2], [CityTown], [PostCode], [UserID] " +
 	  $" , [Title], [FirstName], [LastName], [UserEmail], [StoreNameUser] " +
 	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" ,[SortCode],[AccountNumber],[NameBankAccountHolder] " +
 	  $" FROM [dbo].[StoresRedeem] " +
 	  $" where IsActive = 1 and IsDeleted = 0 " +
 				$" and StoresRedeemID = " + ID);
@@ -61,6 +63,9 @@ namespace DAL
 					$",[LastName] ='" + obj.LastName + "'" +
 					$",[UserEmail] ='" + obj.UserEmail + "'" +
 					$",[StoreNameUser] ='" + obj.StoreNameUser + "'" +
+					$",[SortCode] ='" + obj.SortCode + "'" +
+					$",[AccountNumber] ='" + obj.AccountNumber + "'" +
+					$",[NameBankAccountHolder] ='" + obj.NameBankAccountHolder + "'" +
 
 					$",[UpdatedAt] = GetDate() " +
 					$",[UpdatedBy] = 100 " +
@@ -68,7 +73,7 @@ namespace DAL
 			}
 			else
 			{
-				Query = string.Format($"INSERT INTO [dbo].[StoresRedeem] ([StoreNo] ,[StoreName],[Email],[Address1],[Address2],[CityTown],[PostCode],[UserID],[Title],[FirstName],[LastName],[UserEmail],[StoreNameUser],[IsActive],[IsDeleted],[UpdatedAt],[CreatedAt],[CreatedBy],[UpdatedBy])" +
+				Query = string.Format($"INSERT INTO [dbo].[StoresRedeem] ([StoreNo] ,[StoreName],[Email],[Address1],[Address2],[CityTown],[PostCode],[UserID],[Title],[FirstName],[LastName],[UserEmail],[StoreNameUser],[SortCode],[AccountNumber],[NameBankAccountHolder],[IsActive],[IsDeleted],[UpdatedAt],[CreatedAt],[CreatedBy],[UpdatedBy])" +
 					$" VALUES('" + obj.StoreNo + "','" + obj.StoreName + "'" +
 					$",'" + obj.Email + "' ,'" + obj.Address1 + "'" +
 					$",'" + obj.Address2 + "' ,'" + obj.CityTown + "'" +
@@ -76,6 +81,8 @@ namespace DAL
 					$",'" + obj.Title + "' ,'" + obj.FirstName + "'" +
 					$",'" + obj.LastName + "' ,'" + obj.UserEmail + "'" +
 					$",'" + obj.StoreNameUser + "' "+
+				    $",'" + obj.SortCode + "' ,'" + obj.AccountNumber + "'" +
+					$",'" + obj.NameBankAccountHolder + "' " +
 					$",'1' ,'0'" +
 					$", GetDate() ,GetDate()" +
 					$",'100'" +

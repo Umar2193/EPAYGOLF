@@ -473,7 +473,7 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.StoreNo = Convert.ToInt64(item.StoreNo);
 					redeemEntity.StoreName = item.StoreName;
 					redeemEntity.Product = item.Product;
-					redeemEntity.EAN = Convert.ToInt64(item.EAN);
+					redeemEntity.EAN = 5060380635181;//Convert.ToInt64(item.EAN);
 					redeemEntity.Date = redeemEntity.TransactionDateTime;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
 					//redeemEntity.Postcode = _storeredeemRepository.GetStoreRedeemByStoreNo(Convert.ToInt64(item.StoreNo).ToString()).FirstOrDefault().PostCode;

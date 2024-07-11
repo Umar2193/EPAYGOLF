@@ -24,5 +24,6 @@ namespace Entity
 		public DateTime? UpdatedAt { get; set; }
 		public Int64 UpdatedBy { get; set; }
         public  string document_url { get; set; }
+        public string StoreName { get; set; }
     }
 }

@@ -15,6 +15,9 @@
 			<th>Address2</th>
 			<th>PostCode</th>
 			<th>CityTown</th>
+			<th>SortCode</th>
+			<th>AccountNumber</th>
+			<th>AccountHolder</th>
 		
 			@* <th>StoreNameUser</th> *@
 			<th>Actions</th>
@@ -36,6 +39,9 @@
 					<td>@item.Address2</td>
 					<td>@item.PostCode</td>
 					<td>@item.CityTown</td>
+					<td>@item.SortCode</td>
+					<td>@item.AccountNumber</td>
+					<td>@item.NameBankAccountHolder</td>
 					
 					@* <td>@item.StoreNameUser</td> *@
 					<td>
@@ -60,7 +66,7 @@
 
 <script type="text/javascript">
 	$('#tblRedemptionsStoresList_datatable').DataTable({
-		"order": [],
+		"order": [[0, 'desc']],
 		"paging": true,
 		"lengthChange": false,
 		"searching": true,

@@ -941,6 +941,7 @@ namespace EPAYGOLF.Controllers
 					}
 					longinvoicenumber = ConvertTo7Digits(invoiceNumber);
 					invoiceEntity.InvoiceNumber = invoiceNumber;
+					invoiceEntity.StoreNo = _request.redemstoreno;
 					invoiceEntity.StatementNumber = "GCP" + longinvoicenumber.ToString();
 					invoiceEntity.StatementCreated = DateTime.Now;
 					invoiceEntity.GrossAmount = redempreportresult != null ? redempreportresult.Sum(x => x.Value) * -1 : 0;

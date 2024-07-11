@@ -28,5 +28,10 @@ namespace Entity
 		public Int64 CreatedBy { get; set; }
 		public DateTime? UpdatedAt { get; set; }
 		public Int64 UpdatedBy { get; set; }
+		public string SortCode { get; set; }
+
+		public string AccountNumber { get; set; }
+
+		public string NameBankAccountHolder { get; set; }
 	}
 }

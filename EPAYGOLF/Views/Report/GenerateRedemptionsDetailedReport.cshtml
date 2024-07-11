@@ -110,6 +110,9 @@
 	<th class="thclass">Statement Date</th>
 	<th class="thclass">Statement No.</th>
 	<th class="thclass">Statement Amt</th>
+	<th class="thclass">SortCode</th>
+	<th class="thclass">AccountNumber</th>
+	<th class="thclass">AccountHolder</th>
 	</thead>
 	<tbody>
 		@if (Model != null && Model.Count > 0)
@@ -193,6 +196,10 @@
 						}
 					}
 					<td style="color:@floatcolor">£@item.StatementAmount.ToString("0.00")</td>
+					<td>@item.SortCode</td>
+					<td>@item.AccountNumber</td>
+					<td>@item.NameBankAccountHolder</td>
+
 
 				</tr>
 			}

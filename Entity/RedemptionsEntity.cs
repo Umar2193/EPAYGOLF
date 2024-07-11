@@ -44,7 +44,12 @@ namespace Entity
         public string Title { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-    }
+		public string SortCode { get; set; }
+
+		public string AccountNumber { get; set; }
+
+		public string NameBankAccountHolder { get; set; }
+	}
 	public class RedeptionImportDataEntity
 	{
 		public Int64 ID { get; set; }
@@ -59,7 +64,7 @@ namespace Entity
 		public Int64 StoreNo { get; set; }
 		public string StoreName { get; set; }
 		public string Product { get; set; }
-		public Int64 EAN { get; set; }
+		public string EAN { get; set; }
 
 
 	}

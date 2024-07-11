@@ -24,6 +24,7 @@
 									<tr>
 										<th>InvoiceNumber</th>
 										<th>StoreNo</th>
+										<th>StoreName</th>
 										<th>StatementCreated</th>
 										<th>
 											StatementNumber
@@ -57,6 +58,7 @@
 											<tr>
 												<td>@item.InvoiceNumber</td>
 												<td>@item.StoreNo</td>
+												<td>@item.StoreName</td>
 												<td>@item.StatementCreated.ToString("dd/MM/yyyy")</td>
 												<td>@item.StatementNumber</td>
 												<td>£@item.GrossAmount.ToString("N2")</td>

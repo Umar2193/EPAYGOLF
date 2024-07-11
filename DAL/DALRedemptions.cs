@@ -28,6 +28,7 @@ namespace DAL
 	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
 	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
 	  $" , sr.[PostCode]  Postcode" +
+	  $" ,sr.[SortCode],sr.[AccountNumber],sr.[NameBankAccountHolder] " +
 	  $" FROM [dbo].[Redemptions]  r" +
 	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
 	  $" where r.IsActive = 1 and r.IsDeleted = 0 " +
@@ -182,6 +183,7 @@ namespace DAL
 		 $" , sr.[Title]  Title " +
 		   $" , sr.[FirstName]  FirstName " +
 			 $" , sr.[LastName]  LastName " +
+			   $" ,sr.[SortCode],sr.[AccountNumber],sr.[NameBankAccountHolder] " +
 	  $" FROM [dbo].[Redemptions]  r" +
 	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
 	  $" where r.IsActive = 1 and r.IsDeleted = 0 ";
@@ -230,16 +232,18 @@ namespace DAL
 		public List<InvoiceEntity> GetInvoiceList(Int64 id = 0)
 		{
 
-			string Query = string.Format($"SELECT [ID],[InvoiceNumber],[StoreNo],[StatementCreated],[StatementNumber],[GrossAmount] " +
+			string Query = string.Format($"SELECT r.[ID],r.[InvoiceNumber],r.[StoreNo],r.[StatementCreated],r.[StatementNumber],r.[GrossAmount] " +
 
-		$" , [ProductCommission], [VATDue], [AmountPayable] " +
+		$" , r.[ProductCommission], r.[VATDue], r.[AmountPayable] " +
 
-		$" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-		$" , document_url " +
+		$" , r.[IsActive], r.[IsDeleted], r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+		$" , r.document_url " +
+		$", sr.StoreName " +
 
-		$"  FROM[dbo].[Invoices]" +
-	    $" where IsActive = 1 and IsDeleted = 0 " +
-	    $" order by InvoiceNumber desc");
+		$"  FROM [dbo].[Invoices] r" +
+		$" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo " +
+	    $" where r.IsActive = 1 and r.IsDeleted = 0 " +
+	    $" order by r.InvoiceNumber desc");
 			var Data = dapper.Query<InvoiceEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
