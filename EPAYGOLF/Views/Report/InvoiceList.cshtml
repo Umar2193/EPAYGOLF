@@ -67,8 +67,14 @@
 												<td>£@item.AmountPayable.ToString("N2")</td>
 												@if (!string.IsNullOrEmpty(item.document_url))
 												{
-													<td><a title="View Invoice" href="@item.document_url" target="_blank"><i class="fas fa-eye"></i></a></td>
-													
+													<td>
+														<a title="View Invoice" style="color: #2b92ae ;font-size: 14px;" href="@item.document_url" target="_blank"><i class="fas fa-eye"></i></a>
+														@if (!string.IsNullOrEmpty(item.EmailTo) && !string.IsNullOrEmpty(item.UserName) && !string.IsNullOrEmpty(item.DatePeriod))
+														{
+															<a title="Resend Email" href="#" class="clsresendremittanceemail" style="color: forestgreen;font-size: 14px;margin-left:5px;" data-invoicenumber="@item.InvoiceNumber" data-username="@item.UserName" data-dateperiod="@item.DatePeriod" data-emailto="@item.EmailTo" data-document_url="@item.document_url"><i class="fas fa-envelope"></i></a>
+														}
+													</td>
+
 												}
 												else
 												{
@@ -121,5 +127,64 @@
 			]
 
 		}).buttons().container().appendTo('#tblInvoices_datatable_wrapper .col-md-6:eq(0)');
+
+		$('.clsresendremittanceemail').on("click", function () {
+			var invoicenumber = $(this).data('invoicenumber');
+			var username = $(this).data('username');
+			var DatePeriod = $(this).data('dateperiod');
+			var EmailTo = $(this).data('emailto');
+			var document_url = $(this).data('document_url');
+			bootbox.confirm({
+				title: "Resend Remittance Advice Email",
+				message: "Are you sure you want to resend email to " + EmailTo +" ?",
+				buttons: {
+					confirm: {
+						label: 'Yes',
+						className: 'btn-success'
+					},
+					cancel: {
+						label: 'No',
+						className: 'btn-danger'
+					}
+				},
+				callback: function (result) {
+					if (result) {
+						$.ajax({
+							url: "/Report/ResendRemittanceEmail",
+							type: "POST",
+							data: {
+								InvoiceNumber: invoicenumber, UserName: username, DatePeriod: DatePeriod, EmailTo: EmailTo
+								, document_url: document_url
+							},
+							success: function (result) {
+								debugger
+
+								if (result == true) {
+									toastr.success("Email has been sent successfully");
+
+								}
+								else {
+									toastr.error("Error occur while sending email. Please contact support team.")
+								}
+
+
+							},
+							error: function (result) {
+
+							},
+							beforeSend: function () {
+								$('.loader-overlay').show();
+							},
+							complete: function (result) {
+								$('.loader-overlay').hide();
+							}
+						});
+					}
+				}
+			});
+
+		
+
+		});
 	});
 </script>

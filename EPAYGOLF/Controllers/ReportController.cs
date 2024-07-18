@@ -20,6 +20,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using NPOI.HPSF;
 using EPAYGOLF.Models;
 using System.Threading.Tasks;
+using OfficeOpenXml.FormulaParsing.Excel.Functions;
 
 
 
@@ -734,7 +735,7 @@ namespace EPAYGOLF.Controllers
 				reportSummaryModel.RedeemTotalCount = redempreportresult.Count;
 				reportSummaryModel.TotalValueRedemp = redempreportresult.Sum(x => x.Value).ToString("N2");
 				decimal liabilitypct = _liabilitypct;
-				reportSummaryModel.ggliability = (Convert.ToDecimal(reportSummaryModel.UnRedeemedAmount) * liabilitypct).ToString("N2"); ;
+				reportSummaryModel.ggliability = (Convert.ToDecimal(reportSummaryModel.UnRedeemedAmount) * liabilitypct/100).ToString("N2") ;
 
 			}
 			catch (Exception ex)
@@ -948,6 +949,8 @@ namespace EPAYGOLF.Controllers
 					invoiceEntity.ProductCommission = redempreportresult != null ? redempreportresult.Sum(x => x.ProductAmount) * -1 : 0;
 					invoiceEntity.VATDue = redempreportresult != null ? redempreportresult.Sum(x => x.VATDueOnCommission) * -1 : 0;
 					invoiceEntity.AmountPayable = redempreportresult != null ? redempreportresult.Sum(x => x.AmountPayableToStore) * -1 : 0;
+					invoiceEntity.DatePeriod = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
+					invoiceEntity.UserId = _request.userId;
 
 					int invoicesaveresult = _redemptionsRepository.SaveInvoiceInformation(invoiceEntity);
 
@@ -1044,7 +1047,7 @@ namespace EPAYGOLF.Controllers
 				InvoiceEntity invoiceEntity1 = new InvoiceEntity();
 
 				invoiceEntity1.InvoiceNumber = invoiceNumber;
-				invoiceEntity1.document_url = serverfilepath;
+				invoiceEntity1.document_url = filename;
 
 				Helpers.ApplicationExceptions.SaveActivityLog("_redemptionsRepository.UpdateInvoiceDocument(invoiceEntity1)");
 				int updatedocument=_redemptionsRepository.UpdateInvoiceDocument(invoiceEntity1);
@@ -1085,8 +1088,54 @@ namespace EPAYGOLF.Controllers
 		public IActionResult InvoiceList()
 		{
 			var invoiceresult = _redemptionsRepository.GetInvoiceList().ToList();
+			string baseUrl = $"{Request.Scheme}://{Request.Host}";
+			if (invoiceresult !=null && invoiceresult.Count > 0)
+			{
+				invoiceresult.ForEach(invoice => {
+					if (!string.IsNullOrEmpty(invoice.document_url)) {
+						invoice.document_url = baseUrl + "/RemittanceReport/" + invoice.document_url;
+					}
+					});
+			}
 			return View(invoiceresult);
         }
+		[HttpPost]
+		public IActionResult ResendRemittanceEmail(string InvoiceNumber,string UserName,string DatePeriod,string EmailTo,string document_url)
+		{
+		
+			try
+			{
+				string webRootPath = _env.WebRootPath;
+				string dirPath = Path.Combine(webRootPath, "RemittanceReport");
+				string filePath = dirPath + "\\" + document_url;
+				var model = _settingsRepository.GetSettingsList().FirstOrDefault();
+				if (model == null)
+				{
+					Helpers.ApplicationExceptions.SaveActivityLog("SMTP Config is missing");
+					return Json(false);
+				}
+				if (model != null)
+				{
+					if (model.EnableSendEmail)
+					{
+						EmailService emailService = new EmailService();
+						var _subject = "Redemptions Remittance Advice " + InvoiceNumber + " Period: " + DatePeriod;
+						var _body = $"Dear {UserName}," + Environment.NewLine + Environment.NewLine +
+
+						$"Please find attached your Golf Gift Card Redemptions account statement for the period: {DatePeriod}" + Environment.NewLine + Environment.NewLine +
+						$"For any queries please email the Finance Team at: partner@thegolfgiftcard.com";
+						var _emailto = EmailTo;
+						emailService.SendSMTPEmail(_emailto, _subject, _body, filePath);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Json(false);
+			}
+			return Json(true);
+		}
 		public IActionResult TestMail()
 		{
 			EmailService emailService = new EmailService();

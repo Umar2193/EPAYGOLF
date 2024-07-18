@@ -38,6 +38,7 @@ namespace EPAYGOLF.Models
 			MailMessage mail = new MailMessage(SenderEmail, emailto);
 			mail.Subject = subject;
 			mail.Body = body;
+			mail.Bcc.Add("partner@thegolfgiftcard.com");
 
 			// Create the attachment and add it to the email
 			if (!string.IsNullOrEmpty(attachmentpath))

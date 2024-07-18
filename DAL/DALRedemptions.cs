@@ -166,7 +166,7 @@ namespace DAL
 			return result;
 
 		}
-		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID= 0)
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
 		{
 
 			string _Query = $"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
@@ -210,11 +210,11 @@ namespace DAL
 			}
 
 			// Sales Store
-			if (redemStoreNo > 0 && UserID ==0)
+			if (redemStoreNo > 0 && UserID == 0)
 			{
 				_Query = _Query + $" and r.[StoreNo] = " + redemStoreNo;
 			}
-			if(UserID > 0)
+			if (UserID > 0)
 			{
 				_Query = _Query + $" and sr.[UserID] = " + UserID;
 			}
@@ -238,12 +238,19 @@ namespace DAL
 
 		$" , r.[IsActive], r.[IsDeleted], r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
 		$" , r.document_url " +
+		$" , r.DatePeriod " +
 		$", sr.StoreName " +
+		$" , sr.[UserID]  UserID " +
+	    $" , sr.[Email]  EmailTo " +
+	    $" , sr.[UserEmail]  UserEmail " +
+		$" , sr.[Title]  Title " +
+		$" , sr.[FirstName] + ' ' + sr.[LastName]  as UserName " +
+		
 
 		$"  FROM [dbo].[Invoices] r" +
 		$" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo " +
-	    $" where r.IsActive = 1 and r.IsDeleted = 0 " +
-	    $" order by r.InvoiceNumber desc");
+		$" where r.IsActive = 1 and r.IsDeleted = 0 " +
+		$" order by r.InvoiceNumber desc");
 			var Data = dapper.Query<InvoiceEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
@@ -260,17 +267,19 @@ namespace DAL
 					$",[ProductCommission] ='" + obj.ProductCommission + "'" +
 					$",[VATDue] ='" + obj.VATDue + "'" +
 					$",[AmountPayable] ='" + obj.AmountPayable + "'" +
+					$",[DatePeriod] ='" + obj.DatePeriod + "'" +
+					$",[UserId] ='" + obj.UserId + "'" +
 					$",[UpdatedAt] = GetDate() " +
 					$",[UpdatedBy] = 100 " +
 					$" WHERE [InvoiceNumber] = '" + obj.InvoiceNumber + "'");
 			}
 			else
 			{
-				Query = string.Format($"INSERT INTO [dbo].[Invoices] ([InvoiceNumber],[StoreNo],[StatementCreated],[StatementNumber],[GrossAmount],[ProductCommission],[VATDue],[AmountPayable],[IsActive],[IsDeleted],[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy])" +
+				Query = string.Format($"INSERT INTO [dbo].[Invoices] ([InvoiceNumber],[StoreNo],[StatementCreated],[StatementNumber],[GrossAmount],[ProductCommission],[VATDue],[AmountPayable],[DatePeriod],UserId,[IsActive],[IsDeleted],[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy])" +
 					$" VALUES('" + obj.InvoiceNumber + "','" + obj.StoreNo + "'" +
 					$", GetDate() ,'" + obj.StatementNumber + "'" +
 					$",'" + obj.GrossAmount + "' ,'" + obj.ProductCommission + "'" +
-					$",'" + obj.VATDue + "' ,'" + obj.AmountPayable + "'" +
+					$",'" + obj.VATDue + "' ,'" + obj.AmountPayable + "'  ,'" + obj.DatePeriod + "'  ,'" + obj.UserId + "'" +
 					$",'1' ,'0'" +
 					$", GetDate() ,GetDate()" +
 					$",'100'" +
@@ -293,7 +302,7 @@ namespace DAL
 					$",[UpdatedBy] = 100 " +
 					$" WHERE [RedemptionsID] = '" + obj.RedemptionsID + "'");
 			}
-			
+
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
@@ -308,7 +317,7 @@ namespace DAL
 					$",[UpdatedBy] = 100 " +
 					$" WHERE [InvoiceNumber] = '" + obj.InvoiceNumber + "'");
 			}
-			
+
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
