@@ -1,11 +1,13 @@
 ﻿using Entity;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DAL
@@ -218,27 +220,128 @@ namespace DAL
 			}
 			else
 			{
-				if(ProductID > 0)
+				if (ProductID > 0)
 				{
 					_Query = _Query + $" and [EAN] = " + ProductID;
 				}
 			}
 
 			// Sales Store
-			if(SalesStoreNo > 0)
+			if (SalesStoreNo > 0)
 			{
 				_Query = _Query + $" and [StoreNo] = " + SalesStoreNo;
 			}
 
 
 			//Date
-			_Query = _Query + $" and cast([Date] as date) >= Cast('"+startDate+"' as date) ";
+			_Query = _Query + $" and cast([Date] as date) >= Cast('" + startDate + "' as date) ";
 			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
 
 
 			_Query = _Query + $"  order by TransactionDateTime desc ";
 			string Query = string.Format(_Query);
 			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
+		}
+		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		{
+			string _ProductClause = string.Empty;
+			string _SalesStoreNoClause = string.Empty;
+			//Product
+			if (ProductID == 2) //All Golf Products
+			{
+				_ProductClause = $" and [EAN] LIKE '5%'";
+			}
+			else if (ProductID == 3) //All Cycling Products
+			{
+				_ProductClause = $" and [EAN] LIKE '6%'";
+			}
+			else if (ProductID == 4) //All Fishing Products
+			{
+				_ProductClause = $" and [EAN] LIKE '7%'";
+			}
+			else
+			{
+				if (ProductID > 0)
+				{
+					_ProductClause = $" and [EAN] = " + ProductID;
+				}
+			}
+
+			// Sales Store
+			if (SalesStoreNo > 0)
+			{
+				_SalesStoreNoClause = $" and [StoreNo] = " + SalesStoreNo;
+			}
+
+
+			string _Query = $" WITH AggregatedData AS ( SELECT  " +
+
+		$" FORMAT([Date], 'MMM-yyyy') AS MonthYear, " +
+		$" COUNT(*) AS RecordCount, " +
+		$" SUM([Value]) AS TotalValue, " +
+		$" Sum(StoreAmount) AS TotalStoreAmount, " +
+		$" Sum(ProcessAmount) as TotalProcessAmount, " +
+		$" Sum(StripeAmount) as TotalStripeAmount, " +
+		$" Sum(TransactionAmount) as TotalTransactionAmount, " +
+		$" Sum(NetAmount) as TotalNetAmount, " +
+		$" Sum(RedeemedAmount) as TotalRedeemedAmount, " +
+		$" Sum(UnRedeemedAmount) as TotalUnRedeemedAmount, " +
+		$" Sum(GGCAmount) as TotalGGCAmount, " +
+		$" Sum(Breakage) as TotalBreakage " +
+		$" FROM [dbo].[Sales] " +
+		$" where IsActive = 1 and IsDeleted = 0 " +
+		$" and cast([Date] as date) >= Cast('" + startDate + "' as date) " +
+		$" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+			if (!string.IsNullOrEmpty(_ProductClause))
+			{
+				_Query = _Query + _ProductClause;
+			}
+			if (!string.IsNullOrEmpty(_SalesStoreNoClause))
+			{
+				_Query = _Query + _SalesStoreNoClause;
+			}
+
+			_Query = _Query +
+			$" GROUP BY FORMAT([Date], 'MMM-yyyy')) " +
+
+			$" Select * from ( SELECT  " +
+			$" ROW_NUMBER() OVER (PARTITION BY  FORMAT(t.Date, 'MMM-yyyy') order by FORMAT(t.Date, 'MMM-yyyy')) AS rn,  " +
+			$" a.MonthYear,  " +
+			$" a.RecordCount,  " +
+			$" a.TotalValue,  " +
+			$" a.TotalStoreAmount,  " +
+			$" a.TotalProcessAmount,  " +
+			$" a.TotalStripeAmount,  " +
+			$" a.TotalTransactionAmount,  " +
+			$" a.TotalNetAmount,  " +
+			$" a.TotalRedeemedAmount,  " +
+			$" a.TotalUnRedeemedAmount,  " +
+			$" a.TotalGGCAmount,  " +
+			$" a.TotalBreakage,  " +
+			$" t.*  " +
+			 $" FROM[dbo].[Sales]  t  " +
+			$" JOIN  AggregatedData a ON FORMAT(t.Date, 'MMM-yyyy') = a.MonthYear  " +
+			$" where IsActive = 1 and IsDeleted = 0  " +
+			$" and cast([Date] as date) >= Cast('" + startDate + "' as date) " +
+			$" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+			if (!string.IsNullOrEmpty(_ProductClause))
+			{
+				_Query = _Query + _ProductClause;
+			}
+			if (!string.IsNullOrEmpty(_SalesStoreNoClause))
+			{
+				_Query = _Query + _SalesStoreNoClause;
+			}
+
+
+			_Query = _Query + $" )p  " +
+		$" where p.rn = 1  " +
+		$" ORDER BY  p.TransactionDateTime  ";
+
+
+			string Query = string.Format(_Query);
+			var Data = dapper.Query<MonthlySalesEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
 	}

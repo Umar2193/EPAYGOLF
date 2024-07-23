@@ -285,6 +285,10 @@
 					toastr.error("Please fill email for store " + result.storeName);
 					return;
 				}
+				if (result.ispostcodemissing == true) {
+					toastr.error("Please fill address fields for store " + result.storeName);
+					return;
+				}
 				if (result.isError == true) {
 					toastr.error(result.errorMessage);
 					return;

@@ -63,4 +63,23 @@ namespace Entity
 		public Int64 EAN { get; set; }
 
 	}
+	public class MonthlySalesEntity
+	{
+        public string MonthYear { get; set; }
+        public int RecordCount { get; set; }
+        public decimal TotalValue { get; set; }
+		public decimal TotalStoreAmount { get; set; }
+
+		public decimal TotalProcessAmount { get; set; }
+
+		public decimal TotalStripeAmount { get; set; }
+
+		public decimal TotalTransactionAmount { get; set; }
+		public decimal TotalNetAmount { get; set; }
+		public decimal TotalRedeemedAmount { get; set; }
+		public decimal TotalUnRedeemedAmount { get; set; }
+		public decimal TotalGGCAmount { get; set; }
+		public decimal TotalBreakage { get; set; }
+		public DateTime? TransactionDateTime { get; set; }
+	}
 }

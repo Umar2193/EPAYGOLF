@@ -16,5 +16,6 @@ namespace Repository.Sales
 		SalesEntity GetSalesDataByID(string ID);
 		int TransformSalesData();
 		List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate);
+		List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate);
 	}
 }

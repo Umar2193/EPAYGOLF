@@ -25,4 +25,11 @@
     <Folder Include="wwwroot\Reports\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Report\GenerateDetailedMonthlySalesReport.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

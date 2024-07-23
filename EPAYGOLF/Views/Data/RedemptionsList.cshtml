@@ -34,6 +34,7 @@
 				<th>StatementCreated</th>
 				<th>StatementNumber</th>
 				<th>StatementAmount</th>
+				<th>RemainingRedemptionAmount</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -127,7 +128,18 @@
 						floatcolor = "";
 					}
 					<td>  <span style="color:@floatcolor;font-weight:bold;">@item.StatementAmount.ToString("0.00")</span></td>
-				
+					@if (item.RemainingRedemptionAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+
+
+						floatcolor = "";
+					}
+					<td>  <span style="color:@floatcolor;font-weight:bold;">@item.RemainingRedemptionAmount.ToString("0.00")</span></td>
+					
 
 
 				</tr>

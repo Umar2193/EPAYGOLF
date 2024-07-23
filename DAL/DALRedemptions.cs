@@ -22,11 +22,11 @@ namespace DAL
 
 			string Query = string.Format($"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
 	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
-	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], sr.[StoreName], r.[Product] " +
 	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
 	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
 	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
-	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] ,r.RemainingRedemptionAmount " +
 	  $" , sr.[PostCode]  Postcode" +
 	  $" ,sr.[SortCode],sr.[AccountNumber],sr.[NameBankAccountHolder] " +
 	  $" FROM [dbo].[Redemptions]  r" +
@@ -41,11 +41,11 @@ namespace DAL
 
 			string Query = string.Format($"SELECT r.[RedemptionsID], r.[ID], r.[AccountName], r.[TransactionID] " +
 	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
-	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], sr.[StoreName], r.[Product] " +
 	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
 	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
 	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
-	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy], r.RemainingRedemptionAmount  " +
 	  $" , sr.[PostCode]  Postcode" +
 	  $" FROM [dbo].[Redemptions]  r" +
 	   $" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo" +
@@ -161,6 +161,7 @@ namespace DAL
 			//Update Breakage Value
 			Query += "\r\n UPDATE Sales\r\nSET Breakage = [Value] - [RedeemedAmount] \r\nWHERE Cast(ExpiryDate as date) <= Cast(GetDate() as date) AND ExpiryDate IS NOT NULL\r\nAND Breakage IS NULL";
 
+			Query += "   -- Drop temporary tables if they exist\r\n    IF OBJECT_ID('tempdb..#TempCumulativeRedemptions') IS NOT NULL DROP TABLE #TempCumulativeRedemptions;\r\n    IF OBJECT_ID('tempdb..#TempInitialValues') IS NOT NULL DROP TABLE #TempInitialValues;\r\n    IF OBJECT_ID('tempdb..#TempRemainingValues') IS NOT NULL DROP TABLE #TempRemainingValues;\r\n\r\n    -- Create a temporary table to store initial card values\r\n    CREATE TABLE #TempInitialValues (\r\n        CardID BIGINT,\r\n        InitialValue FLOAT\r\n    );\r\n\r\n    -- Populate the temporary table with initial card values from the Sales table\r\n    INSERT INTO #TempInitialValues (CardID, InitialValue)\r\n    SELECT CardID, Value\r\n    FROM Sales;\r\n\r\n    -- Create a temporary table to store cumulative redemption amounts\r\n    CREATE TABLE #TempCumulativeRedemptions (\r\n        CardID BIGINT,\r\n        RedemptionID BIGINT,\r\n        CumulativeRedemptionAmount FLOAT\r\n    );\r\n\r\n    -- Populate the temporary table with cumulative redemption amounts\r\n    INSERT INTO #TempCumulativeRedemptions (CardID, RedemptionID, CumulativeRedemptionAmount)\r\n    SELECT R.CardID, R.ID, SUM(R2.Value) AS CumulativeRedemptionAmount\r\n    FROM Redemptions AS R\r\n    INNER JOIN Redemptions AS R2 ON R.CardID = R2.CardID AND R2.TransactionDateTime <= R.TransactionDateTime AND R2.ID <= R.ID\r\n    GROUP BY R.CardID, R.ID;\r\n\r\n    -- Create a temporary table to store remaining redemption amounts\r\n    CREATE TABLE #TempRemainingValues (\r\n        CardID BIGINT,\r\n        RedemptionID BIGINT,\r\n        RemainingRedemptionAmount FLOAT\r\n    );\r\n\r\n    -- Populate the temporary table with remaining redemption amounts\r\n    INSERT INTO #TempRemainingValues (CardID, RedemptionID, RemainingRedemptionAmount)\r\n    SELECT C.CardID, C.RedemptionID, (I.InitialValue + C.CumulativeRedemptionAmount) AS RemainingRedemptionAmount\r\n    FROM #TempCumulativeRedemptions AS C\r\n    INNER JOIN #TempInitialValues AS I ON C.CardID = I.CardID;\r\n\r\n    -- Update the original table using the temporary table\r\n    UPDATE R\r\n    SET R.RemainingRedemptionAmount = T.RemainingRedemptionAmount\r\n    FROM Redemptions AS R\r\n    INNER JOIN #TempRemainingValues AS T ON R.CardID = T.CardID AND R.ID = T.RedemptionID;\r\n\r\n    -- Drop the temporary tables\r\n    DROP TABLE #TempCumulativeRedemptions;\r\n    DROP TABLE #TempInitialValues;\r\n    DROP TABLE #TempRemainingValues;";
 
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
@@ -171,11 +172,11 @@ namespace DAL
 
 			string _Query = $"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
 	  $" , r.[TransactionType], r.[CardID], r.[PAN], r.[TransactionDateTime] " +
-	  $" , r.[Value], r.[BINNumber], r.[StoreNo], r.[StoreName], r.[Product] " +
+	  $" , r.[Value], r.[BINNumber], r.[StoreNo], sr.[StoreName], r.[Product] " +
 	  $" , r.[EAN], r.[Date], isnull(r.[ProductCommission],0.0) * 100 as ProductCommission, r.[ProductAmount],  isnull(r.[VATRate],0.0) * 100 as VATRate " +
 	  $" , r.[VATDueOnCommission], r.[AmountPayableToStore], r.[StatementCreated] " +
 	  $" , r.[StatementNumber], r.[StatementAmount], r.[IsActive], r.[IsDeleted] " +
-	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] " +
+	  $" , r.[CreatedAt], r.[CreatedBy], r.[UpdatedAt], r.[UpdatedBy] , r.RemainingRedemptionAmount " +
 	  $" , sr.[PostCode]  Postcode" +
 	   $" , sr.[UserID]  UserID " +
 	   $" , sr.[Email]  Email " +

@@ -292,12 +292,12 @@ namespace EPAYGOLF.Controllers
 		public JsonResult TransformSalesData()
 		{
 			var checkifcommisionnull = _salesRepository.GetSalesList().Where(x => x.Value ==0).ToList();
-			if(checkifcommisionnull != null  && checkifcommisionnull.Count > 0)
+			if( checkifcommisionnull != null  && checkifcommisionnull.Count > 0)
 			{
 				return Json(-10);
 			}
 			 checkifcommisionnull = _salesRepository.GetSalesList();
-			if(checkifcommisionnull == null || (checkifcommisionnull !=null && checkifcommisionnull.Count==0))
+			if( checkifcommisionnull == null || (checkifcommisionnull !=null && checkifcommisionnull.Count==0))
 			{
 				return Json(-12);
 			}
@@ -533,18 +533,18 @@ namespace EPAYGOLF.Controllers
 		}
 		public JsonResult TransformRedeemData()
 		{
-			var checkifStoresRedeemnull = _storeredeemRepository.GetStoresRedeemList().Where(x => x.PostCode== string.Empty).ToList();
-			if (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count > 0)
-			{
-				return Json(-10);
-			}
-			checkifStoresRedeemnull = _storeredeemRepository.GetStoresRedeemList();
-			if (checkifStoresRedeemnull == null || (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count == 0))
+			//var checkifStoresRedeemnull = _storeredeemRepository.GetStoresRedeemList().Where(x => x.PostCode== string.Empty).ToList();
+			//if (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count > 0)
+			//{
+			//	return Json(-10);
+			//}
+			var checkifStoresRedeemnull = _storeredeemRepository.GetStoresRedeemList();
+			if ( checkifStoresRedeemnull == null || (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count == 0))
 			{
 				return Json(-12);
 			}
 			var checkifredemtionnull = _redemptionsRepository.GetRedemptionsList();
-			if (checkifredemtionnull == null || (checkifredemtionnull != null && checkifredemtionnull.Count == 0))
+			if ( checkifredemtionnull == null || (checkifredemtionnull != null && checkifredemtionnull.Count == 0))
 			{
 				return Json(-12);
 			}
@@ -642,10 +642,10 @@ namespace EPAYGOLF.Controllers
 			}
 			
 			var redemresult= TransformRedeemData();
-			if ((int)redemresult.Value == -10)
-			{
-				errorMessage = "Please update the Database with the Store addresses!";
-			}
+			//if ((int)redemresult.Value == -10)
+			//{
+			//	errorMessage = "Please update the Database with the Store addresses!";
+			//}
 			if ((int)redemresult.Value == -11)
 			{
 				errorMessage = "Please update the product with the commission percentage!";
@@ -660,6 +660,47 @@ namespace EPAYGOLF.Controllers
 			}
 			
 			return Json(new { salesstatus = (int)result.Value, redemstatus = (int)redemresult.Value, message = errorMessage, type = "redeem" });
+		}
+		public string TransformSalesRedemptionsDataString()
+		{
+			string errorMessage = string.Empty;
+			var result = TransformSalesData();
+			if ((int)result.Value == -10)
+			{
+				 errorMessage = "Please update the salesstore with the commission percentage!";
+			}
+			if ((int)result.Value == -11)
+			{
+				errorMessage = "Please update the product with the commission percentage!";
+			}
+			if ((int)result.Value == -12)
+			{
+				errorMessage = "No sales data found.";
+			}
+			if ((int)result.Value == -13)
+			{
+				errorMessage = "No product data found.";
+			}
+
+			var redemresult = TransformRedeemData();
+			if ((int)redemresult.Value == -10)
+			{
+				errorMessage += Environment.NewLine + "Please update the redemptions with the Store addresses!";
+			}
+			if ((int)redemresult.Value == -11)
+			{
+				errorMessage += Environment.NewLine +  "Please update the product with the commission percentage!";
+			}
+			if ((int)redemresult.Value == -12)
+			{
+				errorMessage += Environment.NewLine + "No redemption data found.";
+			}
+			if ((int)redemresult.Value == -13)
+			{
+				errorMessage += Environment.NewLine + "No product data found.";
+			}
+
+			return errorMessage;
 		}
 		#endregion
 	}

@@ -33,6 +33,7 @@
 			<th>SortCode</th>
 			<th>AccountNumber</th>
 			<th>AccountHolder</th>
+			<th>RemainingRedemptionAmount</th>
         </tr>
     </thead>
     <tbody>
@@ -118,6 +119,17 @@
 					<td>@item.SortCode</td>
 					<td>@item.AccountNumber</td>
 					<td>@item.NameBankAccountHolder</td>
+					@if (item.RemainingRedemptionAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+
+
+						floatcolor = "";
+					}
+					<td>  <span style="color:@floatcolor;font-weight:bold;">@item.RemainingRedemptionAmount.ToString("0.00")</span></td>
 
 
 

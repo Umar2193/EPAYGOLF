@@ -32,7 +32,8 @@ namespace Entity
 		public DateTime? StatementCreated { get; set; }
 		public string StatementNumber { get; set; }
 		public decimal StatementAmount { get; set; }
-		public bool IsActive { get; set; }
+        public decimal RemainingRedemptionAmount { get; set; }
+        public bool IsActive { get; set; }
 		public bool IsDeleted { get; set; }
 		public DateTime? CreatedAt { get; set; }
 		public Int64 CreatedBy { get; set; }
