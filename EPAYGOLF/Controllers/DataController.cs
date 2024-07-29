@@ -115,7 +115,7 @@ namespace EPAYGOLF.Controllers
 						{
 							return Json(-4); //Transaction type load not found
 						}
-						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower()  != "load" && x.TransactionType.ToLower() !="refund").ToList();
+						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower()  != "load" && x.TransactionType.ToLower() !="refund" && x.TransactionType.ToLower() != "void").ToList();
 						if ( findtrantypenotload != null && findtrantypenotload.Count > 0)
 						{
 							return Json(-7); //All record should have transaction type Load.

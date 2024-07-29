@@ -219,6 +219,19 @@
 				}
 				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.TotalValue.ToString("N2")</td>
 				<td class="tdclass" style="font-weight:bold;">@ViewBag.TotalCount</td>
+			
+				@{
+
+					if (ViewBag.ProductAmount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.ProductAmount.ToString("N2")</td>
 				@{
 
 					if (ViewBag.VATDueOnCommission < 0)
@@ -233,18 +246,6 @@
 				<td class="tdclass" style="font-weight:bold;color:@floatcolor">
 					£@ViewBag.VATDueOnCommission.ToString("N2")
 				</td>
-				@{
-
-					if (ViewBag.ProductAmount < 0)
-					{
-						floatcolor = "red";
-					}
-					else
-					{
-						floatcolor = "";
-					}
-				}
-				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.ProductAmount.ToString("N2")</td>
 				@{
 
 					if (ViewBag.AmountPayableToStore < 0)
