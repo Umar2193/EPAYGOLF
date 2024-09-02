@@ -136,6 +136,27 @@
 											</div>
 
 										</div>
+										<div class="row col-md-12">
+											<div class="form-group row col-md-12">
+												<label for="inputEmail3" class="col-md-3 col-form-label">
+													Retailer
+												</label>
+												<div class="col-md-6">
+													<select class="form-control select2bs4 " style="width:100%" name="ddlretailer" id="ddlretailer">
+														<option value="0">All Retailer</option>
+														@if (ViewBag.AllRetailer != null)
+														{
+															@foreach (var item in ViewBag.AllRetailer)
+															{
+																<option value="@item.RetailerCode">@item.RetailerName</option>
+															}
+														}
+													</select>
+												</div>
+
+											</div>
+
+										</div>
 										<div class="card-footer">
 
 											<button style="margin-left:5px;margin-right:5px;float:right;" onclick="GenerateDetailedReport()" type="button" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-file"></i> Generate Detailed Report</button>
@@ -283,6 +304,7 @@
 			data: {
 				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
 				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+				, retailercode: $('#ddlretailer').val()
 			},
 			success: function (result) {
 				debugger
@@ -340,6 +362,7 @@
 			data: {
 				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
 				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+				, retailercode: $('#ddlretailer').val()
 			},
 			success: function (result) {
 				debugger
@@ -418,6 +441,7 @@
 			data: {
 				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
 				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+				, retailercode: $('#ddlretailer').val()
 			},
 			success: function (result) {
 				debugger
@@ -577,6 +601,7 @@
 			data: {
 				startDate: $('#_redstartdate').val(), endDate: $('#_redenddate').val(), salesstoreno: $('#ddlsalesstorename').val(), salesstorename: $('#ddlsalesstorename option:selected').text()
 				, redemstoreno: $('#ddlredemstorename').val(), redemstorename: $('#ddlredemstorename option:selected').text(), productid: $('#ddlproduct').val(), productName: $('#ddlproduct option:selected').text()
+				, retailercode: $('#ddlretailer').val()
 			},
 			success: function (result) {
 				debugger

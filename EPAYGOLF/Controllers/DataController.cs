@@ -16,6 +16,9 @@ using Repository.StoresRedeem;
 using Repository.SalesStore;
 using Repository.VATRates;
 using System.Text.Json.Serialization;
+using NPOI.SS.Formula.Functions;
+using SixLabors.ImageSharp.ColorSpaces;
+using Repository.Retailer;
 
 namespace EPAYGOLF.Controllers
 {
@@ -28,6 +31,7 @@ namespace EPAYGOLF.Controllers
 		private IStoresRedeemRepository _storeredeemRepository = new StoresRedeemRepository();
 		private ISalesStoreRepository _salesStoreRepository = new SalesStoreRepository();
 		private IVATRatesRepository _vATRatesRepository = new VATRatesRepository();
+		private IRetailerRepository _retailerRepository = new RetailerRepository();
 		public IActionResult Index()
 		{
 			return View();
@@ -45,12 +49,12 @@ namespace EPAYGOLF.Controllers
 
 			return View(_list);
 		}
-        public IActionResult ExportSalesList()
-        {
-            var _list = _salesRepository.GetSalesList();
+		public IActionResult ExportSalesList()
+		{
+			var _list = _salesRepository.GetSalesList();
 
-            return View(_list);
-        }
+			return View(_list);
+		}
 		public IActionResult DeleteSales(Int64 ID)
 		{
 			var result = _salesRepository.DeleteSalesInformation(ID);
@@ -77,11 +81,11 @@ namespace EPAYGOLF.Controllers
 			return Json(result);
 		}
 		public IActionResult ExportRedemptionsList()
-        {
-            var _list = _redemptionsRepository.GetRedemptionsList();
+		{
+			var _list = _redemptionsRepository.GetRedemptionsList();
 
-            return View(_list);
-        }
+			return View(_list);
+		}
 
 		#endregion
 
@@ -106,7 +110,7 @@ namespace EPAYGOLF.Controllers
 						filesalesdata.CopyTo(ms);
 						var fileBytes = ms.ToArray();
 						list = ReadSalesCsvFile(fileBytes);
-						if (list == null || (list !=null &&  list.Count ==0))
+						if (list == null || (list != null && list.Count == 0))
 						{
 							return Json(-3);
 						}
@@ -115,8 +119,8 @@ namespace EPAYGOLF.Controllers
 						{
 							return Json(-4); //Transaction type load not found
 						}
-						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower()  != "load" && x.TransactionType.ToLower() !="refund" && x.TransactionType.ToLower() != "void").ToList();
-						if ( findtrantypenotload != null && findtrantypenotload.Count > 0)
+						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower() != "load" && x.TransactionType.ToLower() != "refund" && x.TransactionType.ToLower() != "void").ToList();
+						if (findtrantypenotload != null && findtrantypenotload.Count > 0)
 						{
 							return Json(-7); //All record should have transaction type Load.
 						}
@@ -127,7 +131,7 @@ namespace EPAYGOLF.Controllers
 						}
 					}
 
-					var errormessage=ProcessSalesImportData(list);
+					var errormessage = ProcessSalesImportData(list);
 					if (!string.IsNullOrEmpty(errormessage))
 					{
 						return Json(errormessage);
@@ -136,7 +140,7 @@ namespace EPAYGOLF.Controllers
 					{
 						return Json(1);
 					}
-					
+
 				}
 			}
 			catch (Exception ex)
@@ -147,8 +151,8 @@ namespace EPAYGOLF.Controllers
 		}
 		private string ProcessSalesImportData(List<SalesImportDataEntity> list)
 		{
-			var errorMessage=string.Empty;
-		    foreach(var item in  list)
+			var errorMessage = string.Empty;
+			foreach (var item in list)
 			{
 				#region CheckEAN
 				var _checkEAN = _productRepository.GetProductByEAN(item.EAN.ToString());
@@ -156,7 +160,8 @@ namespace EPAYGOLF.Controllers
 				{
 
 				}
-				else {
+				else
+				{
 					ProductEntity productEntity = new ProductEntity();
 					productEntity.ProductName = item.Product;
 					productEntity.ProductEAN = Convert.ToInt64(item.EAN);
@@ -167,7 +172,7 @@ namespace EPAYGOLF.Controllers
 				var _checkStoreNo = _salesStoreRepository.GetSalesStoreByStoreNo(item.StoreNo.ToString());
 				if (_checkStoreNo != null && _checkStoreNo.Count > 0)//It means StoreNo exist no need to insert.
 				{
-					
+
 				}
 				else
 				{
@@ -191,40 +196,40 @@ namespace EPAYGOLF.Controllers
 					salesEntity.TransactionType = item.TransactionType;
 					salesEntity.CardID = item.CardID;
 					salesEntity.PAN = item.PAN;
-                    DateTime _trandate;
-                    if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        salesEntity.TransactionDateTime = _trandate;
+					DateTime _trandate;
+					if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        salesEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        salesEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        salesEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        salesEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDateTime = _trandate;
 
 
-                    }
+					}
 					salesEntity.TransactionDateTime = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss",CultureInfo.InvariantCulture);
 
-                    salesEntity.Value = Convert.ToDecimal(item.Value);
+					salesEntity.Value = Convert.ToDecimal(item.Value);
 					salesEntity.BINNumber = item.BINNumber;
 					salesEntity.StoreNo = Convert.ToInt64(item.StoreNo);
 					salesEntity.StoreName = item.StoreName;
@@ -232,13 +237,13 @@ namespace EPAYGOLF.Controllers
 					salesEntity.EAN = Convert.ToInt64(item.EAN);
 					salesEntity.Date = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
-                    var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
-					if(_vatrate == null)
+					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
+					if (_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";
 						break;
 					}
-					salesEntity.VATRate = _vatrate.VATRate/100;
+					salesEntity.VATRate = _vatrate.VATRate / 100;
 					salesEntity.StoreCommission = 0;
 					salesEntity.StoreAmount = 0;
 					salesEntity.GGCCommission = 0;
@@ -246,7 +251,7 @@ namespace EPAYGOLF.Controllers
 					salesEntity.StoreAmount = 0;
 					salesEntity.TransactionAmount = 0;
 					salesEntity.NetAmount = 0;
-					var savesaleresult=_salesRepository.SaveSalesInformation(salesEntity);
+					var savesaleresult = _salesRepository.SaveSalesInformation(salesEntity);
 					if (savesaleresult < 0)
 					{
 						Helpers.ApplicationExceptions.SaveActivityLog("Unable to save sales ID record " + item.ID);
@@ -257,9 +262,9 @@ namespace EPAYGOLF.Controllers
 					{
 						Helpers.ApplicationExceptions.SaveActivityLog("saved sales ID record " + item.ID);
 					}
-				
+
 				}
-			
+
 				#endregion
 
 				#endregion
@@ -291,17 +296,17 @@ namespace EPAYGOLF.Controllers
 		}
 		public JsonResult TransformSalesData()
 		{
-			var checkifcommisionnull = _salesRepository.GetSalesList().Where(x => x.Value ==0).ToList();
-			if( checkifcommisionnull != null  && checkifcommisionnull.Count > 0)
+			var checkifcommisionnull = _salesRepository.GetSalesList().Where(x => x.Value == 0).ToList();
+			if (checkifcommisionnull != null && checkifcommisionnull.Count > 0)
 			{
 				return Json(-10);
 			}
-			 checkifcommisionnull = _salesRepository.GetSalesList();
-			if( checkifcommisionnull == null || (checkifcommisionnull !=null && checkifcommisionnull.Count==0))
+			checkifcommisionnull = _salesRepository.GetSalesList();
+			if (checkifcommisionnull == null || (checkifcommisionnull != null && checkifcommisionnull.Count == 0))
 			{
 				return Json(-12);
 			}
-			var checkifproductvaluenull = _productRepository.GetProductList().Where(x => x.Commission < 1 && x.ProductEAN !=2 &&  x.ProductEAN != 3 && x.ProductEAN != 4).ToList();
+			var checkifproductvaluenull = _productRepository.GetProductList().Where(x => x.Commission < 1 && x.ProductEAN != 2 && x.ProductEAN != 3 && x.ProductEAN != 4).ToList();
 			if (checkifproductvaluenull != null && checkifproductvaluenull.Count > 0)
 			{
 				return Json(-11);
@@ -311,7 +316,7 @@ namespace EPAYGOLF.Controllers
 			{
 				return Json(-13);
 			}
-			var result=_salesRepository.TransformSalesData();
+			var result = _salesRepository.TransformSalesData();
 			return Json(result);
 		}
 		public static List<SalesImportDataEntity> ReadSalesCsvFile(byte[] filePath)
@@ -437,37 +442,37 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.CardID = item.CardID;
 					redeemEntity.PAN = item.PAN;
 					DateTime _trandate;
-					if(DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
 					{
 						redeemEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        redeemEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						redeemEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        redeemEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						redeemEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        redeemEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						redeemEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                   else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
-                    {
-                        redeemEntity.TransactionDateTime = _trandate;
+					}
+					else if (DateTime.TryParseExact(item.TransactionDateTime, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						redeemEntity.TransactionDateTime = _trandate;
 
 
-                    }
-                    //redeemEntity.TransactionDateTime = //DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+					}
+					//redeemEntity.TransactionDateTime = //DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 					redeemEntity.Value = Convert.ToDecimal(item.Value);
 					redeemEntity.BINNumber = item.BINNumber;
 					redeemEntity.StoreNo = Convert.ToInt64(item.StoreNo);
@@ -478,7 +483,7 @@ namespace EPAYGOLF.Controllers
 
 					//redeemEntity.Postcode = _storeredeemRepository.GetStoreRedeemByStoreNo(Convert.ToInt64(item.StoreNo).ToString()).FirstOrDefault().PostCode;
 
-                    var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
+					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
 					if (_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";
@@ -489,10 +494,10 @@ namespace EPAYGOLF.Controllers
 					redeemEntity.ProductAmount = 0;
 					redeemEntity.VATDueOnCommission = 0;
 					redeemEntity.AmountPayableToStore = 0;
-					
+
 
 					var saveredemresult = _redemptionsRepository.SaveRedemptionsInformation(redeemEntity);
-					if(saveredemresult < 0)
+					if (saveredemresult < 0)
 					{
 						Helpers.ApplicationExceptions.SaveActivityLog("Unable to save redeem ID record " + item.ID);
 						errorMessage = "Unable to save redemption data with record ID " + item.ID;
@@ -502,7 +507,7 @@ namespace EPAYGOLF.Controllers
 					{
 						Helpers.ApplicationExceptions.SaveActivityLog("saved redeem ID record " + item.ID);
 					}
-					
+
 				}
 
 				#endregion
@@ -539,12 +544,12 @@ namespace EPAYGOLF.Controllers
 			//	return Json(-10);
 			//}
 			var checkifStoresRedeemnull = _storeredeemRepository.GetStoresRedeemList();
-			if ( checkifStoresRedeemnull == null || (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count == 0))
+			if (checkifStoresRedeemnull == null || (checkifStoresRedeemnull != null && checkifStoresRedeemnull.Count == 0))
 			{
 				return Json(-12);
 			}
 			var checkifredemtionnull = _redemptionsRepository.GetRedemptionsList();
-			if ( checkifredemtionnull == null || (checkifredemtionnull != null && checkifredemtionnull.Count == 0))
+			if (checkifredemtionnull == null || (checkifredemtionnull != null && checkifredemtionnull.Count == 0))
 			{
 				return Json(-12);
 			}
@@ -623,7 +628,7 @@ namespace EPAYGOLF.Controllers
 		public ActionResult TransformSalesRedemptionsData()
 		{
 			string errorMessage = string.Empty;
-			var result=TransformSalesData();
+			var result = TransformSalesData();
 			if ((int)result.Value == -10)
 			{
 				errorMessage = "Please update the salesstore with the commission percentage!";
@@ -640,8 +645,8 @@ namespace EPAYGOLF.Controllers
 			{
 				errorMessage = "No product data found.";
 			}
-			
-			var redemresult= TransformRedeemData();
+
+			var redemresult = TransformRedeemData();
 			//if ((int)redemresult.Value == -10)
 			//{
 			//	errorMessage = "Please update the Database with the Store addresses!";
@@ -658,7 +663,7 @@ namespace EPAYGOLF.Controllers
 			{
 				errorMessage = "No product data found.";
 			}
-			
+
 			return Json(new { salesstatus = (int)result.Value, redemstatus = (int)redemresult.Value, message = errorMessage, type = "redeem" });
 		}
 		public string TransformSalesRedemptionsDataString()
@@ -667,7 +672,7 @@ namespace EPAYGOLF.Controllers
 			var result = TransformSalesData();
 			if ((int)result.Value == -10)
 			{
-				 errorMessage = "Please update the salesstore with the commission percentage!";
+				errorMessage = "Please update the salesstore with the commission percentage!";
 			}
 			if ((int)result.Value == -11)
 			{
@@ -689,7 +694,7 @@ namespace EPAYGOLF.Controllers
 			}
 			if ((int)redemresult.Value == -11)
 			{
-				errorMessage += Environment.NewLine +  "Please update the product with the commission percentage!";
+				errorMessage += Environment.NewLine + "Please update the product with the commission percentage!";
 			}
 			if ((int)redemresult.Value == -12)
 			{
@@ -703,5 +708,239 @@ namespace EPAYGOLF.Controllers
 			return errorMessage;
 		}
 		#endregion
+
+		#region BlackHawk
+		[HttpPost]
+		public IActionResult uploadfileblackhawkdata(IFormFile fileblackhawkdata)
+		{
+			try
+			{
+				if (fileblackhawkdata == null)
+				{
+					return Json(-5);
+				}
+
+				else
+				{
+					var list = new List<BlackHawkEntityImportDataEntity>();
+					using (var ms = new MemoryStream())
+					{
+						fileblackhawkdata.CopyTo(ms);
+						var fileBytes = ms.ToArray();
+						list = ReadBlackHawkCsvFile(fileBytes);
+						if (list == null || (list != null && list.Count == 0))
+						{
+							return Json(-3);
+						}
+						//var findLoadtypeData = list.Where(x => x.TransactionType.ToLower() == "redeem").ToList();
+						//if (findLoadtypeData == null || (findLoadtypeData != null && findLoadtypeData.Count == 0))
+						//{
+						//	return Json(-4); //Transaction type redeem not found
+						//}
+						//var findtrantypenotload = list.Where(x => x.TransactionType.ToLower() != "redeem").ToList();
+						//if (findtrantypenotload != null && findtrantypenotload.Count > 0)
+						//{
+						//	return Json(-7); //All record should have transaction type redeem.
+						//}
+						//var findStoreNoEmptyNUll = list.Where(x => x.StoreNo < 1).ToList();
+						//if (findStoreNoEmptyNUll != null && findStoreNoEmptyNUll.Count > 0)
+						//{
+						//	return Json(-6); // StoreNo is empty
+						//}
+					}
+
+					var errormessage = ProcessBlackHawkImportData(list);
+					if (!string.IsNullOrEmpty(errormessage))
+					{
+						return Json(errormessage);
+					}
+					else
+					{
+						return Json(1);
+					}
+
+				}
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Json(-1);
+			}
+			return Json(1);
+		}
+		public static List<BlackHawkEntityImportDataEntity> ReadBlackHawkCsvFile(byte[] filePath)
+		{
+			var list = new List<BlackHawkEntityImportDataEntity>();
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null, // Ignore missing fields
+			};
+
+			using (var reader = new StreamReader(new ByteArrayInputStream(filePath)))
+			using (var csv = new CsvReader(reader, config))
+			{
+				// Skip the first row
+
+				csv.Read();
+
+				// Read the second row as the header
+				csv.Read();
+				csv.ReadHeader();
+
+				// Read all records into a list
+				list = csv.GetRecords<BlackHawkEntityImportDataEntity>().ToList();
+
+				if (list != null && list.Count > 0)
+				{
+					// Skip the last row by taking all but the last record
+					list = list.Take(list.Count - 1).ToList();
+
+					
+				}
+			}
+
+
+			return list;
+		}
+		private string ProcessBlackHawkImportData(List<BlackHawkEntityImportDataEntity> list)
+		{
+			var errorMessage = string.Empty;
+			foreach (var item in list)
+			{
+				
+				
+				#region SaveBlackHawkSalesData 
+				#region CheckBlackHawkSalesData
+				var _checkSalesData = _retailerRepository.GetBlackHawkDataByID(item.REFERENCENUMBER);
+				Helpers.ApplicationExceptions.SaveActivityLog("GetBlackHawkDataByID " + item.REFERENCENUMBER);
+				if (_checkSalesData == null)//It means SalesID not exist need to insert.
+				{
+					Helpers.ApplicationExceptions.SaveActivityLog("GetBlackHawkDataByID == null" + item.REFERENCENUMBER);
+					BlackHawkSalesEntity salesEntity = new BlackHawkSalesEntity();
+					salesEntity.CompanyName = item.CompanyName;
+					salesEntity.MerchantName = item.MerchantName;
+					salesEntity.REFERENCENUMBER = item.REFERENCENUMBER;
+					salesEntity.StoreID = item.StoreID;
+					salesEntity.StoreName = item.StoreName;
+					salesEntity.GIFTCARDNUMBER = item.GIFTCARDNUMBER;
+					DateTime _trandate;
+					if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+					else if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+					else if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "dd/MM/yyyy HH:mm tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+					else if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+					else if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "dd/MM/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+					else if (DateTime.TryParseExact(item.POSTRANSACTIONDATE, "ddMMyyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+					{
+						salesEntity.TransactionDate = _trandate;
+
+
+					}
+
+					salesEntity.TRANSACTIONAMOUNT = Convert.ToDecimal(item.TRANSACTIONAMOUNT);
+					salesEntity.PRODUCTDESCRIPTION = item.PRODUCTDESCRIPTION;
+					salesEntity.SOURCETRANSACTIONID = item.SOURCETRANSACTIONID;
+					salesEntity.TransactionDate = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+					
+				
+					var savesaleresult = _retailerRepository.SaveBlackHawkSalesInformation(salesEntity);
+					if (savesaleresult < 0)
+					{
+						Helpers.ApplicationExceptions.SaveActivityLog("Unable to save sales ID record " + item.REFERENCENUMBER);
+						errorMessage = "Unable to save sales data with record ID " + item.REFERENCENUMBER;
+						break;
+					}
+					else
+					{
+						Helpers.ApplicationExceptions.SaveActivityLog("saved sales ID record " + item.REFERENCENUMBER);
+					}
+
+				}
+
+				#endregion
+
+				#endregion
+			}
+			if (string.IsNullOrEmpty(errorMessage))
+			{
+				var result = TransformBlackHawkData(); 
+				if ((int)result.Value == -10)
+				{
+					errorMessage = "Please update the salesstore with the commission percentage!";
+				}
+				if ((int)result.Value == -11)
+				{
+					errorMessage = "Please update the product with the commission percentage!";
+				}
+				if ((int)result.Value == -12)
+				{
+					errorMessage = "No sales data found.";
+				}
+				if ((int)result.Value == -13)
+				{
+					errorMessage = "No product data found.";
+				}
+			}
+
+
+
+			return errorMessage;
+		}
+		public JsonResult TransformBlackHawkData()
+		{
+		
+			var result = _retailerRepository.TransformBlackHawkSalesData();
+			return Json(result);
+		}
+		#endregion
+		public IActionResult BlackHawkIndex()
+		{
+			Helpers.ApplicationExceptions.SaveActivityLog("BlackHawkIndex action method called.");
+
+			return View();
+		}
+		public IActionResult BlackHawkList()
+		{
+			var _list = _retailerRepository.GetBlackHawkSalesList();
+
+			return View(_list);
+		}
+		public IActionResult ExportBlackHawkList()
+		{
+			var _list = _retailerRepository.GetBlackHawkSalesList();
+
+			return View(_list);
+		}
+		public IActionResult DeleteBlackHawk(Int64 ID)
+		{
+			var result = _retailerRepository.DeleteBlackHawkInformation(ID);
+			return Json(result);
+		}
+
 	}
 }

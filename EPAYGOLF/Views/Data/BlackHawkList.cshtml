@@ -1,0 +1,149 @@
+﻿@model List<Entity.BlackHawkSalesEntity>
+@{
+	ViewData["Title"] = "BlackHawk List";
+	Layout = null;
+	string floatcolor = "";
+}
+<table id="tblBlackHawkSalesList_datatable" class="table table-striped table-bordered table-hover">
+	@if (Model != null && Model.Count > 0)
+	{
+		<thead>
+			<tr>
+				<th>StoreID</th>
+				<th>GiftCardNumber</th>
+				<th>Product Description</th>
+				<th>Date</th>
+				<th>MetchantTransactionID</th>
+				<th>Amount</th>
+				<th>SourceTransactionID</th>
+				<th>EPAYSales CardID</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+
+
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td style="padding-bottom:13px !important;width:80px !important;">@item.StoreID
+						<span><i style="color:red" onclick="ConfirmDeleteBlackHawkSalesrecord(@item.BlackHawkSalesID)" class="far fa-trash-alt" title="Click here to delete record"></i></span>
+					</td>
+					<td>@item.GIFTCARDNUMBER
+						
+					</td>
+					<td>@item.PRODUCTDESCRIPTION</td>
+					<td data-order="@item.TransactionDate.ToString("yyyyMMdd")">@item.TransactionDate.ToString("dd/MM/yyyy")</td>
+					<td>@item.REFERENCENUMBER</td>
+					@if (item.TRANSACTIONAMOUNT < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+					<td><span style="color:@floatcolor;font-weight:bold;">@item.TRANSACTIONAMOUNT.ToString("0.00")</span></td>
+					<td>@item.SOURCETRANSACTIONID</td>
+					<td>@item.EPAYCardID</td>
+					
+					
+
+				</tr>
+			}
+
+
+
+
+		</tbody>
+		
+	}
+	else
+	{
+		<thead>
+			<tr>
+				<th>StoreID</th>
+				<th>GiftCardNumber</th>
+				<th>Product Description</th>
+				<th>Date</th>
+				<th>MetchantTransactionID</th>
+				<th>Amount</th>
+				<th>SourceTransactionID</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+
+
+			</tr>
+		</tbody>
+	}
+
+</table>
+
+<script type="text/javascript">
+	$('#tblBlackHawkSalesList_datatable').DataTable({
+
+		"order": [[3, 'desc']],
+		"paging": true,
+		"lengthChange": false,
+		"searching": true,
+		"ordering": true,
+		"info": true,
+		"autoWidth": false,
+		"responsive": true,
+		"pageLength": 100,
+		"buttons": ["csv", "excel"]
+	});
+	//.buttons().container().appendTo('#tblSalesList_datatable_wrapper .col-md-6:eq(0)')
+	function ConfirmDeleteBlackHawkSalesrecord(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteBlackHawk(ID);
+				}
+			}
+		});
+	}
+	function DeleteBlackHawk(ID) {
+		$.ajax({
+			url: "/Data/DeleteBlackHawk",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetBlackHawkSalesLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+</script>

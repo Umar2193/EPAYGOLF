@@ -11,7 +11,8 @@ namespace Repository.Sales
 	public class SalesRepository : ISalesRepository
 	{
 		DAL.DALSales _DALsales = new DAL.DALSales();
-		public List<SalesEntity> GetSalesList()
+        DAL.DALRetailer _DALretailer = new DAL.DALRetailer();
+        public List<SalesEntity> GetSalesList()
 		{
 			try
 			{
@@ -80,8 +81,9 @@ namespace Repository.Sales
 		{
 			try
 			{
+				_DALretailer.TransformBlackHawkSalesData();
 
-				return _DALsales.TransformSalesData();
+                return _DALsales.TransformSalesData();
 			}
 			catch (Exception ex)
 			{
@@ -89,12 +91,12 @@ namespace Repository.Sales
 				return -1;
 			}
 		}
-		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			try
 			{
 
-				return _DALsales.GetSalesListReport(ProductID, SalesStoreNo,startDate,endDate);
+				return _DALsales.GetSalesListReport(ProductID, SalesStoreNo,startDate,endDate, retailercode);
 			}
 			catch (Exception ex)
 			{
@@ -102,12 +104,12 @@ namespace Repository.Sales
 				return null;
 			}
 		}
-		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			try
 			{
 
-				return _DALsales.GetSalesMonthlyListReport(ProductID, SalesStoreNo, startDate, endDate);
+				return _DALsales.GetSalesMonthlyListReport(ProductID, SalesStoreNo, startDate, endDate,retailercode);
 			}
 			catch (Exception ex)
 			{

@@ -21,6 +21,7 @@ using NPOI.HPSF;
 using EPAYGOLF.Models;
 using System.Threading.Tasks;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
+using Repository.Retailer;
 
 
 
@@ -37,6 +38,7 @@ namespace EPAYGOLF.Controllers
 		private IStoresRedeemRepository _storesredeemRepository = new StoresRedeemRepository();
 		private ISalesStoreRepository _salesstoreRepository = new SalesStoreRepository();
 		private ISettingsRepository _settingsRepository = new SettingsRepository();
+		private IRetailerRepository _retailerRepository = new RetailerRepository();
 		private readonly ViewRenderingService _viewRenderingService;
 		private readonly IWebHostEnvironment _env;
 	
@@ -52,6 +54,16 @@ namespace EPAYGOLF.Controllers
 			ViewBag.AllProducts = _productRepository.GetProductList().OrderBy(x => x.ProductEAN).ToList();
 			ViewBag.AllSalesStore = _salesstoreRepository.GetSalesStoreList().OrderBy(x => x.RetailerID).ToList();
 			ViewBag.AllRedemStore = _storesredeemRepository.GetStoresRedeemList().OrderBy(x => x.StoreNo).ToList();
+			var _retailerstore = _retailerRepository.GetRetailerList();
+			if(_retailerstore !=null && _retailerstore.Count > 0)
+			{
+				ViewBag.AllRetailer = _retailerRepository.GetRetailerList().OrderBy(x => x.RetailerName).ToList();
+			}
+			else
+			{
+				ViewBag.AllRedemStore = new List<RetailerEntity>();
+			}
+			
 			var getsettinglist = _settingsRepository.GetSettingsList().FirstOrDefault();
 			var _liabilitypct = (decimal)0.0;
 			var _yearStatDate = "";//"01/01" + DateTime.Now.AddYears(-1).Year;
@@ -87,7 +99,7 @@ namespace EPAYGOLF.Controllers
 				//{
 				//	return Json(new { isTranformationError = true, errormessage = res });
 				//}
-				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value,_request.retailercode).ToList();
 				//var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 				if (salesreportresult != null && salesreportresult.Count > 0)
 				{
@@ -649,7 +661,7 @@ namespace EPAYGOLF.Controllers
 				
 				//var salestran = dataController.TransformSalesData(false);
 				//var redemtran = dataController.TransformRedeemData(false);
-				var salesreportresult = _salesRepository.GetSalesMonthlyListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var salesreportresult = _salesRepository.GetSalesMonthlyListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value,_request.retailercode).ToList();
 				//var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 				if (salesreportresult != null && salesreportresult.Count > 0)
 				{
@@ -945,7 +957,7 @@ namespace EPAYGOLF.Controllers
 			ReportSummaryModel reportSummaryModel = new ReportSummaryModel();
 			try
 			{
-				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
+				var salesreportresult = _salesRepository.GetSalesListReport(_request.productid, _request.salesstoreno, _request.startDate.Value, _request.endDate.Value,_request.retailercode).ToList();
 				var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 				var getsettinglist = _settingsRepository.GetSettingsList().FirstOrDefault();
 				var _liabilitypct = (decimal)0.0;

@@ -92,6 +92,7 @@
 		<tr>
 			<th class="thclass">TransactionDateTime</th>
 			<th class="thclass">Product</th>
+			<th class="thclass">Retailer</th>
 			<th class="thclass">TransactionID</th>
 			<th class="thclass">CardID</th>
 			<th class="thclass">Value</th>
@@ -119,6 +120,7 @@
 				<tr>
 					<td class="tdclass">@item.TransactionDateTime.Value.ToString("dd/MM/yyyy HH:mm:ss")</td>
 					<td class="tdclass">@item.Product</td>
+					<td class="tdclass">@item.RetailerCode</td>
 					<td class="tdclass">@item.TransactionID</td>
 					<td class="tdclass">@item.CardID</td>
 					@if (item.Value < 0)

@@ -28,7 +28,7 @@ namespace DAL
 	  $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
 	  $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
 	  $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
-	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy], RetailerCode " +
 	  $" FROM [dbo].[Sales] " +
 	  $" where IsActive=1 and IsDeleted =0 " +
 	  $"  order by TransactionDateTime desc");
@@ -44,7 +44,7 @@ namespace DAL
 	  $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
 	  $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
 	  $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
-	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy], RetailerCode " +
 	  $" FROM [dbo].[Sales] s" +
 	  $" where IsActive=1 and IsDeleted =0 " +
 				$" and s.SalesID = " + id);
@@ -192,7 +192,7 @@ namespace DAL
 			return result;
 
 		}
-		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 
 			string _Query = $"SELECT [SalesID],[ID],[AccountName],[TransactionID],[TransactionType] " +
@@ -201,9 +201,13 @@ namespace DAL
 	  $" , isnull([VATRate],0.0) * 100 as VATRate, [Date], [StoreAmount], isnull([GGCCommission],0.0) * 100 as GGCCommission, [GGCAmount] " +
 	  $" , isnull([ProcessCommission],0.0) * 100 as ProcessCommission, [ProcessAmount], isnull([StripeCommission],0.0) * 100 as StripeCommission, [StripeAmount], [TransactionAmount] " +
 	  $" , [NetAmount], [ExpiryDate], [RedeemedAmount], [UnRedeemedAmount], [Breakage] " +
-	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+	  $" , [IsActive], [IsDeleted], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy], RetailerCode " +
 	  $" FROM [dbo].[Sales] " +
 	  $" where IsActive=1 and IsDeleted =0 ";
+
+			//Date
+			_Query = _Query + $" and cast([Date] as date) >= Cast('" + startDate + "' as date) ";
+			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
 
 			//Product
 			if (ProductID == 2) //All Golf Products
@@ -232,10 +236,11 @@ namespace DAL
 				_Query = _Query + $" and [StoreNo] = " + SalesStoreNo;
 			}
 
-
-			//Date
-			_Query = _Query + $" and cast([Date] as date) >= Cast('" + startDate + "' as date) ";
-			_Query = _Query + $" and cast([Date] as date) <= Cast('" + endDate + "' as date) ";
+			if (!string.IsNullOrEmpty(retailercode) && retailercode !="0")
+			{
+				_Query = _Query + $" and [RetailerCode] =  '"+ retailercode+ "' ";
+			}
+			
 
 
 			_Query = _Query + $"  order by TransactionDateTime desc ";
@@ -243,7 +248,7 @@ namespace DAL
 			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
-		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate)
+		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			string _ProductClause = string.Empty;
 			string _SalesStoreNoClause = string.Empty;
@@ -274,7 +279,7 @@ namespace DAL
 				_SalesStoreNoClause = $" and [StoreNo] = " + SalesStoreNo;
 			}
 
-
+			
 			string _Query = $" WITH AggregatedData AS ( SELECT  " +
 
 		$" FORMAT([Date], 'MMM-yyyy') AS MonthYear, " +
@@ -301,7 +306,10 @@ namespace DAL
 			{
 				_Query = _Query + _SalesStoreNoClause;
 			}
-
+			if (!string.IsNullOrEmpty(retailercode) && retailercode != "0")
+			{
+				_Query = _Query + $" and [RetailerCode] =  '" + retailercode + "' ";
+			}
 			_Query = _Query +
 			$" GROUP BY FORMAT([Date], 'MMM-yyyy')) " +
 
@@ -332,6 +340,10 @@ namespace DAL
 			if (!string.IsNullOrEmpty(_SalesStoreNoClause))
 			{
 				_Query = _Query + _SalesStoreNoClause;
+			}
+			if (!string.IsNullOrEmpty(retailercode) && retailercode != "0")
+			{
+				_Query = _Query + $" and t.[RetailerCode] =  '" + retailercode + "' ";
 			}
 
 

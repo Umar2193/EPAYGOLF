@@ -1,0 +1,126 @@
+﻿@{
+	ViewData["Title"] = "Retailers";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-edit" style="color:#2b92ae !important"></i>
+								<span style="font-size:14px;font-weight:bold;">Retailers</span>
+								</h3>
+							<button onclick="AddRetailer()" type="button" class="btn btn-info btn-sm  btn-flat" style="float:right;"><i class="fa fa-plus"></i>  Add Retailer</button>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div id="tblRetailer">
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</div>
+<script type="text/javascript">
+	$(document).ready(function () {
+		GetRetailerLists();
+	
+	 });
+	function GetRetailerLists() {
+        $.ajax({
+			url: "/MetaData/RetailerList",
+            type: "Get",
+            success: function (result) {
+				$('#tblRetailer').html(result);
+
+            },
+            error: function (result) {
+
+            },
+            beforeSend: function () {
+				$('.preloader').show();
+            },
+            complete: function (result) {
+				$('.preloader').hide();
+            }
+        });
+    }
+	function AddRetailer(ID) {
+
+		$.ajax({
+			url: "/MetaData/AddUpdateRetailer",
+			data: { ID: ID },
+			success: function (result) {
+				$('#LargeModalPopup').modal('show');
+				$('#LargeModalPopupTitle').html("Retailer Detail");
+				$('#LargeModalPopupBody').html(result);
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+				$('.preloader').show();
+			},
+			complete: function (result) {
+				$('.preloader').hide();
+			}
+		});
+	}
+	function ConfirmDeleteRetailer(ID) {
+		bootbox.confirm({
+			title: "Delete",
+			message: "Are you sure you want to delete ?",
+			buttons: {
+				confirm: {
+					label: 'Yes',
+					className: 'btn-success'
+				},
+				cancel: {
+					label: 'No',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if (result) {
+					DeleteRetailer(ID);
+				}
+			}
+		});
+	}
+	function DeleteRetailer(ID) {
+		$.ajax({
+			url: "/MetaData/DeleteRetailer",
+			data: { ID: ID },
+			type: "GET",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record deleted successfully..!!!");
+					GetRetailerLists();
+				}
+				else {
+					toastr.error("Unable to delete record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+
+</script>

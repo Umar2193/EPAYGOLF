@@ -1,6 +1,7 @@
 ﻿using Entity;
 using Microsoft.AspNetCore.Mvc;
 using Repository.Products;
+using Repository.Retailer;
 using Repository.SalesStore;
 using Repository.StoresRedeem;
 using Repository.VATRates;
@@ -16,8 +17,8 @@ namespace EPAYGOLF.Controllers
 		private IVATRatesRepository _vatratesRepository = new VATRatesRepository();
 		private IStoresRedeemRepository _storesredeemRepository = new StoresRedeemRepository();
 		private ISalesStoreRepository _salesstoreRepository = new SalesStoreRepository();
-
-		public IActionResult Index()
+        private IRetailerRepository _retailerRepository = new RetailerRepository();
+        public IActionResult Index()
         {
             return View();
         }
@@ -210,7 +211,50 @@ namespace EPAYGOLF.Controllers
 			var result = _salesstoreRepository.DeleteSalesStoreInformation(ID);
 			return Json(result);
 		}
-		#endregion
+        #endregion
+        #region Retailers
+        public IActionResult RetailerIndex()
+        {
+            Helpers.ApplicationExceptions.SaveActivityLog("RetailerIndex action method called.");
 
-	}
+            return View();
+        }
+        public IActionResult RetailerList()
+        {
+            var _product = _retailerRepository.GetRetailerList();
+
+            return View(_product);
+        }
+        public IActionResult AddUpdateRetailer(Int64 ID)
+        {
+            var model = _retailerRepository.GetRetailerDetail(ID);
+            if (model == null)
+            {
+                model = new RetailerEntity();
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult SaveRetailers(RetailerEntity obj)
+        {
+            if (obj != null)
+            {
+                if (obj.Commission > 0)
+                {
+                    obj.Commission = obj.Commission / 100;
+                }
+
+
+            }
+            var result = _retailerRepository.SaveRetailerInformation(obj);
+            return Json(result);
+        }
+        public IActionResult DeleteRetailer(Int64 ID)
+        {
+            var result = _retailerRepository.DeleteRetailerInformation(ID);
+            return Json(result);
+        }
+        #endregion
+
+    }
 }

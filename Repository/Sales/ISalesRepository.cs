@@ -15,7 +15,7 @@ namespace Repository.Sales
 		int DeleteSalesInformation(Int64 ID);
 		SalesEntity GetSalesDataByID(string ID);
 		int TransformSalesData();
-		List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate);
-		List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate);
+		List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate,string retailercode="");
+		List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "");
 	}
 }

@@ -23,6 +23,7 @@ namespace Entity
         public string  productName { get; set; }
         public bool isWeeklyReport { get; set; }
         public Int64 userId{ get; set; }
+        public string retailercode { get; set; }
 
     }
 

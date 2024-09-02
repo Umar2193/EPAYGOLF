@@ -1,0 +1,118 @@
+﻿@model Entity.RetailerEntity
+@{
+	ViewData["Title"] = "Retailer Detail";
+	Layout = null;
+}
+<!-- Content Wrapper. Contains page content -->
+<!-- Main content -->
+<section class="content">
+	<div class="container-fluid">
+		<!-- SELECT2 EXAMPLE -->
+		<div class="card card-default">
+
+			<!-- /.card-header -->
+			<div class="card-body">
+				<form id="frmRetailer">
+					<input type="hidden" name="RetailerID" id="RetailerID" value="@Model.RetailerID" />
+				<div class="row col-md-12 mb-3">
+				
+					<div class="form-group row col-md-6">
+						<label for="inputEmail3" class="col-md-4 col-form-label">Name</label>
+						<div class="col-md-8">
+								<input value="@Model.RetailerName" name="RetailerName" type="text" class="form-control" autocomplete="off" id="RetailerName" max="300" placeholder="Name">
+						</div>
+					</div>
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">ID</label>
+							<div class="col-md-8">
+								<input value="@Model.RetailerCode" name="RetailerCode" type="text" class="form-control" autocomplete="off" id="RetailerCode" max="300" placeholder="ID">
+							</div>
+						</div>
+						
+				</div>
+					<div class="row col-md-12 mb-3">
+
+					
+						<div class="form-group row col-md-6">
+							<label for="inputEmail3" class="col-md-4 col-form-label">Commision</label>
+
+							<div class="col-md-8">
+								<div class="input-group">
+									<input value="@Model.Commission" type="number" step=".01" class="form-control" name="Commission" id="Commission" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" maxlength="10" placeholder="Commision">
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="fas fa-percentage"></i></span>
+									</div>
+
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+				
+				</form>
+
+			</div>
+			<!-- /.row -->
+			<div class="card-footer">
+
+				<button style="margin-left:5px;margin-right:5px;float:right;" onclick="SaveRetailer()" type="button" class="btn btn-info btn-sm  btn-flat"><i class="fa fa-save"></i>  Save</button>
+				<button style="margin-left:5px;margin-right:5px;float:right;" data-dismiss="modal" type="button" class="btn btn-default btn-sm  btn-flat"><i class="fa fa-times"></i>  Cancel</button>
+			</div>
+		</div>
+		<!-- /.card-body -->
+	
+	</div>
+	<!-- /.card -->
+	<!-- /.row -->
+	<!-- /.row -->
+	</div>
+	<!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+<!-- /.content-wrapper -->
+<script type="text/javascript">
+	function SaveRetailer() {
+		
+		if ($('#RetailerName').val() == null || $('#RetailerName').val() == ""
+			|| $('#RetailerName').val().trim() == "") {
+			toastr.error("Please enter Name")
+			return;
+		}
+		if ($('#RetailerCode').val() == null || $('#RetailerCode').val() == "") {
+			toastr.error("Please enter ID")
+			return;
+		}
+		if ($('#Commission').val() == null || $('#Commission').val() == "" || $('#Commission').val() == "0"
+			|| $('#Commission').val().trim() == "") {
+			toastr.error("Please enter Commission")
+			return;
+		}
+		$.ajax({
+			url: "/MetaData/SaveRetailers",
+			data: $('#frmRetailer').serialize(),
+			type: "post",
+			success: function (result) {
+				if (result > 0) {
+
+					toastr.success("Record saved successfully..!!!");
+					$('#LargeModalPopup').modal('hide');
+					GetRetailerLists();
+				}
+				else {
+					toastr.error("Unable to save record..!!!");
+				}
+
+			},
+			error: function (result) {
+
+			},
+			beforeSend: function () {
+
+			},
+			complete: function (result) {
+
+			}
+		});
+	}
+</script>

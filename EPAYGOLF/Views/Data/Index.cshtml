@@ -44,6 +44,18 @@
 									</div>
 									
 								</div>
+								<div class="row col-md-12 mb-3">
+									<div class="form-group row col-md-12">
+										<label for="inputEmail3" class="col-md-2 col-form-label">Import BlackHawk Data</label>
+										<div class="col-md-3">
+											<input type="file" id="filebhdata" accept=".csv" name="filebhdata" class="form-control" />
+										</div>
+										<div class="col-md-3">
+											<button style="width:185px;text-align:left;" onclick="ImportBHData()" type="button" class="btn btn-success btn-sm  btn-flat"><i class="fas fa-upload"></i>  Import BlackHawk Data</button>
+										</div>
+									</div>
+
+								</div>
 							</form>
 						</div>
 					</div>
@@ -212,7 +224,59 @@
 			}
 		});
 	}
-	
+	function ImportBHData() {
+		var fileInput = $('#filebhdata')[0];
+		if (fileInput.files.length === 0) {
+			toastr.error("No file selected. Please select a file.");
+			return;
+		}
+		var formData = new FormData();
+		formData.append('fileblackhawkdata', fileInput.files[0]);
+
+		$.ajax({
+			url: '/Data/uploadfileblackhawkdata',  // Replace with your server upload URL
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+
+
+
+				if (response == -1) {
+					toastr.error("File data is not in valid format");
+				}
+				else if (response == -3) {
+					toastr.error("File contain not data");
+				}
+				else if (response == -4) {
+					toastr.error("Transaction type 'LOAD' not found in selected file");
+				}
+				else if (response == -5) {
+					toastr.error("Please select file");
+				}
+				else if (response == -6) {
+					toastr.error("StoreNo is empty in selected file");
+				}
+				else if (response == -7) {
+					toastr.error("All record should have transaction type value 'REDEEM' in selected file.");
+				}
+				else {
+					if (response > 0) {
+						toastr.success("Data import successfully.");
+					}
+					else {
+						toastr.error(response);
+					}
+
+				}
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				toastr.error("File upload failed. Please try again.");
+			}
+		});
+	}
 
 
 
