@@ -179,6 +179,7 @@ namespace EPAYGOLF.Controllers
 					SalesStoreEntity salesStoreEntity = new SalesStoreEntity();
 					salesStoreEntity.RetailerID = Convert.ToInt64(item.StoreNo);
 					salesStoreEntity.RetailerName = item.StoreName;
+					salesStoreEntity.GGCRedemption = 13 / 100;
 					_salesStoreRepository.SaveSalesStoreInformation(salesStoreEntity);
 				}
 				#endregion
