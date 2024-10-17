@@ -185,7 +185,7 @@ namespace DAL
 			Query += "\r\n UPDATE Sales \r\nSET UnRedeemedAmount = 0 WHERE UnRedeemedAmount IS NULL ";
 
 			//Update Breakage Value
-			Query += "\r\n UPDATE Sales\r\nSET Breakage = [Value] - [RedeemedAmount] \r\nWHERE Cast(ExpiryDate as date) <= Cast(GetDate() as date) AND ExpiryDate IS NOT NULL\r\nAND Breakage IS NULL";
+			Query += "\r\n UPDATE Sales\r\nSET Breakage = [Value] + [RedeemedAmount] \r\nWHERE Cast(ExpiryDate as date) <= Cast(GetDate() as date) AND ExpiryDate IS NOT NULL\r\nAND Breakage IS NULL AND CAST(TransactionDateTime AS DATE) <= CAST(GETDATE() AS DATE)";
 
 
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);

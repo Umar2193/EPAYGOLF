@@ -228,6 +228,7 @@
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 				@{
 
 					if (ViewBag.TotalValue < 0)
@@ -401,6 +402,6 @@
 	table.on('order.dt search.dt', function () {
 		var lastRow = $('#tblsalesreportlist_datatable tbody tr.no-sort');
 		lastRow.remove();
-		$('#tblsalesreportlist_datatable tbody').append(lastRow);
+		//$('#tblsalesreportlist_datatable tbody').append(lastRow);
 	}).draw();
 </script>
