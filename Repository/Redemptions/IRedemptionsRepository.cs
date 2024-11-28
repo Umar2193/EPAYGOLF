@@ -20,5 +20,8 @@ namespace Repository.Redemptions
 		int SaveInvoiceInformation(InvoiceEntity obj);
 		int UpdateRedemptionsInvoiceInformation(RedemptionsEntity obj);
 		int UpdateInvoiceDocument(InvoiceEntity obj);
+		int SaveBreakageInformation(BreakageRedeemEntity obj);
+		BreakageRedeemEntity GetBreakageDataByID(string ID);
+		List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0);
 	}
 }

@@ -242,11 +242,11 @@ namespace DAL
 		$" , r.DatePeriod " +
 		$", sr.StoreName " +
 		$" , sr.[UserID]  UserID " +
-	    $" , sr.[Email]  EmailTo " +
-	    $" , sr.[UserEmail]  UserEmail " +
+		$" , sr.[Email]  EmailTo " +
+		$" , sr.[UserEmail]  UserEmail " +
 		$" , sr.[Title]  Title " +
 		$" , sr.[FirstName] + ' ' + sr.[LastName]  as UserName " +
-		
+
 
 		$"  FROM [dbo].[Invoices] r" +
 		$" left join [dbo].[StoresRedeem] sr on  sr.StoreNo = r.StoreNo " +
@@ -322,5 +322,168 @@ namespace DAL
 			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
 			return result;
 		}
+		#region BreakageData
+		public int SaveBreakageInformation(BreakageRedeemEntity obj)
+		{
+			string Query = "";
+			string trndateQuery = obj.TransactionDate.ToString();
+			string expdateQuery =  obj.ExpiryDate.ToString();
+			if(!string.IsNullOrEmpty(expdateQuery))
+			{
+				expdateQuery = string.Format($"'"+ expdateQuery + "'");
+			}
+			else 
+			{
+				expdateQuery = string.Format("NULL");
+			}
+			if (!string.IsNullOrEmpty(trndateQuery))
+			{
+				trndateQuery = string.Format($"'" + trndateQuery + "'");
+			}
+			else
+			{
+				trndateQuery = string.Format("NULL");
+			}
+
+			Query = string.Format($"INSERT INTO [dbo].[Breakage] ([Activation_TXID] ,[gift_card_number] ,[gift_card_id],[category],[initial_face_value]" +
+				$",[redemption_amount],[current_value]" +
+				$",[TransactionDate],[ExpiryDate],[gift_card_status],[redemption_status],[redemption_month],[redemption_year],[Totally_Direct]" +
+				$" ,[IsActive],[IsDeleted],[CreatedAt],[UpdatedAt],[CreatedBy],[UpdatedBy] )" +
+				$" VALUES('" + obj.Activation_TXID + "','" + obj.gift_card_number + "'" +
+				$",'" + obj.gift_card_id + "' ,'" + obj.category + "'" +
+				$",'" + obj.initial_face_value + "' ,'" + obj.redemption_amount + "'" +
+				$",'" + obj.current_value + "' ," + trndateQuery + "" +
+				$","+ expdateQuery + " ,'" + obj.gift_card_status + "'" +
+				$",'" + obj.redemption_status + "' ,'" + obj.redemption_month + "'" +
+				$",'" + obj.redemption_year + "' ,'" + obj.Totally_Direct + "'" +
+				$",'1' ,'0'" +
+				$", GetDate() ,GetDate()" +
+				$",'100'" +
+				$",'100' )");
+
+
+			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+			return result;
+		}
+		public List<BreakageRedeemEntity> GetBreakageDataList(Int64 id = 0)
+		{
+
+			string Query = string.Format($"SELECT [BreakageID] ,[Activation_TXID] ,[gift_card_number] ,[MerchantTransactionID] " +
+	  $" ,[gift_card_id],[category],[initial_face_value],[redemption_amount],[current_value]" +
+	  $" ,[TransactionDate],[ExpiryDate] " +
+	  $" ,[gift_card_status],[redemption_status],[redemption_month],[redemption_year],[Totally_Direct] " +
+	  $" ,[IsActive],[IsDeleted],[CreatedAt],[CreatedBy],[UpdatedAt],[UpdatedBy] " +
+	  $" FROM [dbo].[Breakage] " +
+	  $" where IsActive=1 and IsDeleted =0 " +
+	  $"  order by CreatedAt desc");
+			var Data = dapper.Query<BreakageRedeemEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
+		}
+		public BreakageRedeemEntity GetBreakageDataByID(string ID)
+		{
+
+			var result = GetBreakageDataList().Where(x => x.Activation_TXID == ID).FirstOrDefault();
+			return result;
+		}
+		public int DeletBreakageInformation(Int64 ID)
+		{
+			string Query = "";
+
+			Query = string.Format($"UPDATE [dbo].[Breakage] SET [IsActive] = '0'" +
+				$",[IsDeleted] = '1' " +
+				$",[UpdatedAt] = GetDate() " +
+				$",[UpdatedBy] = 100 " +
+				$" WHERE [BreakageID] = '" + ID + "'");
+
+			var result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+			return result;
+		}
+		//public int TransformBlackHawkSalesData()
+		//{
+		//	int result = 0;
+		//	var listBHSales = GetBlackHawkSalesList();
+		//	if (listBHSales != null && listBHSales.Count > 0)
+		//	{
+		//		foreach (var item in listBHSales)
+		//		{
+		//			string Query = "";
+		//			// Update Expiry Date Value
+		//			Query = string.Format($" declare @vEPAYSalesID bigint " +
+		//				$" if Exists(Select top 1 1 from BlackHawkSales where IsActive = 1 and IsDeleted = 0) " +
+		//				$" begin " +
+		//				$" Select top 1 @vEPAYSalesID = SalesID  " +
+		//				$" from Sales where Cast(Date as date) = Cast('" + item.TransactionDate + "' as date) and Value = '" + item.TRANSACTIONAMOUNT + "' and IsActive = 1 and IsDeleted = 0  " +
+		//				$" and(RetailerCode = 'BH' or ISNULL(RetailerCode, '') = '')  and StoreNo= 1  " +
+		//				$" if (@vEPAYSalesID > 0)  " +
+		//				$"	begin  " +
+		//				$"	Update Sales  " +
+		//				$"	set GGCCommission = (Select top 1 Commission from Retailer where RetailerCode = 'BH' and IsActive = 1 and IsDeleted = 0)  " +
+		//				$"	,RetailerCode = 'BH', UpdatedAt = GetDate() " +
+		//				$" where SalesID = @vEPAYSalesID " +
+		//				$" Update  BlackHawkSales\r\nSet EPAYCardID = (Select top 1 CardID from Sales where SalesID= @vEPAYSalesID),UpdatedAt=GetDate()\r\n" +
+		//				$" where BlackHawkSalesID = '" + item.BlackHawkSalesID + "' " +
+		//				$" end " +
+		//				$" end ");
+
+		//			result = dapper.Execute<int>(Query, null, null, true, null, CommandType.Text);
+		//		}
+		//	}
+
+		//	return result;
+
+		//}
+		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
+		{
+
+			string _Query = $"SELECT [BreakageID] ,[Activation_TXID] ,[gift_card_number] ,[MerchantTransactionID] " +
+	  $" ,[gift_card_id],[category],[initial_face_value],[redemption_amount],[current_value]" +
+	  $" ,[TransactionDate],[ExpiryDate] " +
+	  $" ,[gift_card_status],[redemption_status],[redemption_month],[redemption_year],[Totally_Direct] " +
+	  $" ,[IsActive],[IsDeleted],[CreatedAt],[CreatedBy],[UpdatedAt],[UpdatedBy] " +
+	  $" FROM [dbo].[Breakage] r " +
+	  $" where r.IsActive = 1 and r.IsDeleted = 0 and r.[TransactionDate] is not null";
+
+			////Product
+			//if (ProductID == 2) //All Golf Products
+			//{
+			//	_Query = _Query + $" and r.[EAN] LIKE '5%'";
+			//}
+			//else if (ProductID == 3) //All Cycling Products
+			//{
+			//	_Query = _Query + $" and r.[EAN] LIKE '6%'";
+			//}
+			//else if (ProductID == 4) //All Fishing Products
+			//{
+			//	_Query = _Query + $" and r.[EAN] LIKE '7%'";
+			//}
+			//else
+			//{
+			//	if (ProductID > 0)
+			//	{
+			//		_Query = _Query + $" and r.[EAN] = " + ProductID;
+			//	}
+			//}
+
+			//// Sales Store
+			//if (redemStoreNo > 0 && UserID == 0)
+			//{
+			//	_Query = _Query + $" and r.[StoreNo] = " + redemStoreNo;
+			//}
+			//if (UserID > 0)
+			//{
+			//	_Query = _Query + $" and sr.[UserID] = " + UserID;
+			//}
+
+			//Date
+			_Query = _Query + $" and cast(r.[TransactionDate] as date) >= Cast('" + startDate + "' as date) ";
+			_Query = _Query + $" and cast(r.[TransactionDate] as date) <= Cast('" + endDate + "' as date) ";
+
+
+			_Query = _Query + $"  order by r.CreatedAt desc ";
+			string Query = string.Format(_Query);
+			var Data = dapper.Query<BreakageRedeemEntity>(Query, null, null, true, null, CommandType.Text);
+			return Data.ToList();
+		}
+		#endregion
 	}
 }

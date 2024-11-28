@@ -153,5 +153,44 @@ namespace Repository.Redemptions
 				return -1;
 			}
 		}
+		public int SaveBreakageInformation(BreakageRedeemEntity obj)
+		{
+			try
+			{
+
+				return _DALredemptions.SaveBreakageInformation(obj);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return -1;
+			}
+		}
+		public BreakageRedeemEntity GetBreakageDataByID(string ID)
+		{
+			try
+			{
+
+				return _DALredemptions.GetBreakageDataByID(ID);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
+			}
+		}
+		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
+		{
+			try
+			{
+
+				return _DALredemptions.GetBreakageListReport(ProductID, redemStoreNo, startDate, endDate, UserID);
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return null;
+			}
+		}
 	}
 }

@@ -1418,7 +1418,7 @@ namespace EPAYGOLF.Controllers
 		//	// Draw the header image (logo) on the most right side
 		//	gfx.DrawImage(logo, page.Width - logoWidth - 20, 20, logoWidth, logoHeight);
 
-			
+
 
 		//	string htmlContent = "<div style=\"float:left;text-align:left\">\r\n\t\t\t<p>The Golf Gift Card Company Limited</p>\r\n\t\t\t<p>A company registered by guarantee</p>\r\n\t\t\t<p>\r\n\t\t\t\tCompany Registration: 14242436\r\n\t\t\t</p>\r\n\t\t\t<p>\r\n\t\t\t\tVAT Number: 438075778\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t\t<div style=\"float:right;text-align:left;\">\r\n\t\t\t<br />\r\n\t\t\t<br />\r\n\t\t\tInvoice No: @Model.InvoiceNumber\r\n\t\t</div>";
 		//	// Define the rectangle for the footer
@@ -1426,22 +1426,100 @@ namespace EPAYGOLF.Controllers
 
 		//	// Draw the HTML content in the footer
 		//	string htmlFooterContent = @"
-  //          <html>
-  //              <head>
-  //                  <style>
-  //                      body { font-family: Arial, sans-serif; font-size: 10pt; }
-  //                      .footer-text { text-align: center; color: #666; }
-  //                  </style>
-  //              </head>
-  //              <body>
-  //                  <div class='footer-text'>
-  //                      <p>This is an example of HTML content in the footer.</p>
-  //                      <p>Generated on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"</p>
-  //                  </div>
-  //              </body>
-  //          </html>";
+		//          <html>
+		//              <head>
+		//                  <style>
+		//                      body { font-family: Arial, sans-serif; font-size: 10pt; }
+		//                      .footer-text { text-align: center; color: #666; }
+		//                  </style>
+		//              </head>
+		//              <body>
+		//                  <div class='footer-text'>
+		//                      <p>This is an example of HTML content in the footer.</p>
+		//                      <p>Generated on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"</p>
+		//                  </div>
+		//              </body>
+		//          </html>";
 		//	tf.DrawString(htmlFooterContent, footerFont, XBrushes.Black, rect);
 		//}
+
+		#region Breakage
+		public IActionResult BreakageIndex()
+		{
+			ViewBag.AllProducts = _productRepository.GetProductList().OrderBy(x => x.ProductEAN).ToList();
+			ViewBag.AllSalesStore = _salesstoreRepository.GetSalesStoreList().OrderBy(x => x.RetailerID).ToList();
+			ViewBag.AllRedemStore = _storesredeemRepository.GetStoresRedeemList().OrderBy(x => x.StoreNo).ToList();
+			var _retailerstore = _retailerRepository.GetRetailerList();
+			if (_retailerstore != null && _retailerstore.Count > 0)
+			{
+				ViewBag.AllRetailer = _retailerRepository.GetRetailerList().OrderBy(x => x.RetailerName).ToList();
+			}
+			else
+			{
+				ViewBag.AllRedemStore = new List<RetailerEntity>();
+			}
+
+			var getsettinglist = _settingsRepository.GetSettingsList().FirstOrDefault();
+			var _liabilitypct = (decimal)0.0;
+			var _yearStatDate = "";//"01/01" + DateTime.Now.AddYears(-1).Year;
+			if (getsettinglist != null)
+			{
+				_liabilitypct = getsettinglist.liabilitypct;
+				if (getsettinglist.YearStartDate != null)
+				{
+					var _dtYearStartDate = getsettinglist.YearStartDate.Value.ToString("dd/MM/yyyy");
+					_yearStatDate = DateTime.ParseExact(_dtYearStartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("dd/MM");
+				}
+			}
+
+			ViewBag.configliabilitypct = _liabilitypct;
+			ViewBag.configyearStatDate = _yearStatDate;
+
+			return View();
+		}
+		[HttpPost]
+		public async Task<ActionResult> GenerateBreakageDetailedReport(ReportSearchParam _request)
+		{
+			//return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
+			var result = 0;
+			string renderedSalesReportView = "";
+			string errormessage = "";
+			try
+			{
+
+				var redempreportresult = _redemptionsRepository.GetBreakageListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value, _request.userId).ToList();
+				if (redempreportresult == null)
+				{
+					redempreportresult = new List<BreakageRedeemEntity>();
+				}
+				if (redempreportresult != null && redempreportresult.Count > 0)
+				{
+
+					ViewBag.current_value = redempreportresult.Sum(x => x.current_value);
+					ViewBag.initial_face_value = redempreportresult.Sum(x => x.initial_face_value);
+					ViewBag.redemption_amount = redempreportresult.Sum(x => x.redemption_amount);
+					ViewBag.TotalCount = redempreportresult.Count;
+				}
+
+				//ViewBag.StoreName = _request.salesstorename;
+				//ViewBag.ProductName = _request.productName;
+				//ViewBag.StartDate = _request.startDate.Value.ToString("dd-MMM-yyyy");
+				//ViewBag.EndDate = _request.endDate.Value.ToString("dd-MMM-yyyy");
+				
+				
+
+
+				return View(redempreportresult);
+			}
+
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				errormessage = ex.InnerException + Environment.NewLine + ex.StackTrace;
+			}
+			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false, errormessage = errormessage });
+		}
+		#endregion
 
 
 	}

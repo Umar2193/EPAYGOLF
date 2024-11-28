@@ -19,6 +19,8 @@ using System.Text.Json.Serialization;
 using NPOI.SS.Formula.Functions;
 using SixLabors.ImageSharp.ColorSpaces;
 using Repository.Retailer;
+using OfficeOpenXml;
+using System.Reflection;
 
 namespace EPAYGOLF.Controllers
 {
@@ -95,6 +97,7 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public IActionResult uploadfilesalesdata(IFormFile filesalesdata)
 		{
+			Helpers.ApplicationExceptions.SaveActivityLog("uploadfilesalesdata action method called.");
 			try
 			{
 				if (filesalesdata == null)
@@ -341,6 +344,7 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public IActionResult uploadfileredemptiondata(IFormFile fileredemptiondata)
 		{
+			Helpers.ApplicationExceptions.SaveActivityLog("uploadfileredemptiondata action method called.");
 			try
 			{
 				if (fileredemptiondata == null)
@@ -714,6 +718,7 @@ namespace EPAYGOLF.Controllers
 		[HttpPost]
 		public IActionResult uploadfileblackhawkdata(IFormFile fileblackhawkdata)
 		{
+			Helpers.ApplicationExceptions.SaveActivityLog("uploadfileblackhawkdata action method called.");
 			try
 			{
 				if (fileblackhawkdata == null)
@@ -942,6 +947,277 @@ namespace EPAYGOLF.Controllers
 			var result = _retailerRepository.DeleteBlackHawkInformation(ID);
 			return Json(result);
 		}
+		#region BreakageDataImport
+		[HttpPost]
+		public IActionResult uploadfilebreakagedata(IFormFile filebreakagedata)
+		{
+			Helpers.ApplicationExceptions.SaveActivityLog("uploadfilebreakagedata action method called.");
+			try
+			{
+				if (filebreakagedata == null)
+				{
+					return Json(-5);
+				}
+
+				else
+				{
+					var list = new List<BreakageEntityImportDataEntity>();
+					using (var ms = new MemoryStream())
+					{
+						filebreakagedata.CopyTo(ms);
+						var fileBytes = ms.ToArray();
+						list = ReadExcelFile<BreakageEntityImportDataEntity>(fileBytes);
+						if (list == null || (list != null && list.Count == 0))
+						{
+							return Json(-3);
+						}
+						//var findLoadtypeData = list.Where(x => x.TransactionType.ToLower() == "redeem").ToList();
+						//if (findLoadtypeData == null || (findLoadtypeData != null && findLoadtypeData.Count == 0))
+						//{
+						//	return Json(-4); //Transaction type redeem not found
+						//}
+						//var findtrantypenotload = list.Where(x => x.TransactionType.ToLower() != "redeem").ToList();
+						//if (findtrantypenotload != null && findtrantypenotload.Count > 0)
+						//{
+						//	return Json(-7); //All record should have transaction type redeem.
+						//}
+						//var findStoreNoEmptyNUll = list.Where(x => x.StoreNo < 1).ToList();
+						//if (findStoreNoEmptyNUll != null && findStoreNoEmptyNUll.Count > 0)
+						//{
+						//	return Json(-6); // StoreNo is empty
+						//}
+					}
+
+					var errormessage = ProcessBreakageImportData(list);
+					if (!string.IsNullOrEmpty(errormessage))
+					{
+						return Json(errormessage);
+					}
+					else
+					{
+						return Json(1);
+					}
+
+				}
+			}
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				return Json(-1);
+			}
+			return Json(1);
+		}
+		public List<T> ReadExcelFile<T>(byte[] filePath) where T : new()
+		{
+			var entities = new List<T>();
+
+			// Enable EPPlus license
+			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+			using var package = new ExcelPackage(new ByteArrayInputStream(filePath));
+			var worksheet = package.Workbook.Worksheets[0]; // Assume the first sheet
+
+			// Read headers from the first row
+			var headers = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+						  .Select(cell => cell.Text.Trim())
+						  .ToList();
+			// Get properties with ExcelHeader attributes
+			var propertyMap = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+									   .Where(prop => Attribute.IsDefined(prop, typeof(ExcelHeaderAttribute)))
+									   .ToDictionary(
+										   prop => prop.GetCustomAttribute<ExcelHeaderAttribute>().HeaderName,
+										   prop => prop
+									   );
+
+			// Map rows to the entity
+			for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+			{
+				var entity = new T();
+
+				foreach (var header in headers)
+				{
+					if (propertyMap.TryGetValue(header, out var property))
+					{
+						var cellValue = worksheet.Cells[row, headers.IndexOf(header) + 1].Text;
+
+						if (!string.IsNullOrWhiteSpace(cellValue))
+						{
+							var convertedValue = Convert.ChangeType(cellValue, property.PropertyType);
+							property.SetValue(entity, convertedValue);
+						}
+					}
+				}
+
+				entities.Add(entity);
+			}
+
+			return entities;
+		}
+
+		private string ProcessBreakageImportData(List<BreakageEntityImportDataEntity> list)
+		{
+			var errorMessage = string.Empty;
+			foreach (var item in list)
+			{
+
+
+				#region SaveBreakageData 
+				#region CheckBreakageData
+				var _checkSalesData = _redemptionsRepository.GetBreakageDataByID(item.Activation_TXID);
+				Helpers.ApplicationExceptions.SaveActivityLog("GetBreakageDataByID " + item.Activation_TXID);
+				if (_checkSalesData == null)//It means SalesID not exist need to insert.
+				{
+					Helpers.ApplicationExceptions.SaveActivityLog("GetBreakageDataByID == null" + item.Activation_TXID);
+					BreakageRedeemEntity salesEntity = new BreakageRedeemEntity();
+					salesEntity.Totally_Direct = item.Totally_Direct;
+					salesEntity.Activation_TXID = item.Activation_TXID;
+					salesEntity.gift_card_number = item.gift_card_number;
+					salesEntity.gift_card_id = item.gift_card_id;
+					//salesEntity.StoreID = item.StoreID;
+					salesEntity.category = item.category;
+					salesEntity.gift_card_status = item.gift_card_status;
+					salesEntity.redemption_status = item.redemption_status;
+					salesEntity.gift_card_status = item.gift_card_status;
+					salesEntity.redemption_month = item.redemption_month;
+					salesEntity.redemption_year = item.redemption_year;
+
+					DateTime _trandate;
+					if(!string.IsNullOrEmpty(item.activation_day) && !string.IsNullOrEmpty(item.activation_month) && !string.IsNullOrEmpty(item.activation_year)
+						&& item.activation_day !="00" && item.activation_month != "00" && item.activation_year != "00"
+						&& item.activation_day != "0" && item.activation_month != "0" && item.activation_year != "0"
+						)
+					{
+						var _crtrndatestr = item.activation_day +"/" +item.activation_month + "/" +item.activation_year;
+						if (DateTime.TryParseExact(_crtrndatestr, "dd/MM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+						{
+							salesEntity.TransactionDate = _trandate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "dd/MMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+						{
+							salesEntity.TransactionDate = _trandate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "d/MMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+						{
+							salesEntity.TransactionDate = _trandate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "dd/MMMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+						{
+							salesEntity.TransactionDate = _trandate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "d/MMMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _trandate))
+						{
+							salesEntity.TransactionDate = _trandate;
+
+
+						}
+					}
+					DateTime _expirydate;
+					if (!string.IsNullOrEmpty(item.expiration_day) && !string.IsNullOrEmpty(item.expiration_month) && !string.IsNullOrEmpty(item.activation_year)
+						&& item.expiration_day != "00" && item.expiration_month != "00" && item.activation_year != "00"
+						&& item.expiration_day != "0" && item.expiration_month != "0" && item.activation_year != "0"
+						)
+					{
+						var _crtrndatestr = item.expiration_day + "/" + item.expiration_month + "/" + item.activation_year;
+						if (DateTime.TryParseExact(_crtrndatestr, "dd/MM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _expirydate))
+						{
+							salesEntity.ExpiryDate = _expirydate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "dd/MMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _expirydate))
+						{
+							salesEntity.ExpiryDate = _expirydate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "d/MMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _expirydate))
+						{
+							salesEntity.ExpiryDate = _expirydate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "dd/MMMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _expirydate))
+						{
+							salesEntity.ExpiryDate = _expirydate;
+
+
+						}
+						else if (DateTime.TryParseExact(_crtrndatestr, "d/MMMM/yyyy", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _expirydate))
+						{
+							salesEntity.ExpiryDate = _expirydate;
+
+
+						}
+					}
+
+					if(!string.IsNullOrEmpty(item.initial_face_value))
+					salesEntity.initial_face_value = Convert.ToDecimal(item.initial_face_value);
+					if (!string.IsNullOrEmpty(item.redemption_amount))
+						salesEntity.redemption_amount = Convert.ToDecimal(item.redemption_amount);
+					if (!string.IsNullOrEmpty(item.current_value))
+						salesEntity.current_value = Convert.ToDecimal(item.current_value);
+
+
+
+
+					var savesaleresult = _redemptionsRepository.SaveBreakageInformation(salesEntity);
+					if (savesaleresult < 0)
+					{
+						Helpers.ApplicationExceptions.SaveActivityLog("Unable to save Activation_TXID ID record " + item.Activation_TXID);
+						errorMessage = "Unable to save ProcessBreakageImportData data with record ID " + item.Activation_TXID;
+						break;
+					}
+					else
+					{
+						Helpers.ApplicationExceptions.SaveActivityLog("saved Activation_TXID ID record " + item.Activation_TXID);
+					}
+
+				}
+
+				#endregion
+
+				#endregion
+			}
+			//if (string.IsNullOrEmpty(errorMessage))
+			//{
+			//	var result = TransformBlackHawkData();
+			//	if ((int)result.Value == -10)
+			//	{
+			//		errorMessage = "Please update the salesstore with the commission percentage!";
+			//	}
+			//	if ((int)result.Value == -11)
+			//	{
+			//		errorMessage = "Please update the product with the commission percentage!";
+			//	}
+			//	if ((int)result.Value == -12)
+			//	{
+			//		errorMessage = "No sales data found.";
+			//	}
+			//	if ((int)result.Value == -13)
+			//	{
+			//		errorMessage = "No product data found.";
+			//	}
+			//}
+
+
+
+			return errorMessage;
+		}
+		public JsonResult TransformBreakageData()
+		{
+
+			var result = _retailerRepository.TransformBlackHawkSalesData();
+			return Json(result);
+		}
+		#endregion
 
 	}
 }

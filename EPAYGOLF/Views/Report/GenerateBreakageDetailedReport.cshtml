@@ -1,0 +1,221 @@
+﻿@model List<Entity.BreakageRedeemEntity>
+@{
+	Layout = null;
+	var floatcolor = "";
+}
+<style>
+	.tblfontstyle {
+		font-weight: bold;
+		font-size: 14px;
+	}
+
+	.tblfontstyle_Summ {
+		font-size: 14px;
+	}
+
+	table.dataTable {
+		width: auto;
+	}
+
+
+	table td {
+		padding: .25rem !important;
+	}
+
+	table.dataTable td:nth-child(1) {
+		padding-bottom: 6px !important;
+		width: auto !important;
+	}
+
+	table.dataTable > thead > tr > th:not(.sorting_disabled), table.dataTable > thead > tr > td:not(.sorting_disabled) {
+		padding-right: 21px;
+		padding-left: 13px;
+	}
+
+	.thclass {
+		font-size: 10px;
+	}
+
+	.tdclass {
+		font-size: 10px;
+	}
+
+</style>
+
+<table id="tblredemptionreportlist_datatable" class="table table-striped table-bordered table-hover" style="width:100%">
+	<thead>
+	<th class="thclass">GiftCardId</th>
+	<th class="thclass">Category</th>
+	<th class="thclass">Initial Face Value</th>
+	<th class="thclass">Redemption Amount</th>
+	<th class="thclass">Current Value</th>
+	<th class="thclass">Activation Date</th>
+	<th class="thclass">Expiry Date</th>
+	<th class="thclass">Gift Card Status</th>
+	<th class="thclass">Redemption Status</th
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Count > 0)
+		{
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.gift_card_id</td>
+					<td>@item.category</td>
+					@{
+
+						if (item.initial_face_value < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.initial_face_value.ToString("0.00")</td>
+					@{
+
+						if (item.redemption_amount < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.redemption_amount.ToString("0.00")</td>
+					@{
+
+						if (item.current_value < 0)
+						{
+							floatcolor = "red";
+						}
+						else
+						{
+							floatcolor = "";
+						}
+					}
+					<td style="color:@floatcolor">£@item.current_value.ToString("0.00")</td>
+					@if (item.TransactionDate != null)
+					{
+						<td>@item.TransactionDate.Value.ToString("dd/MM/yyyy")</td>
+					}
+					else
+					{
+						<td></td>
+					}
+					@if (item.ExpiryDate != null)
+					{
+						<td>@item.ExpiryDate.Value.ToString("dd/MM/yyyy")</td>
+					}
+					else
+					{
+						<td></td>
+					}
+					
+				
+					
+					<td>@item.gift_card_status</td>
+					<td>@item.redemption_status</td>
+					
+
+				</tr>
+			}
+
+			<tr class="no-sort no-count">
+				<td class="tdclass" style="font-weight:bold">Totals</td>
+				<td></td>
+			
+			
+				@{
+
+					if (ViewBag.initial_face_value < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.initial_face_value.ToString("N2")</td>
+				@{
+
+					if (ViewBag.redemption_amount < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td class="tdclass" style="font-weight:bold;color:@floatcolor">
+					£@ViewBag.redemption_amount.ToString("N2")
+				</td>
+				@{
+
+					if (ViewBag.current_value < 0)
+					{
+						floatcolor = "red";
+					}
+					else
+					{
+						floatcolor = "";
+					}
+				}
+				<td  class="tdclass" style="font-weight:bold;color:@floatcolor">£@ViewBag.current_value.ToString("N2")</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		}
+		else
+		{
+			<tr>
+				<td colspan="20" class="alert alert-danger" style="text-align:center">No record found</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+<script type="text/javascript">
+	$('#tblredemptionreportlist_datatable').DataTable({
+		"drawCallback": function (settings) {
+			var api = this.api();
+			var rows = api.rows({ page: 'current' }).nodes();
+			var lastRow = $(rows).filter('.no-count');
+			lastRow.appendTo(api.table().body()); // Re-append to keep it in view
+
+			// Update the info display to exclude the last row from the count
+			var info = api.page.info();
+			var totalRecords = info.recordsTotal - 1; // Subtract 1 for the last row
+			var start = info.start;
+			var end = info.end - 1; // Subtract 1 for the last row
+
+			// Display the information
+			$('#tblredemptionreportlist_datatable_info').html(`Showing ${start + 1} to ${end} of ${totalRecords} entries`);
+		},
+		"order": [],
+		"paging": false,
+		"lengthChange": false,
+		"searching": false,
+		"ordering": true,
+		"info": true,
+		"autoWidth": true,
+		"responsive": false
+
+	});
+	var table = $('#tblredemptionreportlist_datatable').DataTable();
+
+	table.on('order.dt search.dt', function () {
+		var lastRow = $('#tblredemptionreportlist_datatable tbody tr.no-sort');
+		lastRow.remove();
+		$('#tblredemptionreportlist_datatable tbody').append(lastRow);
+	}).draw();
+
+	
+</script>
