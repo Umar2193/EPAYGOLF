@@ -475,8 +475,8 @@ namespace DAL
 			//}
 
 			//Date
-			_Query = _Query + $" and cast(r.[TransactionDate] as date) >= Cast('" + startDate + "' as date) ";
-			_Query = _Query + $" and cast(r.[TransactionDate] as date) <= Cast('" + endDate + "' as date) ";
+			_Query = _Query + $" and cast(r.[ExpiryDate] as date) >= Cast('" + startDate + "' as date) ";
+			_Query = _Query + $" and cast(r.[ExpiryDate] as date) <= Cast('" + endDate + "' as date) ";
 
 
 			_Query = _Query + $"  order by r.CreatedAt desc ";

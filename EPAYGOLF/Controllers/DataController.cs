@@ -1157,7 +1157,10 @@ namespace EPAYGOLF.Controllers
 
 						}
 					}
-
+					if(salesEntity.TransactionDate != null)
+					{
+						salesEntity.ExpiryDate = Convert.ToDateTime(salesEntity.TransactionDate).AddYears(1) ;
+					}
 					if(!string.IsNullOrEmpty(item.initial_face_value))
 					salesEntity.initial_face_value = Convert.ToDecimal(item.initial_face_value);
 					if (!string.IsNullOrEmpty(item.redemption_amount))
