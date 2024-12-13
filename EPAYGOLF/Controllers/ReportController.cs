@@ -1519,6 +1519,48 @@ namespace EPAYGOLF.Controllers
 			}
 			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false, errormessage = errormessage });
 		}
+		[HttpPost]
+		public async Task<ActionResult> ExportBreakageDetailedReport(ReportSearchParam _request)
+		{
+			//return Json(new { issalesReportGenerated = false, isredempReportGenerated = false });
+			var result = 0;
+			string renderedSalesReportView = "";
+			string errormessage = "";
+			try
+			{
+
+				var redempreportresult = _redemptionsRepository.GetBreakageListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value, _request.userId).ToList();
+				if (redempreportresult == null)
+				{
+					redempreportresult = new List<BreakageRedeemEntity>();
+				}
+				if (redempreportresult != null && redempreportresult.Count > 0)
+				{
+
+					ViewBag.current_value = redempreportresult.Sum(x => x.current_value);
+					ViewBag.initial_face_value = redempreportresult.Sum(x => x.initial_face_value);
+					ViewBag.redemption_amount = redempreportresult.Sum(x => x.redemption_amount);
+					ViewBag.TotalCount = redempreportresult.Count;
+				}
+
+				//ViewBag.StoreName = _request.salesstorename;
+				//ViewBag.ProductName = _request.productName;
+				//ViewBag.StartDate = _request.startDate.Value.ToString("dd-MMM-yyyy");
+				//ViewBag.EndDate = _request.endDate.Value.ToString("dd-MMM-yyyy");
+
+
+
+
+				return View(redempreportresult);
+			}
+
+			catch (Exception ex)
+			{
+				Helpers.ApplicationExceptions.SaveAppError(ex);
+				errormessage = ex.InnerException + Environment.NewLine + ex.StackTrace;
+			}
+			return Json(new { issalesReportGenerated = false, isredempReportGenerated = false, errormessage = errormessage });
+		}
 		#endregion
 
 
