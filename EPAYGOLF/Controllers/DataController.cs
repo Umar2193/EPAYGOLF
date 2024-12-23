@@ -369,11 +369,11 @@ namespace EPAYGOLF.Controllers
 						{
 							return Json(-4); //Transaction type redeem not found
 						}
-						var findtrantypenotload = list.Where(x => x.TransactionType.ToLower() != "redeem").ToList();
-						if (findtrantypenotload != null && findtrantypenotload.Count > 0)
-						{
-							return Json(-7); //All record should have transaction type redeem.
-						}
+						//var findtrantypenotload = list.Where(x => x.TransactionType.ToLower() != "redeem").ToList();
+						//if (findtrantypenotload != null && findtrantypenotload.Count > 0)
+						//{
+						//	return Json(-7); //All record should have transaction type redeem.
+						//}
 						var findStoreNoEmptyNUll = list.Where(x => x.StoreNo < 1).ToList();
 						if (findStoreNoEmptyNUll != null && findStoreNoEmptyNUll.Count > 0)
 						{
@@ -402,7 +402,7 @@ namespace EPAYGOLF.Controllers
 		private string ProcessRedemptionImportData(List<RedeptionImportDataEntity> list)
 		{
 			var errorMessage = string.Empty;
-			foreach (var item in list)
+			foreach (var item in list.Where(x => x.TransactionType.ToLower() == "redeem"))
 			{
 				//#region CheckEAN
 				//var _checkEAN = _productRepository.GetProductByEAN(item.EAN);
