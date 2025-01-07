@@ -241,7 +241,8 @@ namespace EPAYGOLF.Controllers
 					salesEntity.EAN = Convert.ToInt64(item.EAN);
 					salesEntity.Date = _trandate;//DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
-					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
+					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRate > 0).OrderByDescending(x => x.VATRateDate).FirstOrDefault();
+						//.Where(x => x.VATRateDate.Value.Year == salesEntity.Date.Value.Year).FirstOrDefault();
 					if (_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";
@@ -488,7 +489,8 @@ namespace EPAYGOLF.Controllers
 
 					//redeemEntity.Postcode = _storeredeemRepository.GetStoreRedeemByStoreNo(Convert.ToInt64(item.StoreNo).ToString()).FirstOrDefault().PostCode;
 
-					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
+					var _vatrate = _vATRatesRepository.GetVATRatesList().Where(x => x.VATRate > 0).OrderByDescending(x => x.VATRateDate).FirstOrDefault();
+						//.Where(x => x.VATRateDate.Value.Year == redeemEntity.Date.Value.Year).FirstOrDefault();
 					if (_vatrate == null)
 					{
 						errorMessage = "VAT rate not found in system";
