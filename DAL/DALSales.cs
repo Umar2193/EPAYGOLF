@@ -192,7 +192,7 @@ namespace DAL
 			return result;
 
 		}
-		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, string SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 
 			string _Query = $"SELECT [SalesID],[ID],[AccountName],[TransactionID],[TransactionType] " +
@@ -231,9 +231,9 @@ namespace DAL
 			}
 
 			// Sales Store
-			if (SalesStoreNo > 0)
+			if (!string.IsNullOrEmpty(SalesStoreNo) && SalesStoreNo != "0")
 			{
-				_Query = _Query + $" and [StoreNo] = " + SalesStoreNo;
+				_Query = _Query + $" and [StoreNo] = '" + SalesStoreNo + "' ";
 			}
 
 			if (!string.IsNullOrEmpty(retailercode) && retailercode !="0")
@@ -248,7 +248,7 @@ namespace DAL
 			var Data = dapper.Query<SalesEntity>(Query, null, null, true, null, CommandType.Text);
 			return Data.ToList();
 		}
-		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
+		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, string SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			string _ProductClause = string.Empty;
 			string _SalesStoreNoClause = string.Empty;
@@ -274,9 +274,9 @@ namespace DAL
 			}
 
 			// Sales Store
-			if (SalesStoreNo > 0)
+			if (!string.IsNullOrEmpty(SalesStoreNo) && SalesStoreNo != "0" )
 			{
-				_SalesStoreNoClause = $" and [StoreNo] = " + SalesStoreNo;
+				_SalesStoreNoClause = $" and [StoreNo] = '" + SalesStoreNo + "' ";
 			}
 
 			

@@ -23,8 +23,7 @@
 									{
 										_readonlyRetailer = "readonly";
 									}
-										<input value="@Model.RetailerID" @_readonlyRetailer required name="RetailerID" type="number" class="form-control" id="RetailerID" placeholder="RetailerID"
-										   	oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+										<input value="@Model.RetailerID" @_readonlyRetailer required name="RetailerID" type="text" class="form-control" id="RetailerID" placeholder="RetailerID"
 										   	maxlength="19">
 								}
 								

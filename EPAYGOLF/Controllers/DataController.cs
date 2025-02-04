@@ -180,9 +180,10 @@ namespace EPAYGOLF.Controllers
 				else
 				{
 					SalesStoreEntity salesStoreEntity = new SalesStoreEntity();
-					salesStoreEntity.RetailerID = Convert.ToInt64(item.StoreNo);
+					salesStoreEntity.RetailerID =item.StoreNo;
 					salesStoreEntity.RetailerName = item.StoreName;
-					salesStoreEntity.GGCRedemption = 13 / 100;
+					salesStoreEntity.StoreName = item.StoreName;
+					salesStoreEntity.GGCRedemption = Convert.ToDecimal(0.13);
 					_salesStoreRepository.SaveSalesStoreInformation(salesStoreEntity);
 				}
 				#endregion
@@ -235,7 +236,7 @@ namespace EPAYGOLF.Controllers
 
 					salesEntity.Value = Convert.ToDecimal(item.Value);
 					salesEntity.BINNumber = item.BINNumber;
-					salesEntity.StoreNo = Convert.ToInt64(item.StoreNo);
+					salesEntity.StoreNo = item.StoreNo;
 					salesEntity.StoreName = item.StoreName;
 					salesEntity.Product = item.Product;
 					salesEntity.EAN = Convert.ToInt64(item.EAN);
@@ -336,6 +337,17 @@ namespace EPAYGOLF.Controllers
 			{
 				list = csv.GetRecords<SalesImportDataEntity>().ToList();
 			}
+			if(list !=null && list.Count > 0)
+			{
+				// Trim leading zeros for the StoreNo field manually
+				foreach (var item in list)
+				{
+					if (item != null && !string.IsNullOrEmpty(item.StoreNo))
+					{
+						item.StoreNo = item.StoreNo.TrimStart('0');
+					}
+				}
+			}
 
 			return list;
 		}
@@ -375,7 +387,7 @@ namespace EPAYGOLF.Controllers
 						//{
 						//	return Json(-7); //All record should have transaction type redeem.
 						//}
-						var findStoreNoEmptyNUll = list.Where(x => x.StoreNo < 1).ToList();
+						var findStoreNoEmptyNUll = list.Where(x => !string.IsNullOrEmpty(x.StoreNo) && x.StoreNo !="0").ToList();
 						if (findStoreNoEmptyNUll != null && findStoreNoEmptyNUll.Count > 0)
 						{
 							return Json(-6); // StoreNo is empty
@@ -428,7 +440,7 @@ namespace EPAYGOLF.Controllers
 				else
 				{
 					StoresRedeemEntity storesRedeemEntity = new StoresRedeemEntity();
-					storesRedeemEntity.StoreNo = Convert.ToInt64(item.StoreNo);
+					storesRedeemEntity.StoreNo = item.StoreNo;
 					storesRedeemEntity.StoreName = item.StoreName;
 					_storeredeemRepository.SaveStoresRedeemInformation(storesRedeemEntity);
 				}
@@ -481,7 +493,7 @@ namespace EPAYGOLF.Controllers
 					//redeemEntity.TransactionDateTime = //DateTime.ParseExact(item.TransactionDateTime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 					redeemEntity.Value = Convert.ToDecimal(item.Value);
 					redeemEntity.BINNumber = item.BINNumber;
-					redeemEntity.StoreNo = Convert.ToInt64(item.StoreNo);
+					redeemEntity.StoreNo = item.StoreNo;
 					redeemEntity.StoreName = item.StoreName;
 					redeemEntity.Product = item.Product;
 					redeemEntity.EAN = 5060380635181;//Convert.ToInt64(item.EAN);
@@ -585,6 +597,17 @@ namespace EPAYGOLF.Controllers
 			}))
 			{
 				list = csv.GetRecords<RedeptionImportDataEntity>().ToList();
+			}
+			if (list != null && list.Count > 0)
+			{
+				// Trim leading zeros for the StoreNo field manually
+				foreach (var item in list)
+				{
+					if (item != null && !string.IsNullOrEmpty(item.StoreNo))
+					{
+						item.StoreNo = item.StoreNo.TrimStart('0');
+					}
+				}
 			}
 
 			return list;
@@ -805,6 +828,7 @@ namespace EPAYGOLF.Controllers
 
 					
 				}
+
 			}
 
 

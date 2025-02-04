@@ -24,8 +24,7 @@
 									{
 										_readonlyStoreNo = "readonly";
 									}
-									<input value="@Model.StoreNo" @_readonlyStoreNo required name="StoreNo" type="number" class="form-control" id="StoreNo" placeholder="StoreNo"
-										   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+									<input value="@Model.StoreNo" @_readonlyStoreNo required name="StoreNo" type="text" class="form-control" id="StoreNo" placeholder="StoreNo"
 										   maxlength="19">
 								}
 							</div>

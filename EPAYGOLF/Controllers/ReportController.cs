@@ -428,7 +428,7 @@ namespace EPAYGOLF.Controllers
 			{
 				if (_request.isWeeklyReport)
 				{
-					if(_request.redemstoreno > 0)
+					if(!string.IsNullOrEmpty(_request.redemstoreno) && _request.redemstoreno != "0")
 					{
 						_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
 					}
@@ -1004,7 +1004,7 @@ namespace EPAYGOLF.Controllers
 			string longinvoicenumber = "0";
 			try
 			{
-				if (_request.redemstoreno > 0)
+				if (!string.IsNullOrEmpty(_request.redemstoreno) && _request.redemstoreno != "0")
 				{
 					_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
 				}
@@ -1022,7 +1022,7 @@ namespace EPAYGOLF.Controllers
 				{
 					invoiceNumber = invoiceNumber + 1;
 				}
-				longinvoicenumber = ConvertTo7Digits(invoiceNumber);
+				longinvoicenumber = ConvertTo7Digits(invoiceNumber.ToString());
 				invoiceEntity.InvoiceNumber = invoiceNumber;
 				invoiceEntity.StatementNumber = "GCP" + longinvoicenumber.ToString();
 				invoiceEntity.StatementCreated = DateTime.Now;
@@ -1072,13 +1072,20 @@ namespace EPAYGOLF.Controllers
 			}
 			return View(redemptionsRemittance);
 		}
-		public static string ConvertTo7Digits(Int64 number)
+		public static string ConvertTo7Digits(string number)
 		{
 			string numberStr = number.ToString();
 			if (numberStr.Length < 7)
 			{
 				// Pad with leading zeros
-				return numberStr.PadLeft(7, '0');
+				if (!long.TryParse(number, out _)) // Check if the input is a valid number
+				{
+					return numberStr;
+				}
+				else
+				{
+					return numberStr.PadLeft(7, '0');
+				}
 			}
 			else if (numberStr.Length > 7)
 			{
@@ -1118,10 +1125,10 @@ namespace EPAYGOLF.Controllers
 		{
 			var redempreportresult = _redemptionsRepository.GetRedemptionsListReport(_request.productid, _request.redemstoreno, _request.startDate.Value, _request.endDate.Value).ToList();
 			var result = new List<StoresRedeemEntity>();
-			List<Int64> filterIds = new List<Int64>();
+			List<string> filterIds = new List<string>();
 			if (redempreportresult !=null && redempreportresult.Count > 0)
 			{
-				foreach(var item in redempreportresult.DistinctBy(x=>x.StoreNo).DistinctBy(x=>x.UserID).OrderBy(x=>x.StoreNo))
+				foreach(var item in redempreportresult.Where(x=>!string.IsNullOrEmpty(x.StoreNo) && x.StoreNo !="0").DistinctBy(x=>x.StoreNo).DistinctBy(x=>x.UserID).OrderBy(x=>x.StoreNo))
 				{
 					
 					filterIds.Add(item.StoreNo);
@@ -1161,7 +1168,7 @@ namespace EPAYGOLF.Controllers
 				string renderhtml = "";
 				try
 				{
-					if (_request.redemstoreno > 0)
+					if (!string.IsNullOrEmpty(_request.redemstoreno) && _request.redemstoreno != "0")
 					{
 						_request.userId = _storesredeemRepository.GetStoreRedeemByStoreNo(_request.redemstoreno.ToString()).FirstOrDefault().UserID;
 					}
@@ -1195,7 +1202,7 @@ namespace EPAYGOLF.Controllers
 					{
 						invoiceNumber = invoiceNumber + 1;
 					}
-					longinvoicenumber = ConvertTo7Digits(invoiceNumber);
+					longinvoicenumber = ConvertTo7Digits(invoiceNumber.ToString());
 					invoiceEntity.InvoiceNumber = invoiceNumber;
 					invoiceEntity.StoreNo = _request.redemstoreno;
 					invoiceEntity.StatementNumber = "GCP" + longinvoicenumber.ToString();

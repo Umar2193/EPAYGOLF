@@ -9,7 +9,7 @@ namespace Entity
 	public class StoresRedeemEntity
 	{
 		public Int64 StoresRedeemID { get; set; }
-		public Int64 StoreNo { get; set; }
+		public string StoreNo { get; set; }
 		public string StoreName { get; set; }
 		public string Email { get; set; }
 		public string Address1 { get; set; }

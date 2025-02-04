@@ -9,7 +9,7 @@ namespace Entity
 	public class SalesStoreEntity
 	{
 		public Int64 CommisionID { get; set; }
-		public Int64 RetailerID { get; set; }
+		public string RetailerID { get; set; }
 		public string RetailerName { get; set; }
 		public string StoreName { get; set; }
 		public decimal Commission { get; set; }

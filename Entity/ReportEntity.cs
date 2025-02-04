@@ -15,9 +15,9 @@ namespace Entity
         public DateTime? startDate { get; set; }
 		public DateTime? endDate { get; set; }
         public string reportPeriod  { get; set; }
-        public Int64 salesstoreno { get; set; }
+        public string salesstoreno { get; set; }
 		public string salesstorename { get; set; }
-		public Int64 redemstoreno { get; set; }
+		public string redemstoreno { get; set; }
 		public string redemstorename { get; set; }
 		public Int64 productid { get; set; }
         public string  productName { get; set; }

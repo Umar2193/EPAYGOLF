@@ -19,7 +19,7 @@ namespace Entity
 		public DateTime? TransactionDateTime { get; set; }
 		public decimal Value { get; set; }
 		public string BINNumber { get; set; }
-		public Int64 StoreNo { get; set; }
+		public string StoreNo { get; set; }
 		public string StoreName { get; set; }
 		public string Product { get; set; }
 		public Int64 EAN { get; set; }
@@ -58,7 +58,7 @@ namespace Entity
 		public string TransactionDateTime { get; set; }
 		public string Value { get; set; }
 		public string BINNumber { get; set; }
-		public Int64 StoreNo { get; set; }
+		public string StoreNo { get; set; }
 		public string StoreName { get; set; }
 		public string Product { get; set; }
 		public Int64 EAN { get; set; }

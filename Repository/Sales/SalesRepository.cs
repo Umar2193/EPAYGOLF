@@ -91,7 +91,7 @@ namespace Repository.Sales
 				return -1;
 			}
 		}
-		public List<SalesEntity> GetSalesListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
+		public List<SalesEntity> GetSalesListReport(Int64 ProductID, string SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			try
 			{
@@ -104,7 +104,7 @@ namespace Repository.Sales
 				return null;
 			}
 		}
-		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, Int64 SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
+		public List<MonthlySalesEntity> GetSalesMonthlyListReport(Int64 ProductID, string SalesStoreNo, DateTime startDate, DateTime endDate, string retailercode = "")
 		{
 			try
 			{

@@ -172,7 +172,7 @@ namespace DAL
 			return result;
 
 		}
-		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, string redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
 		{
 
 			string _Query = $"SELECT r.[RedemptionsID] ,r.[ID],r.[AccountName],r.[TransactionID] " +
@@ -216,9 +216,9 @@ namespace DAL
 			}
 
 			// Sales Store
-			if (redemStoreNo > 0 && UserID == 0)
+			if (!string.IsNullOrEmpty(redemStoreNo) && redemStoreNo!= "0" && UserID == 0)
 			{
-				_Query = _Query + $" and r.[StoreNo] = " + redemStoreNo;
+				_Query = _Query + $" and r.[StoreNo]= '" + redemStoreNo + "' ";
 			}
 			if (UserID > 0)
 			{
@@ -437,7 +437,7 @@ namespace DAL
 		//	return result;
 
 		//}
-		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
+		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, string redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
 		{
 
 			string _Query = $"SELECT [BreakageID] ,[Activation_TXID] ,[gift_card_number] ,[MerchantTransactionID] " +

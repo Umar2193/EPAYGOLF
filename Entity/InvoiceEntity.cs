@@ -10,7 +10,7 @@ namespace Entity
 	{
         public Int64 ID { get; set; }
         public Int64 InvoiceNumber { get; set; }
-        public Int64 StoreNo { get; set; }
+        public string StoreNo { get; set; }
         public DateTime StatementCreated { get; set; }
         public string StatementNumber { get; set; }
         public decimal GrossAmount { get; set; }

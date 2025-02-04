@@ -88,7 +88,7 @@ namespace Repository.Redemptions
 				return -1;
 			}
 		}
-		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID= 0)
+		public List<RedemptionsEntity> GetRedemptionsListReport(Int64 ProductID, string redemStoreNo, DateTime startDate, DateTime endDate,Int64 UserID= 0)
 		{
 			try
 			{
@@ -179,7 +179,7 @@ namespace Repository.Redemptions
 				return null;
 			}
 		}
-		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, Int64 redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
+		public List<BreakageRedeemEntity> GetBreakageListReport(Int64 ProductID, string redemStoreNo, DateTime startDate, DateTime endDate, Int64 UserID = 0)
 		{
 			try
 			{
