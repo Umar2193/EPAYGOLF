@@ -387,7 +387,7 @@ namespace EPAYGOLF.Controllers
 						//{
 						//	return Json(-7); //All record should have transaction type redeem.
 						//}
-						var findStoreNoEmptyNUll = list.Where(x => !string.IsNullOrEmpty(x.StoreNo) && x.StoreNo !="0").ToList();
+						var findStoreNoEmptyNUll = list.Where(x => string.IsNullOrEmpty(x.StoreNo) || x.StoreNo =="0").ToList();
 						if (findStoreNoEmptyNUll != null && findStoreNoEmptyNUll.Count > 0)
 						{
 							return Json(-6); // StoreNo is empty
