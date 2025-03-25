@@ -176,33 +176,40 @@
 			success: function (response) {
 
 
-
-				if (response == -1) {
-					toastr.error("File data is not in valid format");
-				}
-				else if (response == -3) {
-					toastr.error("File contain not data");
-				}
-				else if (response == -4) {
-					toastr.error("Transaction type 'LOAD' not found in selected file");
-				}
-				else if (response == -5) {
-					toastr.error("Please select file");
-				}
-				else if (response == -6) {
-					toastr.error("StoreNo is empty in selected file");
-				}
-				else if (response == -7) {
-					toastr.error("All record should have transaction type value 'REDEEM' in selected file.");
+				if (response.code == -8) {
+					toastr.error(response.message);
 				}
 				else {
-					if (response > 0) {
-						toastr.success("Data import successfully.");
+					if (response == -1) {
+						toastr.error("File data is not in valid format");
+					}
+					else if (response == -3) {
+						toastr.error("File contain not data");
+					}
+					else if (response == -4) {
+						toastr.error("Transaction type 'LOAD' not found in selected file");
+					}
+					else if (response == -5) {
+						toastr.error("Please select file");
+					}
+					else if (response == -6) {
+						toastr.error("StoreNo is empty in selected file");
+					}
+					else if (response == -7) {
+						toastr.error("All record should have transaction type value 'REDEEM' in selected file.");
+					}
+					else if (response == -8) {
+						toastr.error("Against storeno which are in file user ID is missing in Redemptions Stores menu.Please update userid then please retry to import file.");
 					}
 					else {
-						toastr.error(response);
-					}
+						if (response > 0) {
+							toastr.success("Data import successfully.");
+						}
+						else {
+							toastr.error(response);
+						}
 
+					}
 				}
 
 			},

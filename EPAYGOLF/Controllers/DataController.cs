@@ -21,6 +21,7 @@ using SixLabors.ImageSharp.ColorSpaces;
 using Repository.Retailer;
 using OfficeOpenXml;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace EPAYGOLF.Controllers
 {
@@ -392,6 +393,20 @@ namespace EPAYGOLF.Controllers
 						{
 							return Json(-6); // StoreNo is empty
 						}
+						var _storeRedemlist = _storeredeemRepository.GetStoresRedeemList();
+						if (_storeRedemlist != null && _storeRedemlist.Count > 0)
+						{
+							// Extract valid StoreNo values from the valid store list
+							var validStoreNos = new HashSet<string>(list.Select(s => s.StoreNo));
+							var findMissingUserID = _storeRedemlist.Where( x=> x.IsActive ==true && x.IsDeleted==false
+							&& x.UserID == 0 && validStoreNos.Contains(x.StoreNo)).ToList();
+							if (findMissingUserID != null && findMissingUserID.Count > 0)
+							{
+								var storename = string.Join(", ", findMissingUserID.Select(x => x.StoreName));
+
+								return Json(new { Code = -8, Message = "Please retry to import after updating required info in Redemptions Stores menu. UserID is missing for Redemptions Stores " + storename }); // UserID is empty
+							}
+						}
 					}
 
 					var errormessage = ProcessRedemptionImportData(list);
@@ -443,6 +458,9 @@ namespace EPAYGOLF.Controllers
 					storesRedeemEntity.StoreNo = item.StoreNo;
 					storesRedeemEntity.StoreName = item.StoreName;
 					_storeredeemRepository.SaveStoresRedeemInformation(storesRedeemEntity);
+					errorMessage = $"Store No " + storesRedeemEntity.StoreNo + " and Store Name " + storesRedeemEntity.StoreName +
+						" is added successfully. Please update userid and other required information then retry to import file";
+					return errorMessage;
 				}
 				#endregion
 				#region SaveRedeemData 
