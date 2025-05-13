@@ -149,25 +149,25 @@ namespace DAL
 			Query += "\r\n UPDATE Sales\r\nSET Sales.StoreAmount = (Sales.Value * -1)  * Sales.StoreCommission \r\nWHERE (isnull(Sales.StoreAmount,0) = 0) ";
 
 			//Update GGC Commission Value
-			Query += "\r\n UPDATE Sales\r\nSET Sales.GGCCommission = Commissions.GGCRedemption\r\nfrom Sales\r\nINNER JOIN Commissions ON Sales.StoreNo = Commissions.RetailerID \r\nWHERE (isnull(Sales.GGCCommission,0) =0) ";
+			Query += "\r\n UPDATE Sales\r\nSET Sales.GGCCommission = Commissions.GGCRedemption\r\nfrom Sales\r\nINNER JOIN Commissions ON Sales.StoreNo = Commissions.RetailerID \r\nWHERE (isnull(Sales.GGCCommission,0) =0) and Commissions.IsActive=1 and Commissions.IsDeleted=0 ";
 
 			//Update GGC Commission Amount
 			Query += "\r\n UPDATE Sales \r\nSET Sales.GGCAmount = Sales.Value * Sales.GGCCommission \r\nWHERE (isnull(Sales.GGCAmount,0) =0) ";
 
 			//Update Processing Fee
-			Query += "\r\n UPDATE Sales \r\nSET Sales.ProcessCommission = Commissions.ProcessingFee\r\nfrom Sales\r\nINNER JOIN Commissions ON\r\nSales.StoreNo = Commissions.RetailerID \r\nWHERE (isnull(Sales.ProcessCommission,0) = 0)";
+			Query += "\r\n UPDATE Sales \r\nSET Sales.ProcessCommission = Commissions.ProcessingFee\r\nfrom Sales\r\nINNER JOIN Commissions ON\r\nSales.StoreNo = Commissions.RetailerID \r\nWHERE (isnull(Sales.ProcessCommission,0) = 0) and Commissions.IsActive=1 and Commissions.IsDeleted=0";
 
 			//Update Processing Amount
 			Query += "\r\n UPDATE Sales\r\nSET Sales.ProcessAmount = (Sales.Value * -1) * Sales.ProcessCommission \r\nWHERE (isnull(Sales.ProcessAmount,0) = 0) ";
 
 			//Update Stripe Commission
-			Query += "\r\n UPDATE Sales\r\nSET Sales.StripeCommission = Commissions.StripeFee \r\nfrom Sales\r\nINNER JOIN Commissions ON \r\nSales.StoreNo = Commissions.RetailerID \r\nWHERE (ISNULL(Sales.StripeCommission,0) = 0) ";
+			Query += "\r\n UPDATE Sales\r\nSET Sales.StripeCommission = Commissions.StripeFee \r\nfrom Sales\r\nINNER JOIN Commissions ON \r\nSales.StoreNo = Commissions.RetailerID \r\nWHERE (ISNULL(Sales.StripeCommission,0) = 0) and Commissions.IsActive=1 and Commissions.IsDeleted=0 ";
 
 			//Update Stripe Amount
 			Query += "\r\n UPDATE Sales \r\nSET Sales.StripeAmount = (Sales.Value * -1) * Sales.StripeCommission\r\nWHERE (isnull(Sales.StripeAmount,0) = 0) ";
 
 			//Update Transaction Fee Amount
-			Query += "\r\n UPDATE Sales\r\nSET Sales.TransactionAmount = (Commissions.TransactionFee * -1)\r\nfrom Sales\r\nINNER JOIN Commissions ON \r\nSales.StoreNo = Commissions.RetailerID\r\nWHERE (isnull(Sales.TransactionAmount,0) =0) ";
+			Query += "\r\n UPDATE Sales\r\nSET Sales.TransactionAmount = (Commissions.TransactionFee * -1)\r\nfrom Sales\r\nINNER JOIN Commissions ON \r\nSales.StoreNo = Commissions.RetailerID\r\nWHERE (isnull(Sales.TransactionAmount,0) =0) and Commissions.IsActive=1 and Commissions.IsDeleted=0";
 
 			//Update Net Amount
 			Query += "\r\n UPDATE Sales \r\nSET Sales.NetAmount = ROUND(Sales.GGCAmount + Sales.ProcessAmount + \r\nSales.StripeAmount + Sales.TransactionAmount + Sales.StoreAmount, 2) \r\nWHERE (isnull(Sales.NetAmount,0) = 0) ";
