@@ -196,7 +196,7 @@ namespace EPAYGOLF.Controllers
 				{
 					Helpers.ApplicationExceptions.SaveActivityLog("GetSalesDataByID == null" + item.ID);
 					SalesEntity salesEntity = new SalesEntity();
-					salesEntity.ID = Convert.ToInt32(item.ID);
+					salesEntity.ID = Convert.ToInt64(item.ID);
 					salesEntity.AccountName = item.AccountName;
 					salesEntity.TransactionID = item.TransactionID;
 					salesEntity.TransactionType = item.TransactionType;
@@ -314,10 +314,10 @@ namespace EPAYGOLF.Controllers
 				return Json(-12);
 			}
 			var checkifproductvaluenull = _productRepository.GetProductList().Where(x => x.Commission < 1 && x.ProductEAN != 2 && x.ProductEAN != 3 && x.ProductEAN != 4).ToList();
-			if (checkifproductvaluenull != null && checkifproductvaluenull.Count > 0)
-			{
-				return Json(-11);
-			}
+			//if (checkifproductvaluenull != null && checkifproductvaluenull.Count > 0)
+			//{
+			//	return Json(-11);
+			//}
 			checkifproductvaluenull = _productRepository.GetProductList();
 			if (checkifproductvaluenull == null || (checkifproductvaluenull != null && checkifproductvaluenull.Count == 0))
 			{
@@ -471,7 +471,7 @@ namespace EPAYGOLF.Controllers
 				{
 					Helpers.ApplicationExceptions.SaveActivityLog("GetredeemDataByID == null" + item.ID);
 					RedemptionsEntity redeemEntity = new RedemptionsEntity();
-					redeemEntity.ID = Convert.ToInt32(item.ID);
+					redeemEntity.ID = Convert.ToInt64(item.ID);
 					redeemEntity.AccountName = item.AccountName;
 					redeemEntity.TransactionID = item.TransactionID;
 					redeemEntity.TransactionType = item.TransactionType;

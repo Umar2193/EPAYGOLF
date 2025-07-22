@@ -137,8 +137,9 @@ namespace DAL
 		public int TransformSalesData()
 		{
 			string Query = "";
+			Query = "Update p set p.Commission= 0.1300 from [Products] p where p.Commission* 100 < 1 and ProductEAN not in (2,3,4) ";
 			// Update Expiry Date Value
-			Query = "UPDATE Sales \r\nSET Sales.ExpiryDate =  DateAdd(YEAR, 1, Sales.Date) \r\nWHERE isnull(Sales.ExpiryDate,'')  = '' ";
+			Query += "UPDATE Sales \r\nSET Sales.ExpiryDate =  DateAdd(YEAR, 1, Sales.Date) \r\nWHERE isnull(Sales.ExpiryDate,'')  = '' ";
 
 			//Update Store Commission Value
 
