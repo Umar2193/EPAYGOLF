@@ -1190,7 +1190,7 @@ namespace EPAYGOLF.Controllers
 							if (string.IsNullOrEmpty(item.Postcode))
 							{
 								return Json(new { ispostcodemissing = true, StoreName = item.StoreName });
-							}
+							}							
 						}
 					}
 
@@ -1213,7 +1213,11 @@ namespace EPAYGOLF.Controllers
 					invoiceEntity.AmountPayable = redempreportresult != null ? redempreportresult.Sum(x => x.AmountPayableToStore) * -1 : 0;
 					invoiceEntity.DatePeriod = _request.startDate.Value.ToString("dd-MMM-yyyy") + " To " + _request.endDate.Value.ToString("dd-MMM-yyyy");
 					invoiceEntity.UserId = _request.userId;
+					if (invoiceEntity.AmountPayable <= 0)
+					{
+						return Json(new { isAmountPayable = true, StoreName = _request.redemstorename.Split("| ")[1].ToString()});
 
+					}
 					int invoicesaveresult = _redemptionsRepository.SaveInvoiceInformation(invoiceEntity);
 
 					if (invoicesaveresult > 0)

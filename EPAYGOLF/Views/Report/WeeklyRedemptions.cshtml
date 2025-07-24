@@ -289,6 +289,30 @@
 					toastr.error("Please fill address fields for store " + result.storeName);
 					return;
 				}
+				if (result.isAmountPayable == true) {
+					//toastr.error("Unable to send remittance as the amount payable is zero. " + result.storeName);
+					bootbox.confirm({
+						title: "Remittance could not be processed",
+						message: "Remittance could not be processed as the payable amount is zero. Please review and update the details accordingly.",
+						buttons: {
+							confirm: {
+								label: 'OK',
+								className: 'd-none'
+							},
+							cancel: {
+								label: 'OK',
+								className: 'btn-danger'
+							}
+						},
+						callback: function (result) {
+							if (result) {
+
+							}
+						}
+
+					});
+					return;
+				}
 				if (result.isError == true) {
 					toastr.error(result.errorMessage);
 					return;
